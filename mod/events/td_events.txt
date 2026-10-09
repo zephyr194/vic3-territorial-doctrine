@@ -1,0 +1,94 @@
+namespace = td
+
+# Delayed country event. It never schedules another round after terminal cleanup.
+td.1 = {
+    type = country_event
+    hidden = yes
+    immediate = {
+        if = {
+            limit = { has_variable = td_bill }
+            if = {
+                limit = { td_bill_target_valid_trigger = no td_can_legislate_trigger = yes }
+                td_cancel_bill_effect = yes
+                trigger_event = td.14
+            }
+            else_if = {
+                limit = { td_can_legislate_trigger = no }
+                td_cancel_bill_effect = yes
+                trigger_event = td.14
+            }
+            else = {
+                td_calculate_politics_effect = yes
+                random_list = {
+                    1 = { modifier = { multiply = var:td_chance } change_variable = { name = td_successes add = 1 } }
+                    1 = { modifier = { multiply = td_failure_weight } change_variable = { name = td_failures add = 1 } }
+                }
+                if = { limit = { var:td_successes >= td_bill_successes } td_pass_bill_effect = yes }
+                else_if = {
+                    limit = { var:td_failures >= td_bill_failures }
+                    td_cancel_bill_effect = yes
+                    trigger_event = td.13
+                }
+                else = { trigger_event = { id = td.1 days = td_bill_round_days } }
+            }
+        }
+    }
+}
+
+td.2 = {
+    type = country_event
+    hidden = yes
+    immediate = {
+        if = {
+            limit = { has_variable = td_fast }
+            if = {
+                limit = { td_admission_target_valid_trigger = no }
+                remove_modifier = td_project_cost
+                remove_variable = td_fast
+                td_refresh_admission_effect = yes
+            }
+            else = {
+                td_refresh_admission_effect = yes
+                if = {
+                    limit = { td_fast_ready_trigger = yes }
+                    change_variable = { name = td_valid_months add = 1 }
+                    set_variable = { name = td_invalid_months value = 0 }
+                }
+                else = { change_variable = { name = td_invalid_months add = 1 } }
+                if = {
+                    limit = { var:td_valid_months >= td_fast_months }
+                    # Only SPA's actually owned state changes; no ownership/pop effects.
+                    s:STATE_AL_RIF.region_state:SPA = { set_state_type = incorporated }
+                    remove_modifier = td_project_cost
+                    remove_variable = td_fast
+                    trigger_event = td.15
+                }
+                else_if = {
+                    limit = { var:td_invalid_months >= td_fallback_months }
+                    remove_modifier = td_project_cost
+                    remove_variable = td_fast
+                    td_start_regular_effect = yes
+                    trigger_event = td.16
+                }
+                else = { trigger_event = { id = td.2 months = 1 } }
+            }
+        }
+    }
+}
+
+td.10 = {
+    type = country_event
+    title = td.10.t
+    desc = td.10.d
+    flavor = td.flavor
+    immediate = { td_calculate_politics_effect = yes }
+    option = { name = td.close }
+}
+td.11 = { type = country_event title = td.11.t desc = td.11.d flavor = td.flavor option = { name = td.close } }
+td.12 = { type = country_event title = td.12.t desc = td.12.d flavor = td.flavor option = { name = td.close } }
+td.13 = { type = country_event title = td.13.t desc = td.13.d flavor = td.flavor option = { name = td.close } }
+td.14 = { type = country_event title = td.14.t desc = td.14.d flavor = td.flavor option = { name = td.close } }
+td.15 = { type = country_event title = td.15.t desc = td.15.d flavor = td.flavor option = { name = td.close } }
+td.16 = { type = country_event title = td.16.t desc = td.16.d flavor = td.flavor option = { name = td.close } }
+td.17 = { type = country_event title = td.17.t desc = td.17.d flavor = td.flavor option = { name = td.close } }
+td.18 = { type = country_event title = td.18.t desc = td.18.d flavor = td.flavor option = { name = td.close } }

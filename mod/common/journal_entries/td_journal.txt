@@ -1,0 +1,13 @@
+je_td_bill = {
+    group = td_journal_group
+    is_shown_when_inactive = { this = c:SPA }
+    possible = { this = c:SPA has_variable = td_bill }
+    can_deactivate = yes
+    invalid = { NOT = { this = c:SPA } }
+}
+je_td_integration = {
+    group = td_journal_group
+    is_shown_when_inactive = { this = c:SPA }
+    possible = { this = c:SPA owns_entire_state_region = STATE_AL_RIF OR = { has_variable = td_fast has_variable = td_regular } }
+    can_deactivate = yes
+}

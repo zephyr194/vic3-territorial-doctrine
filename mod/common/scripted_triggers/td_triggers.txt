@@ -1,0 +1,66 @@
+# Country scope unless noted. Prototype targets SPA -> Moroccan Al Rif only.
+td_can_legislate_trigger = {
+    is_subject = no
+    is_revolutionary = no
+    NOT = { exists = civil_war }
+    NOT = { has_modifier = country_bankruptcy }
+    legitimacy >= 40
+}
+
+td_has_doctrine_trigger = {
+    OR = {
+        has_law = law_type:law_td_status_quo
+        has_law = law_type:law_td_historical_rights
+        has_law = law_type:law_td_strategic_frontiers
+        has_law = law_type:law_td_imperial_expansion
+    }
+}
+
+td_claim_target_valid_trigger = {
+    this = c:SPA
+    exists = s:STATE_AL_RIF.region_state:MOR
+    NOT = { owns_entire_state_region = STATE_AL_RIF }
+    NOT = { has_claim = s:STATE_AL_RIF }
+    has_variable = td_focus
+    NOT = { has_variable = td_focus_wait }
+    OR = {
+        has_law = law_type:law_td_strategic_frontiers
+        has_law = law_type:law_td_imperial_expansion
+    }
+}
+
+td_admission_target_valid_trigger = {
+    this = c:SPA
+    owns_entire_state_region = STATE_AL_RIF
+    exists = s:STATE_AL_RIF.region_state:SPA
+    s:STATE_AL_RIF.region_state:SPA = { is_incorporated = no }
+}
+
+td_bill_target_valid_trigger = {
+    OR = {
+        AND = { var:td_bill = 1 td_claim_target_valid_trigger = yes }
+        AND = { var:td_bill = 2 td_admission_target_valid_trigger = yes }
+    }
+}
+
+td_can_start_bill_trigger = {
+    td_can_legislate_trigger = yes
+    NOT = { has_variable = td_bill }
+    NOT = { has_variable = td_bill_cooldown }
+    NOT = { has_variable = td_fast }
+    NOT = { has_variable = td_regular }
+}
+
+# Snapshot refresh must have run immediately before this check.
+td_fast_ready_trigger = {
+    td_admission_target_valid_trigger = yes
+    has_variable = td_admitted
+    legitimacy >= 60
+    bureaucracy >= td_unpaid_project_cost
+    var:td_accepted_share >= 0.8
+    s:STATE_AL_RIF.region_state:SPA = {
+        turmoil < 0.2
+        devastation < 0.1
+        market_access >= 0.9
+    }
+}

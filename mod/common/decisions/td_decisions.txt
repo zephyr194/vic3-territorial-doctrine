@@ -1,0 +1,94 @@
+td_focus_north_africa = {
+    is_shown = { this = c:SPA NOT = { has_variable = td_focus } NOT = { has_law = law_type:law_td_status_quo } }
+    possible = {
+        td_can_legislate_trigger = yes
+        has_interest_marker_in_region = region_north_africa
+        if = { limit = { has_law = law_type:law_td_historical_rights } bureaucracy >= 25 }
+        if = { limit = { has_law = law_type:law_td_strategic_frontiers } bureaucracy >= 50 authority >= 25 }
+        if = { limit = { has_law = law_type:law_td_imperial_expansion } bureaucracy >= 75 authority >= 50 }
+    }
+    when_taken = {
+        set_variable = td_focus
+        if = {
+            limit = { has_law = law_type:law_td_historical_rights }
+            add_modifier = td_focus_historical_rights
+            set_variable = { name = td_focus_wait months = 6 }
+        }
+        if = {
+            limit = { has_law = law_type:law_td_strategic_frontiers }
+            add_modifier = td_focus_strategic_frontiers
+            set_variable = { name = td_focus_wait months = 6 }
+        }
+        if = {
+            limit = { has_law = law_type:law_td_imperial_expansion }
+            add_modifier = td_focus_imperial_expansion
+            set_variable = { name = td_focus_wait months = 12 }
+        }
+    }
+    ai_chance = { value = 0 }
+}
+td_remove_focus = {
+    is_shown = { this = c:SPA has_variable = td_focus }
+    possible = { NOT = { has_variable = td_bill } }
+    when_taken = { td_remove_focus_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_claim_al_rif = {
+    is_shown = { this = c:SPA NOT = { owns_entire_state_region = STATE_AL_RIF } NOT = { has_claim = s:STATE_AL_RIF } }
+    possible = { td_can_start_bill_trigger = yes td_claim_target_valid_trigger = yes }
+    when_taken = { set_variable = { name = td_bill value = 1 } td_start_bill_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_admit_al_rif = {
+    is_shown = { this = c:SPA td_admission_target_valid_trigger = yes NOT = { has_variable = td_admitted } }
+    possible = { td_can_start_bill_trigger = yes }
+    when_taken = { set_variable = { name = td_bill value = 2 } td_start_bill_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_pledge_navy = {
+    is_shown = { this = c:SPA has_variable = td_bill NOT = { has_variable = td_bill_pledge_navy } }
+    possible = { NOT = { has_variable = td_pending_navy } }
+    when_taken = { set_variable = td_bill_pledge_navy td_calculate_politics_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_pledge_railway = {
+    is_shown = { this = c:SPA has_variable = td_bill NOT = { has_variable = td_bill_pledge_railway } }
+    possible = { NOT = { has_variable = td_pending_railway } }
+    when_taken = { set_variable = td_bill_pledge_railway td_calculate_politics_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_bill_status = {
+    is_shown = { this = c:SPA has_variable = td_bill }
+    when_taken = { trigger_event = td.10 }
+    ai_chance = { value = 0 }
+}
+td_cancel_bill = {
+    is_shown = { this = c:SPA has_variable = td_bill }
+    when_taken = { td_cancel_bill_effect = yes trigger_event = td.14 }
+    ai_chance = { value = 0 }
+}
+td_fast_integration = {
+    is_shown = { this = c:SPA has_variable = td_admitted td_admission_target_valid_trigger = yes }
+    possible = {
+        NOT = { has_variable = td_fast }
+        NOT = { has_variable = td_regular }
+        td_fast_ready_trigger = yes
+    }
+    when_taken = { td_start_fast_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_regular_integration = {
+    is_shown = { this = c:SPA has_variable = td_admitted td_admission_target_valid_trigger = yes }
+    possible = {
+        NOT = { has_variable = td_fast }
+        NOT = { has_variable = td_regular }
+        bureaucracy >= td_regular_project_cost
+    }
+    when_taken = { td_start_regular_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_refresh_integration = {
+    is_shown = { this = c:SPA has_variable = td_admitted }
+    when_taken = { td_refresh_admission_effect = yes }
+    ai_chance = { value = 0 }
+}

@@ -1,0 +1,32 @@
+on_game_started = {
+    on_actions = { td_initialize_world }
+}
+td_initialize_world = {
+    effect = { every_country = { td_initialize_effect = yes } }
+}
+on_monthly_pulse_country = {
+    on_actions = { td_country_monthly }
+}
+td_country_monthly = {
+    effect = {
+        td_initialize_effect = yes
+        if = {
+            limit = { this = c:SPA }
+            td_refresh_admission_effect = yes
+            td_pledges_monthly_effect = yes
+            if = {
+                limit = { has_variable = td_regular }
+                if = {
+                    limit = {
+                        OR = {
+                            NOT = { owns_entire_state_region = STATE_AL_RIF }
+                            s:STATE_AL_RIF.region_state:SPA = { is_incorporated = yes }
+                        }
+                    }
+                    remove_modifier = td_project_cost
+                    remove_variable = td_regular
+                }
+            }
+        }
+    }
+}

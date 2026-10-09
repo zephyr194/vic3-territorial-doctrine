@@ -1,0 +1,74 @@
+# Baselines and the deadline are set once after full acquisition. Losing/reacquiring
+# ownership, changing doctrine, or admitting the state cannot reset obligations.
+td_pledges_monthly_effect = {
+    if = {
+        limit = { has_variable = td_pending_navy }
+        if = {
+            limit = { NOT = { has_variable = td_navy_started } owns_entire_state_region = STATE_AL_RIF }
+            set_variable = td_navy_started
+            set_variable = { name = td_navy_deadline years = 3 }
+            set_variable = { name = td_navy_baseline value = s:STATE_AL_RIF.region_state:SPA.state_has_building_type_levels:bt:building_naval_base }
+        }
+        if = {
+            limit = { has_variable = td_navy_started }
+            if = {
+                limit = { NOT = { has_variable = td_navy_deadline } }
+                ig:ig_armed_forces = {
+                    add_modifier = { name = td_pledge_broken years = 5 }
+                    set_variable = { name = td_broken_pledge years = 5 }
+                }
+                remove_variable = td_pending_navy
+                remove_variable = td_navy_started
+                trigger_event = td.18
+            }
+            else_if = {
+                limit = {
+                    owns_entire_state_region = STATE_AL_RIF
+                    s:STATE_AL_RIF.region_state:SPA = {
+                        state_has_building_type_levels:bt:building_naval_base > root.var:td_navy_baseline
+                    }
+                }
+                ig:ig_armed_forces = { add_modifier = { name = td_pledge_fulfilled years = 3 } }
+                remove_variable = td_pending_navy
+                remove_variable = td_navy_started
+                remove_variable = td_navy_deadline
+                trigger_event = td.17
+            }
+        }
+    }
+    if = {
+        limit = { has_variable = td_pending_railway }
+        if = {
+            limit = { NOT = { has_variable = td_railway_started } owns_entire_state_region = STATE_AL_RIF }
+            set_variable = td_railway_started
+            set_variable = { name = td_railway_deadline years = 3 }
+            set_variable = { name = td_railway_baseline value = s:STATE_AL_RIF.region_state:SPA.state_has_building_type_levels:bt:building_railway }
+        }
+        if = {
+            limit = { has_variable = td_railway_started }
+            if = {
+                limit = { NOT = { has_variable = td_railway_deadline } }
+                ig:ig_industrialists = {
+                    add_modifier = { name = td_pledge_broken years = 5 }
+                    set_variable = { name = td_broken_pledge years = 5 }
+                }
+                remove_variable = td_pending_railway
+                remove_variable = td_railway_started
+                trigger_event = td.18
+            }
+            else_if = {
+                limit = {
+                    owns_entire_state_region = STATE_AL_RIF
+                    s:STATE_AL_RIF.region_state:SPA = {
+                        state_has_building_type_levels:bt:building_railway > root.var:td_railway_baseline
+                    }
+                }
+                ig:ig_industrialists = { add_modifier = { name = td_pledge_fulfilled years = 3 } }
+                remove_variable = td_pending_railway
+                remove_variable = td_railway_started
+                remove_variable = td_railway_deadline
+                trigger_event = td.17
+            }
+        }
+    }
+}

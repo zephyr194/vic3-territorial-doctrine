@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0-alpha.1",
+  "doctrines": {
+    "status_quo": {"zh": "领土现状主义", "en": "Territorial Status Quo", "focus_limit": 0, "bureaucracy": 0, "authority": 0, "wait_months": 0, "infamy": 0, "cost_multiplier": 0.8},
+    "historical_rights": {"zh": "历史权利主义", "en": "Historical Rights", "focus_limit": 1, "bureaucracy": 25, "authority": 0, "wait_months": 6, "infamy": 0, "cost_multiplier": 0.8},
+    "strategic_frontiers": {"zh": "战略边疆主义", "en": "Strategic Frontiers", "focus_limit": 2, "bureaucracy": 50, "authority": 25, "wait_months": 6, "infamy": 2, "cost_multiplier": 1.0},
+    "imperial_expansion": {"zh": "帝国扩张主义", "en": "Imperial Expansion", "focus_limit": 3, "bureaucracy": 75, "authority": 50, "wait_months": 12, "infamy": 5, "cost_multiplier": 1.25}
+  },
+  "groups": {
+    "armed_forces": [-1, 1, 2, 1],
+    "landowners": [0, 1, 0, 1],
+    "industrialists": [0, 0, 1, 1],
+    "petty_bourgeoisie": [1, 2, 1, 0],
+    "intelligentsia": [1, 0, -1, -2],
+    "trade_unions": [1, 0, -1, -2],
+    "rural_folk": [1, 0, -1, -1],
+    "devout": [0, 1, 0, 0]
+  },
+  "bill": {"round_days": 90, "successes": 3, "failures": 3, "cooldown_days": 730, "min_probability": 5, "max_probability": 85},
+  "integration": {"valid_months": 12, "fallback_months": 6, "legitimacy": 60, "turmoil_below": 0.2, "devastation_below": 0.1, "market_access": 0.9, "accepted_share": 0.8},
+  "prototype": {"country": "SPA", "target": "STATE_AL_RIF", "strategic_region": "region_north_africa", "reason": "strait_security"}
+}

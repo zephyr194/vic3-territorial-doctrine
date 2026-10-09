@@ -1,0 +1,50 @@
+td_refresh_admission_effect = {
+    if = {
+        limit = { NOT = { owns_entire_state_region = STATE_AL_RIF } }
+        remove_variable = td_admitted
+    }
+    set_variable = { name = td_accepted_population value = 0 }
+    set_variable = { name = td_accepted_share value = 0 }
+    if = {
+        limit = { exists = s:STATE_AL_RIF.region_state:SPA }
+        s:STATE_AL_RIF.region_state:SPA = {
+            every_scope_pop = {
+                religion = { save_scope_as = td_pop_religion }
+                if = {
+                    limit = {
+                        pop_acceptance = acceptance_status_5
+                        owner = { NOT = { discriminates_religion = scope:td_pop_religion } }
+                    }
+                    owner = { change_variable = { name = td_accepted_population add = prev.total_size } }
+                }
+            }
+        }
+        if = {
+            limit = { s:STATE_AL_RIF.region_state:SPA = { state_population > 0 } }
+            set_variable = {
+                name = td_accepted_share
+                value = { value = var:td_accepted_population divide = s:STATE_AL_RIF.region_state:SPA.state_population }
+            }
+        }
+    }
+}
+
+td_start_fast_effect = {
+    td_refresh_admission_effect = yes
+    if = {
+        limit = { td_fast_ready_trigger = yes }
+        set_variable = { name = td_project_cost_snapshot value = td_fast_project_cost }
+        add_modifier = { name = td_project_cost multiplier = var:td_project_cost_snapshot }
+        set_variable = td_fast
+        set_variable = { name = td_valid_months value = 0 }
+        set_variable = { name = td_invalid_months value = 0 }
+        trigger_event = { id = td.2 months = 1 }
+    }
+}
+
+td_start_regular_effect = {
+    set_variable = { name = td_project_cost_snapshot value = td_regular_project_cost }
+    add_modifier = { name = td_project_cost multiplier = var:td_project_cost_snapshot }
+    set_variable = td_regular
+    # Incorporation must be started in the vanilla state UI. No speed override.
+}
