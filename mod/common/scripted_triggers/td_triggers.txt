@@ -1,4 +1,4 @@
-# Country scope unless noted. Prototype targets SPA -> Moroccan Al Rif only.
+# Country scope unless explicitly labelled state scope.
 td_can_legislate_trigger = {
     is_subject = no
     is_revolutionary = no
@@ -6,7 +6,6 @@ td_can_legislate_trigger = {
     NOT = { has_modifier = country_bankruptcy }
     legitimacy >= 40
 }
-
 td_has_doctrine_trigger = {
     OR = {
         has_law = law_type:law_td_status_quo
@@ -15,12 +14,23 @@ td_has_doctrine_trigger = {
         has_law = law_type:law_td_imperial_expansion
     }
 }
-
+# STATE: actual ownership is required; acceptance does not replace homeland status.
+td_non_homeland_state_trigger = {
+    is_treaty_port = no
+    is_incorporated = no
+    NOT = { is_homeland_of_country_cultures = owner }
+}
+# STATE: admission belongs to this state and this owner, never to the whole country.
+td_needs_admission_trigger = {
+    td_non_homeland_state_trigger = yes
+    NOT = { AND = { has_variable = td_admitted_owner var:td_admitted_owner = owner } }
+}
 td_claim_target_valid_trigger = {
     this = c:SPA
-    exists = s:STATE_AL_RIF.region_state:MOR
-    NOT = { owns_entire_state_region = STATE_AL_RIF }
+    exists = var:td_target
+    var:td_target = { owner = c:MOR state_region = s:STATE_AL_RIF }
     NOT = { has_claim = s:STATE_AL_RIF }
+    NOT = { is_target_in_variable_list = { name = td_renounced_regions target = s:STATE_AL_RIF } }
     has_variable = td_focus
     NOT = { has_variable = td_focus_wait }
     OR = {
@@ -28,39 +38,78 @@ td_claim_target_valid_trigger = {
         has_law = law_type:law_td_imperial_expansion
     }
 }
-
 td_admission_target_valid_trigger = {
-    this = c:SPA
-    owns_entire_state_region = STATE_AL_RIF
-    exists = s:STATE_AL_RIF.region_state:SPA
-    s:STATE_AL_RIF.region_state:SPA = { is_incorporated = no }
-}
-
-td_bill_target_valid_trigger = {
-    OR = {
-        AND = { var:td_bill = 1 td_claim_target_valid_trigger = yes }
-        AND = { var:td_bill = 2 td_admission_target_valid_trigger = yes }
+    exists = var:td_target
+    var:td_target = {
+        owner = root
+        td_non_homeland_state_trigger = yes
     }
 }
-
-td_can_start_bill_trigger = {
-    td_can_legislate_trigger = yes
+td_bill_target_valid_trigger = {
+    td_reason_valid_trigger = yes
+    OR = {
+        AND = { var:td_bill = 1 td_claim_target_valid_trigger = yes }
+        AND = {
+            var:td_bill = 2
+            td_admission_target_valid_trigger = yes
+            var:td_target = { td_needs_admission_trigger = yes }
+        }
+        AND = { var:td_bill = 3 exists = var:td_target var:td_target = { td_lost_state_trigger = yes } }
+    }
+}
+td_can_select_target_trigger = {
     NOT = { has_variable = td_bill }
-    NOT = { has_variable = td_bill_cooldown }
     NOT = { has_variable = td_fast }
     NOT = { has_variable = td_regular }
 }
-
-# Snapshot refresh must have run immediately before this check.
+td_can_start_bill_trigger = {
+    td_can_legislate_trigger = yes
+    NOT = { has_variable = td_bill }
+    NOT = { has_variable = td_fast }
+    NOT = { has_variable = td_regular }
+    NOT = { has_variable = td_bill_cooldown }
+}
+td_security_reason_valid_trigger = {
+    OR = {
+        AND = { this = c:SPA OR = { var:td_pending_bill = 1 var:td_bill = 1 } }
+        is_adjacent_to_state = var:td_target
+    }
+}
+td_legal_reason_valid_trigger = {
+    NOT = { is_target_in_variable_list = { name = td_renounced_regions target = var:td_target.state_region } }
+    OR = {
+        has_claim = var:td_target.state_region
+        var:td_target = { is_homeland_of_country_cultures = root }
+    }
+}
+td_equality_reason_valid_trigger = {
+    OR = {
+        OR = { var:td_pending_bill = 2 var:td_bill = 2 }
+        var:td_target.var:td_live_power = 1
+    }
+}
+td_reason_valid_trigger = {
+    OR = {
+        AND = { var:td_reason = 1 td_security_reason_valid_trigger = yes }
+        AND = { var:td_reason = 2 td_legal_reason_valid_trigger = yes }
+        AND = { var:td_reason = 3 td_equality_reason_valid_trigger = yes }
+        AND = { var:td_reason = 4 OR = { var:td_pending_bill = 2 var:td_bill = 2 } }
+        AND = { var:td_reason = 5 OR = { var:td_pending_bill = 3 var:td_bill = 3 } }
+    }
+}
 td_fast_ready_trigger = {
     td_admission_target_valid_trigger = yes
-    has_variable = td_admitted
+    var:td_target = { var:td_admitted_owner = owner }
     legitimacy >= 60
     bureaucracy >= td_unpaid_project_cost
     var:td_accepted_share >= 0.8
-    s:STATE_AL_RIF.region_state:SPA = {
-        turmoil < 0.2
-        devastation < 0.1
-        market_access >= 0.9
-    }
+    var:td_target = { turmoil < 0.2 devastation < 0.1 market_access >= 0.9 }
+}
+
+# STATE: a wholly lost region, claimed or a primary-cultural homeland.
+td_lost_state_trigger = {
+    NOT = { owner = root }
+    state_region = { NOT = { any_scope_state = { owner = root } } }
+    OR = { has_claim_by = root is_homeland_of_country_cultures = root }
+    NOT = { root = { is_target_in_variable_list = { name = td_renounced_regions target = prev.state_region } } }
 }

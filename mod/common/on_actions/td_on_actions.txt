@@ -1,31 +1,47 @@
-on_game_started = {
-    on_actions = { td_initialize_world }
-}
+on_game_started = { on_actions = { td_initialize_world } }
 td_initialize_world = {
-    effect = { every_country = { td_initialize_effect = yes } }
+    effect = {
+        every_country = { td_initialize_effect = yes }
+        every_state = { td_update_state_owner_effect = yes }
+    }
 }
-on_monthly_pulse_country = {
-    on_actions = { td_country_monthly }
+on_state_created = { on_actions = { td_new_state_created } }
+td_new_state_created = {
+    effect = {
+        if = {
+            limit = { owner = { has_variable = td_initialized_v3 } is_treaty_port = no NOT = { is_homeland_of_country_cultures = owner } }
+            set_state_type = unincorporated
+        }
+        td_update_state_owner_effect = yes
+    }
 }
+on_state_owner_change = { on_actions = { td_state_changed } }
+td_state_changed = { effect = { td_update_state_owner_effect = yes } }
+on_monthly_pulse_country = { on_actions = { td_country_monthly } }
 td_country_monthly = {
     effect = {
         td_initialize_effect = yes
+        every_scope_state = { td_update_state_owner_effect = yes }
+        # AI also obeys one-state legislation; diplomacy and native incorporation remain vanilla.
         if = {
-            limit = { this = c:SPA }
-            td_refresh_admission_effect = yes
-            td_pledges_monthly_effect = yes
+            limit = { is_player = no td_can_start_bill_trigger = yes any_scope_state = { td_needs_admission_trigger = yes } }
+            td_select_owned_effect = yes
+            set_variable = { name = td_reason value = 4 }
+            set_variable = { name = td_bill value = 2 }
+            td_start_bill_effect = yes
+        }
+        if = { limit = { this = c:SPA } td_pledges_monthly_effect = yes }
+        if = {
+            limit = { OR = { has_variable = td_fast has_variable = td_regular } }
             if = {
-                limit = { has_variable = td_regular }
-                if = {
-                    limit = {
-                        OR = {
-                            NOT = { owns_entire_state_region = STATE_AL_RIF }
-                            s:STATE_AL_RIF.region_state:SPA = { is_incorporated = yes }
-                        }
+                limit = {
+                    OR = {
+                        NOT = { exists = var:td_project_target }
+                        var:td_project_target = { NOT = { owner = root } }
+                        var:td_project_target = { is_incorporated = yes }
                     }
-                    remove_modifier = td_project_cost
-                    remove_variable = td_regular
                 }
+                td_end_project_effect = yes
             }
         }
     }

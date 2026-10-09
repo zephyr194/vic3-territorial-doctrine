@@ -1,0 +1,109 @@
+# STATE scope. Ownership changes invalidate approval without changing homelands.
+td_update_state_owner_effect = {
+    if = {
+        limit = { has_variable = td_recorded_owner NOT = { var:td_recorded_owner = owner } }
+        if = { limit = { exists = var:td_recorded_owner } var:td_recorded_owner = { td_store_power_on_prev_state_effect = yes } }
+        set_variable = { name = td_source_administration value = var:td_live_administration }
+        set_variable = { name = td_source_power value = var:td_live_power }
+        remove_variable = td_admitted_owner
+        remove_variable = td_admission_reason
+        if = {
+            limit = { is_treaty_port = no NOT = { is_homeland_of_country_cultures = owner } }
+            set_state_type = unincorporated
+        }
+    }
+    if = {
+        limit = { NOT = { has_variable = td_source_administration } }
+        # Existing colonies / freshly split states have no reliable former-owner record.
+        set_variable = { name = td_source_administration value = 1 }
+        set_variable = { name = td_source_power value = 0 }
+    }
+    owner = { td_store_power_on_prev_state_effect = yes }
+    set_variable = { name = td_recorded_owner value = owner }
+    if = {
+        limit = { td_needs_admission_trigger = yes }
+        if = { limit = { NOT = { has_modifier = td_requires_admission } } add_modifier = td_requires_admission }
+    }
+    else = { remove_modifier = td_requires_admission }
+}
+
+# COUNTRY scope; selection itself never passes legislation.
+td_pick_owned_effect = {
+    ordered_scope_state = {
+        limit = {
+            td_needs_admission_trigger = yes
+            NOT = { root = { is_target_in_variable_list = { name = td_seen_owned_states target = prev } } }
+        }
+        order_by = state_population
+        max = 1
+        root = {
+            set_variable = { name = td_target value = prev }
+            add_to_variable_list = { name = td_seen_owned_states target = prev }
+        }
+    }
+}
+td_select_owned_effect = {
+    if = {
+        limit = { td_can_start_bill_trigger = yes }
+        remove_variable = td_target
+        td_pick_owned_effect = yes
+        if = { limit = { NOT = { has_variable = td_target } } clear_variable_list = td_seen_owned_states td_pick_owned_effect = yes }
+        set_variable = { name = td_pending_bill value = 2 }
+        set_variable = { name = td_reason value = 0 }
+        td_refresh_target_effect = yes
+    }
+}
+td_pick_admitted_effect = {
+    ordered_scope_state = {
+        limit = {
+            td_non_homeland_state_trigger = yes
+            has_variable = td_admitted_owner
+            var:td_admitted_owner = owner
+            NOT = { root = { is_target_in_variable_list = { name = td_seen_admitted_states target = prev } } }
+        }
+        order_by = state_population
+        max = 1
+        root = {
+            set_variable = { name = td_target value = prev }
+            add_to_variable_list = { name = td_seen_admitted_states target = prev }
+        }
+    }
+}
+td_select_admitted_effect = {
+    if = {
+        limit = { td_can_select_target_trigger = yes }
+        remove_variable = td_target
+        td_pick_admitted_effect = yes
+        if = { limit = { NOT = { has_variable = td_target } } clear_variable_list = td_seen_admitted_states td_pick_admitted_effect = yes }
+        if = {
+            limit = { exists = var:td_target }
+            set_variable = { name = td_reason value = var:td_target.var:td_admission_reason }
+        }
+        td_refresh_target_effect = yes
+    }
+}
+td_pick_lost_effect = {
+    ordered_state = {
+        limit = {
+            td_lost_state_trigger = yes
+            NOT = { root = { is_target_in_variable_list = { name = td_seen_lost_regions target = prev.state_region } } }
+        }
+        order_by = state_population
+        max = 1
+        root = {
+            set_variable = { name = td_target value = prev }
+            add_to_variable_list = { name = td_seen_lost_regions target = prev.state_region }
+        }
+    }
+}
+td_select_lost_effect = {
+    if = {
+        limit = { td_can_start_bill_trigger = yes }
+        remove_variable = td_target
+        td_pick_lost_effect = yes
+        if = { limit = { NOT = { has_variable = td_target } } clear_variable_list = td_seen_lost_regions td_pick_lost_effect = yes }
+        set_variable = { name = td_pending_bill value = 3 }
+        set_variable = { name = td_reason value = 0 }
+        td_refresh_target_effect = yes
+    }
+}

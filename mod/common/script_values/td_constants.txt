@@ -3,6 +3,7 @@ td_status_quo_multiplier = 0.8
 td_historical_rights_multiplier = 0.8
 td_strategic_frontiers_multiplier = 1.0
 td_imperial_expansion_multiplier = 1.25
+td_bill_base_probability = 10
 td_bill_round_days = 90
 td_bill_successes = 3
 td_bill_failures = 3

@@ -1,25 +1,29 @@
 td_legitimacy_bonus = { value = legitimacy subtract = 50 multiply = 0.2 }
 td_success_probability = {
-    value = 10
+    value = td_bill_base_probability
     add = { value = var:td_support multiply = 0.6 }
     subtract = { value = var:td_opposition multiply = 0.4 }
     add = td_legitimacy_bonus
-    if = {
-        limit = { exists = ruler.interest_group ruler.interest_group = { var:td_score >= 5 } }
-        if = { limit = { has_law = law_type:law_monarchy } add = 5 }
-        if = { limit = { has_law = law_type:law_autocracy } add = 10 }
-    }
+    add = td_reason_bonus
     if = { limit = { is_at_war = yes } subtract = 5 }
     if = { limit = { scaled_debt >= 0.9 } subtract = 5 }
-    # Great-power intervention assessment is not yet automated in this prototype.
     if = { limit = { var:td_population_ratio >= 0.5 } subtract = 10 }
     else_if = { limit = { var:td_population_ratio >= 0.2 } subtract = 5 }
     min = td_bill_max_probability
     max = td_bill_min_probability
 }
 td_failure_weight = { value = 100 subtract = var:td_chance }
+td_claim_infamy = {
+    value = 0
+    if = { limit = { has_law = law_type:law_td_strategic_frontiers } value = 2 }
+    if = { limit = { has_law = law_type:law_td_imperial_expansion } value = 5 }
+    multiply = td_reason_cost_multiplier
+    multiply = var:td_target.var:td_live_diplomatic
+    if = { limit = { OR = { var:td_pending_bill = 2 var:td_pending_bill = 3 var:td_bill = 2 var:td_bill = 3 } } value = 0 }
+    ceiling = yes
+}
 td_base_project_cost = {
-    value = s:STATE_AL_RIF.region_state:SPA.state_population
+    value = var:td_target.state_population
     divide = 1000000
     multiply = 25
     add = 25
@@ -31,9 +35,26 @@ td_cost_multiplier = {
     if = { limit = { has_law = law_type:law_td_historical_rights } value = td_historical_rights_multiplier }
     if = { limit = { has_law = law_type:law_td_imperial_expansion } value = td_imperial_expansion_multiplier }
 }
-td_regular_project_cost = { value = td_base_project_cost multiply = td_cost_multiplier ceiling = yes }
-td_fast_project_cost = { value = td_base_project_cost multiply = td_cost_multiplier multiply = 2 ceiling = yes }
-# Before starting, full cost is unpaid; while active, the modifier already reserves it.
+td_territory_cost_multiplier = {
+    value = 1
+    add = { value = var:td_target.turmoil multiply = 0.5 }
+    add = { value = var:td_target.devastation multiply = 0.5 }
+    add = { value = 1 subtract = var:td_accepted_share multiply = 0.25 }
+}
+td_project_cost_before_rounding = {
+    value = td_base_project_cost
+    multiply = td_cost_multiplier
+    multiply = td_reason_cost_multiplier
+    multiply = td_actor_cost_multiplier
+    multiply = td_inherited_cost_multiplier
+    multiply = td_territory_cost_multiplier
+}
+td_inherited_cost_multiplier = {
+    value = var:td_target.var:td_source_administration
+    if = { limit = { OR = { var:td_pending_bill = 1 var:td_bill = 1 } } value = var:td_target.var:td_live_administration }
+}
+td_regular_project_cost = { value = td_project_cost_before_rounding ceiling = yes }
+td_fast_project_cost = { value = td_project_cost_before_rounding multiply = 2 ceiling = yes }
 td_unpaid_project_cost = {
     value = td_fast_project_cost
     if = { limit = { has_variable = td_fast } value = 0 }

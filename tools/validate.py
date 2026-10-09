@@ -125,7 +125,9 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
                     # Only identifiers; do not require parsing the whole base game.
                     vanilla.update(re.findall(r'^\s*([A-Za-z_]\w*)\s*=\s*\{', path.read_text(encoding='utf-8-sig', errors='replace'), re.M))
             required_vanilla = {'SPA', 'MOR', 'STATE_AL_RIF', 'region_north_africa', 'country_bankruptcy',
-                                'law_monarchy', 'law_autocracy', 'building_naval_base', 'building_railway',
+                                'law_monarchy', 'law_autocracy', 'law_single_party_state', 'law_census_suffrage',
+                                'law_universal_suffrage', 'law_presidential_republic', 'law_parliamentary_republic',
+                                'building_naval_base', 'building_railway',
                                 'acceptance_status_5'} | {f'ig_{g}' for g in RULES['groups']}
             for name in sorted(required_vanilla - vanilla):
                 errors.append(f'Vanilla identifier missing: {name}; check 1.13 game files before loading')

@@ -1,38 +1,44 @@
-td_refresh_admission_effect = {
-    if = {
-        limit = { NOT = { owns_entire_state_region = STATE_AL_RIF } }
-        remove_variable = td_admitted
-    }
+# COUNTRY scope. All population reads refer to the one selected state.
+td_refresh_target_effect = {
     set_variable = { name = td_accepted_population value = 0 }
     set_variable = { name = td_accepted_share value = 0 }
     if = {
-        limit = { exists = s:STATE_AL_RIF.region_state:SPA }
-        s:STATE_AL_RIF.region_state:SPA = {
-            every_scope_pop = {
-                religion = { save_scope_as = td_pop_religion }
-                if = {
-                    limit = {
-                        pop_acceptance = acceptance_status_5
-                        owner = { NOT = { discriminates_religion = scope:td_pop_religion } }
+        limit = { exists = var:td_target }
+        var:td_target = { td_update_state_owner_effect = yes }
+        if = {
+            limit = { var:td_target = { owner = root } }
+            var:td_target = {
+                every_scope_pop = {
+                    religion = { save_scope_as = td_pop_religion }
+                    if = {
+                        limit = { pop_acceptance = acceptance_status_5 owner = { NOT = { discriminates_religion = scope:td_pop_religion } } }
+                        owner = { change_variable = { name = td_accepted_population add = prev.total_size } }
                     }
-                    owner = { change_variable = { name = td_accepted_population add = prev.total_size } }
                 }
             }
-        }
-        if = {
-            limit = { s:STATE_AL_RIF.region_state:SPA = { state_population > 0 } }
-            set_variable = {
-                name = td_accepted_share
-                value = { value = var:td_accepted_population divide = s:STATE_AL_RIF.region_state:SPA.state_population }
+            if = {
+                limit = { var:td_target = { state_population > 0 } }
+                set_variable = { name = td_accepted_share value = { value = var:td_accepted_population divide = var:td_target.state_population } }
             }
         }
     }
 }
-
+td_begin_project_effect = {
+    change_variable = { name = td_generation add = 1 }
+    set_variable = { name = td_project_target value = var:td_target }
+    save_scope_value_as = { name = td_project_run value = var:td_generation }
+}
+td_end_project_effect = {
+    remove_modifier = td_project_cost
+    remove_variable = td_fast
+    remove_variable = td_regular
+    remove_variable = td_project_target
+}
 td_start_fast_effect = {
-    td_refresh_admission_effect = yes
+    td_refresh_target_effect = yes
     if = {
         limit = { td_fast_ready_trigger = yes }
+        td_begin_project_effect = yes
         set_variable = { name = td_project_cost_snapshot value = td_fast_project_cost }
         add_modifier = { name = td_project_cost multiplier = var:td_project_cost_snapshot }
         set_variable = td_fast
@@ -41,10 +47,10 @@ td_start_fast_effect = {
         trigger_event = { id = td.2 months = 1 }
     }
 }
-
 td_start_regular_effect = {
+    td_begin_project_effect = yes
     set_variable = { name = td_project_cost_snapshot value = td_regular_project_cost }
     add_modifier = { name = td_project_cost multiplier = var:td_project_cost_snapshot }
     set_variable = td_regular
-    # Incorporation must be started in the vanilla state UI. No speed override.
+    # State approval has unlocked the vanilla incorporation button for this state.
 }

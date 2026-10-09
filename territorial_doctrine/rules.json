@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0-alpha.1",
+  "version": "0.3.0-alpha.1",
   "doctrines": {
     "status_quo": {"zh": "领土现状主义", "en": "Territorial Status Quo", "focus_limit": 0, "bureaucracy": 0, "authority": 0, "wait_months": 0, "infamy": 0, "cost_multiplier": 0.8},
     "historical_rights": {"zh": "历史权利主义", "en": "Historical Rights", "focus_limit": 1, "bureaucracy": 25, "authority": 0, "wait_months": 6, "infamy": 0, "cost_multiplier": 0.8},
@@ -16,7 +16,19 @@
     "rural_folk": [1, 0, -1, -1],
     "devout": [0, 1, 0, 0]
   },
-  "bill": {"round_days": 90, "successes": 3, "failures": 3, "cooldown_days": 730, "min_probability": 5, "max_probability": 85},
+  "bill": {"base_probability": 10, "round_days": 90, "successes": 3, "failures": 3, "cooldown_days": 730, "min_probability": 5, "max_probability": 85},
+  "reasons": {
+    "security": {"id": 1, "zh": "边疆与航道安全", "en": "Border and Sea Lane Security", "government": {"monarchy": 3, "republic": 0, "other": 0}, "power": {"autocracy": 4, "democracy": -2, "other": 0}, "cost_multiplier": 1.0},
+    "historical_right": {"id": 2, "zh": "已有法理权利", "en": "Existing Legal Rights", "government": {"monarchy": 4, "republic": -2, "other": 0}, "power": {"autocracy": 2, "democracy": 0, "other": 0}, "cost_multiplier": 0.9},
+    "equal_rights": {"id": 3, "zh": "居民平等权利", "en": "Equal Rights for Residents", "government": {"monarchy": -2, "republic": 3, "other": 0}, "power": {"autocracy": -5, "democracy": 5, "other": 0}, "cost_multiplier": 1.1},
+    "civil_administration": {"id": 4, "zh": "正式行政接管", "en": "Formal Civil Administration", "government": {"monarchy": 0, "republic": 0, "other": 0}, "power": {"autocracy": 2, "democracy": 2, "other": 0}, "cost_multiplier": 1.0},
+    "peace_settlement": {"id": 5, "zh": "承认边界与和平解决", "en": "Border Recognition and Peace Settlement", "government": {"monarchy": 0, "republic": 0, "other": 0}, "power": {"autocracy": -2, "democracy": 2, "other": 0}, "cost_multiplier": 1.0}
+  },
+  "regimes": {
+    "autocracy": {"id": 1, "diplomatic_multiplier": 0.9, "inherited_administration_multiplier": 1.15, "actor_administration_multiplier": 1.1},
+    "democracy": {"id": 2, "diplomatic_multiplier": 1.25, "inherited_administration_multiplier": 1.0, "actor_administration_multiplier": 0.95},
+    "other": {"id": 0, "diplomatic_multiplier": 1.0, "inherited_administration_multiplier": 1.0, "actor_administration_multiplier": 1.0}
+  },
   "integration": {"valid_months": 12, "fallback_months": 6, "legitimacy": 60, "turmoil_below": 0.2, "devastation_below": 0.1, "market_access": 0.9, "accepted_share": 0.8},
   "prototype": {"country": "SPA", "target": "STATE_AL_RIF", "strategic_region": "region_north_africa", "reason": "strait_security"}
 }

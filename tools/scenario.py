@@ -12,7 +12,7 @@ def main():
     target = Target(1_000_000, focus_ready=True, strategic_site=True)
     assert target.eligible('strategic_frontiers')
     p = round_probability(55, 20, legitimacy=50,
-                          monarch_supports=True, autocrat_supports=True)
+                          reason='security', government='monarchy', power='autocracy')
     print(f'Spain claim fixture: round={p:.1%}, final={final_probability(p):.1%}')
     bill = Bill()
     for day, roll in zip((90, 180, 270, 360, 450), (.1, .8, .2, .7, .3)):

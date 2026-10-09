@@ -34,61 +34,65 @@ td_remove_focus = {
     ai_chance = { value = 0 }
 }
 td_claim_al_rif = {
-    is_shown = { this = c:SPA NOT = { owns_entire_state_region = STATE_AL_RIF } NOT = { has_claim = s:STATE_AL_RIF } }
-    possible = { td_can_start_bill_trigger = yes td_claim_target_valid_trigger = yes }
-    when_taken = { set_variable = { name = td_bill value = 1 } td_start_bill_effect = yes }
+    is_shown = { this = c:SPA exists = s:STATE_AL_RIF.region_state:MOR NOT = { has_claim = s:STATE_AL_RIF } }
+    possible = {
+        td_can_start_bill_trigger = yes
+        has_variable = td_focus
+        NOT = { has_variable = td_focus_wait }
+        NOT = { is_target_in_variable_list = { name = td_renounced_regions target = s:STATE_AL_RIF } }
+        OR = { has_law = law_type:law_td_strategic_frontiers has_law = law_type:law_td_imperial_expansion }
+    }
+    when_taken = {
+        set_variable = { name = td_target value = s:STATE_AL_RIF.region_state:MOR }
+        set_variable = { name = td_pending_bill value = 1 }
+        set_variable = { name = td_reason value = 0 }
+        td_refresh_target_effect = yes
+        trigger_event = td.20
+    }
     ai_chance = { value = 0 }
 }
-td_admit_al_rif = {
-    is_shown = { this = c:SPA td_admission_target_valid_trigger = yes NOT = { has_variable = td_admitted } }
+td_select_owned = {
+    is_shown = { any_scope_state = { td_needs_admission_trigger = yes } }
     possible = { td_can_start_bill_trigger = yes }
-    when_taken = { set_variable = { name = td_bill value = 2 } td_start_bill_effect = yes }
+    when_taken = { clear_variable_list = td_seen_owned_states td_select_owned_effect = yes trigger_event = td.20 }
+    ai_chance = { value = 0 }
+}
+td_renounce_lost = {
+    is_shown = { any_state = { td_lost_state_trigger = yes } }
+    possible = { td_can_start_bill_trigger = yes }
+    when_taken = { clear_variable_list = td_seen_lost_regions td_select_lost_effect = yes trigger_event = td.20 }
+    ai_chance = { value = 0 }
+}
+td_select_integration = {
+    is_shown = { any_scope_state = { td_non_homeland_state_trigger = yes var:td_admitted_owner = owner } }
+    possible = { NOT = { has_variable = td_bill } NOT = { has_variable = td_fast } NOT = { has_variable = td_regular } }
+    when_taken = { clear_variable_list = td_seen_admitted_states td_select_admitted_effect = yes trigger_event = td.22 }
     ai_chance = { value = 0 }
 }
 td_pledge_navy = {
-    is_shown = { this = c:SPA has_variable = td_bill NOT = { has_variable = td_bill_pledge_navy } }
+    is_shown = { this = c:SPA var:td_bill = 1 NOT = { has_variable = td_bill_pledge_navy } }
     possible = { NOT = { has_variable = td_pending_navy } }
     when_taken = { set_variable = td_bill_pledge_navy td_calculate_politics_effect = yes }
     ai_chance = { value = 0 }
 }
 td_pledge_railway = {
-    is_shown = { this = c:SPA has_variable = td_bill NOT = { has_variable = td_bill_pledge_railway } }
+    is_shown = { this = c:SPA var:td_bill = 1 NOT = { has_variable = td_bill_pledge_railway } }
     possible = { NOT = { has_variable = td_pending_railway } }
     when_taken = { set_variable = td_bill_pledge_railway td_calculate_politics_effect = yes }
     ai_chance = { value = 0 }
 }
 td_bill_status = {
-    is_shown = { this = c:SPA has_variable = td_bill }
+    is_shown = { has_variable = td_bill }
     when_taken = { trigger_event = td.10 }
     ai_chance = { value = 0 }
 }
 td_cancel_bill = {
-    is_shown = { this = c:SPA has_variable = td_bill }
+    is_shown = { has_variable = td_bill }
     when_taken = { td_cancel_bill_effect = yes trigger_event = td.14 }
     ai_chance = { value = 0 }
 }
-td_fast_integration = {
-    is_shown = { this = c:SPA has_variable = td_admitted td_admission_target_valid_trigger = yes }
-    possible = {
-        NOT = { has_variable = td_fast }
-        NOT = { has_variable = td_regular }
-        td_fast_ready_trigger = yes
-    }
-    when_taken = { td_start_fast_effect = yes }
-    ai_chance = { value = 0 }
-}
-td_regular_integration = {
-    is_shown = { this = c:SPA has_variable = td_admitted td_admission_target_valid_trigger = yes }
-    possible = {
-        NOT = { has_variable = td_fast }
-        NOT = { has_variable = td_regular }
-        bureaucracy >= td_regular_project_cost
-    }
-    when_taken = { td_start_regular_effect = yes }
-    ai_chance = { value = 0 }
-}
 td_refresh_integration = {
-    is_shown = { this = c:SPA has_variable = td_admitted }
-    when_taken = { td_refresh_admission_effect = yes }
+    is_shown = { exists = var:td_target var:td_target = { owner = root var:td_admitted_owner = owner } }
+    when_taken = { td_refresh_target_effect = yes }
     ai_chance = { value = 0 }
 }

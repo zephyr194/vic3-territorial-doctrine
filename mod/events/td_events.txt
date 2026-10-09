@@ -40,15 +40,13 @@ td.2 = {
     hidden = yes
     immediate = {
         if = {
-            limit = { has_variable = td_fast }
+            limit = { has_variable = td_fast scope:td_project_run = var:td_generation }
             if = {
                 limit = { td_admission_target_valid_trigger = no }
-                remove_modifier = td_project_cost
-                remove_variable = td_fast
-                td_refresh_admission_effect = yes
+                td_end_project_effect = yes
             }
             else = {
-                td_refresh_admission_effect = yes
+                td_refresh_target_effect = yes
                 if = {
                     limit = { td_fast_ready_trigger = yes }
                     change_variable = { name = td_valid_months add = 1 }
@@ -57,16 +55,13 @@ td.2 = {
                 else = { change_variable = { name = td_invalid_months add = 1 } }
                 if = {
                     limit = { var:td_valid_months >= td_fast_months }
-                    # Only SPA's actually owned state changes; no ownership/pop effects.
-                    s:STATE_AL_RIF.region_state:SPA = { set_state_type = incorporated }
-                    remove_modifier = td_project_cost
-                    remove_variable = td_fast
+                    var:td_project_target = { set_state_type = incorporated }
+                    td_end_project_effect = yes
                     trigger_event = td.15
                 }
                 else_if = {
                     limit = { var:td_invalid_months >= td_fallback_months }
-                    remove_modifier = td_project_cost
-                    remove_variable = td_fast
+                    td_end_project_effect = yes
                     td_start_regular_effect = yes
                     trigger_event = td.16
                 }
@@ -92,3 +87,72 @@ td.15 = { type = country_event title = td.15.t desc = td.15.d flavor = td.flavor
 td.16 = { type = country_event title = td.16.t desc = td.16.d flavor = td.flavor option = { name = td.close } }
 td.17 = { type = country_event title = td.17.t desc = td.17.d flavor = td.flavor option = { name = td.close } }
 td.18 = { type = country_event title = td.18.t desc = td.18.d flavor = td.flavor option = { name = td.close } }
+
+td.19 = { type = country_event title = td.19.t desc = td.19.d flavor = td.flavor option = { name = td.close } }
+# Choosing a reason precedes the first timer and cannot pass a bill by itself.
+td.20 = {
+    type = country_event
+    title = td.20.t
+    desc = td.20.d
+    flavor = td.flavor
+    option = { name = td.reason.security trigger = { td_can_start_bill_trigger = yes exists = var:td_target td_security_reason_valid_trigger = yes NOT = { var:td_pending_bill = 3 } } set_variable = { name = td_reason value = 1 } trigger_event = td.21 }
+    option = { name = td.reason.historical_right trigger = { td_can_start_bill_trigger = yes exists = var:td_target td_legal_reason_valid_trigger = yes NOT = { var:td_pending_bill = 3 } } set_variable = { name = td_reason value = 2 } trigger_event = td.21 }
+    option = { name = td.reason.equal_rights trigger = { td_can_start_bill_trigger = yes exists = var:td_target td_equality_reason_valid_trigger = yes NOT = { var:td_pending_bill = 3 } } set_variable = { name = td_reason value = 3 } trigger_event = td.21 }
+    option = { name = td.reason.civil_administration trigger = { td_can_start_bill_trigger = yes exists = var:td_target var:td_pending_bill = 2 } set_variable = { name = td_reason value = 4 } trigger_event = td.21 }
+    option = { name = td.reason.peace_settlement trigger = { td_can_start_bill_trigger = yes exists = var:td_target var:td_pending_bill = 3 } set_variable = { name = td_reason value = 5 } trigger_event = td.21 }
+    option = {
+        name = td.next_state
+        trigger = { td_can_start_bill_trigger = yes exists = var:td_target OR = { var:td_pending_bill = 2 var:td_pending_bill = 3 } }
+        if = { limit = { var:td_pending_bill = 2 } td_select_owned_effect = yes }
+        else = { td_select_lost_effect = yes }
+        trigger_event = td.20
+        ai_chance = { base = 0 }
+    }
+    option = { name = td.cancel_menu remove_variable = td_pending_bill ai_chance = { base = 0 } }
+}
+td.21 = {
+    type = country_event
+    title = td.21.t
+    desc = td.21.d
+    flavor = td.flavor
+    immediate = {
+        td_refresh_target_effect = yes
+        set_variable = { name = td_preview_reason_bonus value = td_reason_bonus }
+        set_variable = { name = td_preview_infamy value = td_claim_infamy }
+        set_variable = { name = td_preview_regular_cost value = td_regular_project_cost }
+        set_variable = { name = td_preview_fast_cost value = td_fast_project_cost }
+    }
+    option = {
+        name = td.submit_bill
+        trigger = {
+            td_can_start_bill_trigger = yes td_reason_valid_trigger = yes
+            OR = {
+                AND = { var:td_pending_bill = 1 td_claim_target_valid_trigger = yes }
+                AND = { var:td_pending_bill = 2 td_admission_target_valid_trigger = yes var:td_target = { td_needs_admission_trigger = yes } }
+                AND = { var:td_pending_bill = 3 exists = var:td_target var:td_target = { td_lost_state_trigger = yes } }
+            }
+        }
+        set_variable = { name = td_bill value = var:td_pending_bill }
+        td_start_bill_effect = yes
+    }
+    option = { name = td.change_reason trigger = { td_can_start_bill_trigger = yes } trigger_event = td.20 ai_chance = { base = 0 } }
+    option = { name = td.cancel_menu remove_variable = td_pending_bill ai_chance = { base = 0 } }
+}
+td.22 = {
+    type = country_event
+    title = td.22.t
+    desc = td.22.d
+    flavor = td.flavor
+    option = {
+        name = td.fast_track
+        trigger = { NOT = { has_variable = td_bill } NOT = { has_variable = td_fast } NOT = { has_variable = td_regular } td_fast_ready_trigger = yes }
+        td_start_fast_effect = yes
+    }
+    option = {
+        name = td.regular_track
+        trigger = { NOT = { has_variable = td_bill } NOT = { has_variable = td_fast } NOT = { has_variable = td_regular } td_admission_target_valid_trigger = yes var:td_target = { var:td_admitted_owner = owner } bureaucracy >= td_regular_project_cost }
+        td_start_regular_effect = yes
+    }
+    option = { name = td.next_state trigger = { td_can_select_target_trigger = yes } td_select_admitted_effect = yes trigger_event = td.22 ai_chance = { base = 0 } }
+    option = { name = td.cancel_menu ai_chance = { base = 0 } }
+}

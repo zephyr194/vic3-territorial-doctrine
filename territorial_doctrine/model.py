@@ -29,6 +29,7 @@ def political_weight(score: float) -> float:
 
 
 def group_scores(doctrine: str, *, admission: bool = False,
+                 renunciation: bool = False,
                  security: bool = False, scarce_resource: bool = False,
                  compatriots: bool = False, discriminatory: bool = False,
                  conscription: bool = False, great_power_risk: bool = False,
@@ -51,6 +52,11 @@ def group_scores(doctrine: str, *, admission: bool = False,
     if admission:
         scores["intelligentsia"] += 15
         scores["trade_unions"] += 15
+    if renunciation:
+        for group, value in {'armed_forces': -20, 'landowners': -10,
+                             'petty_bourgeoisie': -15, 'intelligentsia': 10,
+                             'trade_unions': 10, 'rural_folk': 10}.items():
+            scores[group] += value
     if discriminatory:
         scores["intelligentsia"] -= 20
     if conscription:
@@ -78,8 +84,8 @@ def political_forces(scores: dict[str, float], clout: dict[str, float]) -> tuple
 
 
 def round_probability(support: float, opposition: float, *, legitimacy: float,
-                      monarch_supports: bool = False,
-                      autocrat_supports: bool = False,
+                      reason: str | None = None, government: str = "other",
+                      power: str = "other",
                       fiscal_crisis: bool = False, at_war: bool = False,
                       great_power_risk: bool = False,
                       target_population_ratio: float = 0) -> float:
@@ -90,10 +96,10 @@ def round_probability(support: float, opposition: float, *, legitimacy: float,
         raise ValueError("Support and opposition exceed total clout")
     if target_population_ratio < 0:
         raise ValueError("Population ratio must be nonnegative")
-    government = 5 * monarch_supports + 10 * autocrat_supports
+    bonus = reason_bonus(reason, government, power)
     risk = 5 * (fiscal_crisis + at_war + great_power_risk)
     size = 10 if target_population_ratio >= 0.5 else 5 if target_population_ratio >= 0.2 else 0
-    raw = 10 + 0.6 * support - 0.4 * opposition + government + 0.2 * (legitimacy - 50) - risk - size
+    raw = RULES['bill']['base_probability'] + 0.6 * support - 0.4 * opposition + bonus + 0.2 * (legitimacy - 50) - risk - size
     return min(85, max(5, raw)) / 100
 
 
@@ -128,9 +134,10 @@ class Target:
     compatriot_population: int = 0
     foreign: bool = True
     diplomatic_target: bool = True
+    renounced: bool = False
 
     def eligible(self, doctrine: str) -> bool:
-        if self.population <= 0 or not self.foreign or not self.diplomatic_target:
+        if self.population <= 0 or not self.foreign or not self.diplomatic_target or self.renounced:
             return False
         if doctrine == "status_quo":
             return False
@@ -190,11 +197,106 @@ class Bill:
         self.cooldown_until = day + RULES["bill"]["cooldown_days"]
 
 
-def integration_cost(population: int, doctrine: str, *, fast: bool) -> int:
+def reason_bonus(reason: str | None, government: str, power: str) -> float:
+    if government not in ('monarchy', 'republic', 'other') or power not in RULES['regimes']:
+        raise ValueError("Unknown government or power structure")
+    if reason is None:
+        return 0.0
+    r = RULES['reasons'][reason]
+    return r['government'][government] + r['power'][power]
+
+
+def claim_infamy(doctrine: str, reason: str, target_power: str) -> int:
+    return ceil(RULES['doctrines'][doctrine]['infamy']
+                * RULES['reasons'][reason]['cost_multiplier']
+                * RULES['regimes'][target_power]['diplomatic_multiplier'])
+
+
+def integration_cost(population: int, doctrine: str, *, fast: bool,
+                     reason: str | None = None, actor_power: str = "other",
+                     source_power: str = "other", turmoil: float = 0,
+                     devastation: float = 0, accepted_share: float = 1) -> int:
     if population < 0:
         raise ValueError("Population must be nonnegative")
     base = ceil(25 + 25 * population / 1_000_000)
-    return ceil(base * RULES["doctrines"][doctrine]["cost_multiplier"] * (2 if fast else 1))
+    for value, label in ((turmoil, 'turmoil'), (devastation, 'devastation'), (accepted_share, 'accepted_share')):
+        _range(value, 0, 1, label)
+    conditions = 1 + .5 * turmoil + .5 * devastation + .25 * (1 - accepted_share)
+    return ceil(base * RULES["doctrines"][doctrine]["cost_multiplier"] * (2 if fast else 1)
+                * RULES['regimes'][actor_power]['actor_administration_multiplier']
+                * RULES['regimes'][source_power]['inherited_administration_multiplier']
+                * (RULES['reasons'][reason]['cost_multiplier'] if reason else 1) * conditions)
+
+
+@dataclass
+class OwnedTerritory:
+    key: str
+    owner: str
+    homeland: bool = False
+    incorporated: bool = False
+    treaty_port: bool = False
+    admitted_owner: str | None = None
+    source_power: str = 'other'
+    reason: str | None = None
+
+    def needs_admission(self, country: str) -> bool:
+        return (self.owner == country and not self.homeland and not self.incorporated
+                and not self.treaty_port and self.admitted_owner != country)
+
+    def transfer(self, new_owner: str, former_power: str, *, homeland: bool = False) -> None:
+        if new_owner == self.owner:
+            return
+        self.owner = new_owner
+        self.source_power = former_power
+        self.homeland = homeland
+        self.admitted_owner = None
+        self.reason = None
+        if not homeland and not self.treaty_port:
+            self.incorporated = False
+
+
+@dataclass
+class TerritorialAgenda:
+    country: str
+    active_target: str | None = None
+    cooldown_until: int = 0
+
+    def start(self, state: OwnedTerritory, day: int) -> None:
+        if self.active_target or day < self.cooldown_until or not state.needs_admission(self.country):
+            raise ValueError('Only one eligible owned state may be legislated at a time')
+        self.active_target = state.key
+
+    def resolve(self, state: OwnedTerritory, *, passed: bool, day: int, reason: str) -> None:
+        if self.active_target != state.key:
+            raise ValueError('Resolution must address the active state')
+        if not state.needs_admission(self.country):
+            passed = False
+        if passed:
+            state.admitted_owner = self.country
+            state.reason = reason
+        else:
+            self.cooldown_until = day + RULES['bill']['cooldown_days']
+        self.active_target = None
+
+
+@dataclass
+class LostTerritory:
+    region: str
+    owner: str
+    claimant: str
+    homeland: bool = False
+    claimed: bool = False
+    renounced: bool = False
+
+    def eligible(self) -> bool:
+        return self.owner != self.claimant and (self.claimed or self.homeland) and not self.renounced
+
+    def renounce(self) -> None:
+        if not self.eligible():
+            raise ValueError('Only an unrenounced lost homeland or claim can be relinquished')
+        self.claimed = False
+        self.renounced = True
+        # Homeland identity and sovereignty remain unchanged.
 
 
 @dataclass(frozen=True)

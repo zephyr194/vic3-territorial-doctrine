@@ -44,6 +44,7 @@ def package(output: Path) -> None:
         archive.write(ROOT / 'LICENSE', f'{NAME}/LICENSE')
         archive.writestr(f'{NAME}.mod', descriptor(f'mod/{NAME}'))
         archive.write(ROOT / 'docs/INSTALL.md', 'INSTALL.md')
+        archive.write(ROOT / 'docs/README.en.md', 'README.en.md')
     print(f'Packaged: {output.resolve()}')
 
 

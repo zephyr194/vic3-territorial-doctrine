@@ -75,27 +75,29 @@ def walk(entries: list[Entry]):
             yield from walk(entry.value)
 
 
-def triggers(entries: list[Entry], context: dict[str, float | bool]) -> bool:
+def triggers(entries: list[Entry], context: dict, definitions: dict | None = None) -> bool:
+    definitions = definitions or {}
     for e in entries:
         if e.key == 'OR':
-            result = any(triggers([v], context) for v in e.value)
+            result = any(triggers([v], context, definitions) for v in e.value)
         elif e.key == 'NOT':
-            result = not triggers(e.value, context)
+            result = not triggers(e.value, context, definitions)
         elif e.key == 'AND':
-            result = triggers(e.value, context)
+            result = triggers(e.value, context, definitions)
         elif isinstance(e.value, list):
             # Flatten scoped predicate paths, e.g. ruler.interest_group.var:td_score.
             prefix = e.key + '.'
-            result = triggers(e.value, {k.removeprefix(prefix): v for k, v in context.items() if k.startswith(prefix)})
+            result = triggers(e.value, {k.removeprefix(prefix): v for k, v in context.items() if k.startswith(prefix)}, definitions)
         elif e.key == 'exists':
             result = bool(context.get('exists:' + e.value, False))
         elif e.key in ('has_law', 'has_variable'):
             result = bool(context.get(e.key + ':' + e.value, False))
         else:
-            lhs = context[e.key]
+            lhs = formula(e.key, context, definitions) if e.key in definitions else context[e.key]
             rhs = {'yes': True, 'no': False}.get(e.value)
             if rhs is None:
-                rhs = float(e.value) if re.fullmatch(r'-?\d+(\.\d+)?', e.value) else context[e.value]
+                rhs = (formula(e.value, context, definitions) if e.value in definitions
+                       else float(e.value) if re.fullmatch(r'-?\d+(\.\d+)?', e.value) else context[e.value])
             result = {'=': lambda: lhs == rhs, '>=': lambda: lhs >= rhs,
                       '<=': lambda: lhs <= rhs, '>': lambda: lhs > rhs,
                       '<': lambda: lhs < rhs, '!=': lambda: lhs != rhs}[e.operator]()
@@ -120,7 +122,7 @@ def formula(value: str | list[Entry], context: dict, definitions: dict, active=(
         if e.key in ('if', 'else_if', 'else'):
             body = [v for v in e.value if v.key != 'limit']
             limit = next((v.value for v in e.value if v.key == 'limit'), [])
-            enabled = (e.key == 'if' or not previous_if) and triggers(limit, context)
+            enabled = (e.key == 'if' or not previous_if) and triggers(limit, context, definitions)
             if e.key == 'if':
                 previous_if = False
             if enabled:

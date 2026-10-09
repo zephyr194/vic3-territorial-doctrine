@@ -1,4 +1,7 @@
 td_initialize_effect = {
+    if = { limit = { NOT = { has_variable = td_generation } } set_variable = { name = td_generation value = 0 } }
+    set_variable = td_initialized_v3
+
     if = {
         limit = { NOT = { td_has_doctrine_trigger = yes } }
         activate_law = law_type:law_td_status_quo
@@ -25,6 +28,7 @@ td_remove_focus_effect = {
 
 td_clear_bill_effect = {
     remove_variable = td_bill
+    remove_variable = td_pending_bill
     remove_variable = td_bill_pledge_navy
     remove_variable = td_bill_pledge_railway
 }
@@ -44,8 +48,7 @@ td_doctrine_changed_effect = {
 
 td_calculate_politics_effect = {
     td_base_scores_effect = yes
-    # Al Rif is explicitly registered as a Strait of Gibraltar security target.
-    ig:ig_armed_forces = { change_variable = { name = td_score add = 15 } }
+    if = { limit = { var:td_reason = 1 } ig:ig_armed_forces = { change_variable = { name = td_score add = 15 } } }
     if = {
         limit = { var:td_bill = 2 }
         ig:ig_intelligentsia = { change_variable = { name = td_score add = 15 } }
@@ -57,6 +60,15 @@ td_calculate_politics_effect = {
     }
     if = { limit = { has_variable = td_bill_pledge_navy } ig:ig_armed_forces = { change_variable = { name = td_score add = 10 } } }
     if = { limit = { has_variable = td_bill_pledge_railway } ig:ig_industrialists = { change_variable = { name = td_score add = 10 } } }
+    if = {
+        limit = { var:td_bill = 3 }
+        ig:ig_armed_forces = { change_variable = { name = td_score subtract = 20 } }
+        ig:ig_landowners = { change_variable = { name = td_score subtract = 10 } }
+        ig:ig_petty_bourgeoisie = { change_variable = { name = td_score subtract = 15 } }
+        ig:ig_intelligentsia = { change_variable = { name = td_score add = 10 } }
+        ig:ig_trade_unions = { change_variable = { name = td_score add = 10 } }
+        ig:ig_rural_folk = { change_variable = { name = td_score add = 10 } }
+    }
     set_variable = { name = td_support value = 0 }
     set_variable = { name = td_opposition value = 0 }
     every_interest_group = {
@@ -78,19 +90,13 @@ td_calculate_politics_effect = {
             owner = { change_variable = { name = td_opposition add = { value = prev.ig_clout multiply = 50 } } }
         }
     }
-    set_variable = { name = td_population_ratio value = 0 }
-    if = {
-        limit = { var:td_bill = 1 exists = s:STATE_AL_RIF.region_state:MOR }
-        set_variable = { name = td_population_ratio value = { value = s:STATE_AL_RIF.region_state:MOR.state_population divide = total_population } }
-    }
-    else_if = {
-        limit = { var:td_bill = 2 exists = s:STATE_AL_RIF.region_state:SPA }
-        set_variable = { name = td_population_ratio value = { value = s:STATE_AL_RIF.region_state:SPA.state_population divide = total_population } }
-    }
+    td_refresh_target_effect = yes
+    set_variable = { name = td_population_ratio value = { value = var:td_target.state_population divide = total_population } }
     set_variable = { name = td_chance value = td_success_probability }
 }
 
 td_start_bill_effect = {
+    td_refresh_target_effect = yes
     set_variable = { name = td_successes value = 0 }
     set_variable = { name = td_failures value = 0 }
     td_calculate_politics_effect = yes
@@ -108,14 +114,24 @@ td_pass_bill_effect = {
     }
     if = {
         limit = { var:td_bill = 1 }
-        s:STATE_AL_RIF = { add_claim = root }
-        if = { limit = { has_law = law_type:law_td_strategic_frontiers } change_infamy = 2 }
-        if = { limit = { has_law = law_type:law_td_imperial_expansion } change_infamy = 5 }
+        var:td_target.state_region = { add_claim = root }
+        change_infamy = td_claim_infamy
         trigger_event = td.11
     }
-    else = {
-        set_variable = td_admitted
+    else_if = {
+        limit = { var:td_bill = 2 }
+        var:td_target = {
+            set_variable = { name = td_admitted_owner value = owner }
+            set_variable = { name = td_admission_reason value = root.var:td_reason }
+            remove_modifier = td_requires_admission
+        }
         trigger_event = td.12
+        if = { limit = { is_player = no bureaucracy >= td_regular_project_cost } td_start_regular_effect = yes }
+    }
+    else = {
+        var:td_target.state_region = { remove_claim = root }
+        add_to_variable_list = { name = td_renounced_regions target = var:td_target.state_region }
+        trigger_event = td.19
     }
     td_clear_bill_effect = yes
 }

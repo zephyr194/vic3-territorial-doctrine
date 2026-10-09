@@ -4,7 +4,8 @@ import unittest
 
 from territorial_doctrine.model import (Bill, BillStatus, Conditions, Integration,
     Target, final_probability, group_scores, integration_cost, political_forces,
-    political_weight, round_probability)
+    political_weight, round_probability, reason_bonus, claim_infamy,
+    OwnedTerritory, TerritorialAgenda, LostTerritory, RULES)
 
 
 class PoliticsTests(unittest.TestCase):
@@ -34,15 +35,33 @@ class PoliticsTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 group_scores('status_quo', pledges=pledges)
 
-    def test_prior_conversation_examples(self):
+    def test_common_base_and_reason_example(self):
         self.assertAlmostEqual(round_probability(55, 20, legitimacy=50,
-            monarch_supports=True, autocrat_supports=True), .5)
+            reason='security', government='monarchy', power='autocracy'), .42)
+        self.assertAlmostEqual(round_probability(55, 20, legitimacy=50), .35)
         self.assertAlmostEqual(round_probability(75, 20, legitimacy=75), .52)
+
+    def test_every_structure_has_the_same_starting_rate(self):
+        for government, power in product(('monarchy', 'republic', 'other'), RULES['regimes']):
+            self.assertEqual(round_probability(0, 0, legitimacy=50,
+                government=government, power=power), .10)
+
+    def test_reason_fit_changes_sign(self):
+        self.assertEqual(reason_bonus('security', 'monarchy', 'autocracy'), 7)
+        self.assertEqual(reason_bonus('security', 'republic', 'democracy'), -2)
+        self.assertEqual(reason_bonus('equal_rights', 'monarchy', 'autocracy'), -7)
+        self.assertEqual(reason_bonus('equal_rights', 'republic', 'democracy'), 8)
+
+    def test_renunciation_has_distinct_politics(self):
+        normal = group_scores('historical_rights')
+        waived = group_scores('historical_rights', renunciation=True)
+        self.assertEqual(waived['armed_forces'], normal['armed_forces'] - 20)
+        self.assertEqual(waived['intelligentsia'], normal['intelligentsia'] + 10)
 
     def test_probability_bounds_and_risk(self):
         self.assertEqual(round_probability(0, 100, legitimacy=0, at_war=True), .05)
         self.assertEqual(round_probability(100, 0, legitimacy=100,
-            monarch_supports=True, autocrat_supports=True), .85)
+            reason='equal_rights', government='republic', power='democracy'), .85)
         baseline = round_probability(55, 20, legitimacy=50)
         self.assertAlmostEqual(round_probability(55, 20, legitimacy=50,
             target_population_ratio=.2), baseline - .05)
@@ -94,6 +113,82 @@ class TargetTests(unittest.TestCase):
         self.assertTrue(target.eligible('imperial_expansion'))
         self.assertFalse(replace(target, foreign=False).eligible('imperial_expansion'))
         self.assertFalse(replace(target, diplomatic_target=False).eligible('imperial_expansion'))
+
+
+class IndividualTerritoryTests(unittest.TestCase):
+    def test_each_state_requires_its_own_bill(self):
+        a, b = OwnedTerritory('A', 'SPA'), OwnedTerritory('B', 'SPA')
+        agenda = TerritorialAgenda('SPA')
+        agenda.start(a, 0)
+        with self.assertRaises(ValueError):
+            agenda.start(b, 1)
+        with self.assertRaises(ValueError):
+            agenda.resolve(b, passed=True, day=270, reason='civil_administration')
+        agenda.resolve(a, passed=True, day=270, reason='civil_administration')
+        self.assertFalse(a.needs_admission('SPA'))
+        self.assertTrue(b.needs_admission('SPA'))
+        agenda.start(b, 271)
+        agenda.resolve(b, passed=True, day=541, reason='equal_rights')
+        self.assertEqual(b.reason, 'equal_rights')
+
+    def test_foreign_occupation_homeland_and_treaty_port_are_excluded(self):
+        for state in (OwnedTerritory('A', 'MOR'), OwnedTerritory('A', 'SPA', homeland=True),
+                      OwnedTerritory('A', 'SPA', treaty_port=True),
+                      OwnedTerritory('A', 'SPA', incorporated=True)):
+            self.assertFalse(state.needs_admission('SPA'))
+
+    def test_owner_change_invalidates_admission_even_after_reacquisition(self):
+        state = OwnedTerritory('A', 'SPA', admitted_owner='SPA', incorporated=True)
+        state.transfer('FRA', 'autocracy')
+        self.assertTrue(state.needs_admission('FRA'))
+        self.assertFalse(state.incorporated)
+        self.assertEqual(state.source_power, 'autocracy')
+        state.transfer('SPA', 'democracy')
+        self.assertTrue(state.needs_admission('SPA'))
+        self.assertIsNone(state.admitted_owner)
+        self.assertEqual(state.source_power, 'democracy')
+
+    def test_loss_during_bill_cannot_approve_foreign_state(self):
+        state = OwnedTerritory('A', 'SPA')
+        agenda = TerritorialAgenda('SPA')
+        agenda.start(state, 0)
+        state.transfer('FRA', 'autocracy')
+        agenda.resolve(state, passed=True, day=90, reason='civil_administration')
+        self.assertIsNone(state.admitted_owner)
+        self.assertEqual(agenda.cooldown_until, 820)
+
+    def test_waive_lost_homeland_claim_keeps_culture_and_owner(self):
+        lost = LostTerritory('Outer Manchuria', 'RUS', 'CHI', homeland=True, claimed=True)
+        other = LostTerritory('Other region', 'RUS', 'CHI', homeland=True, claimed=True)
+        lost.renounce()
+        self.assertTrue(lost.homeland)
+        self.assertEqual(lost.owner, 'RUS')
+        self.assertFalse(lost.claimed)
+        self.assertFalse(lost.eligible())
+        self.assertTrue(other.claimed)
+        self.assertTrue(other.eligible())
+        for doctrine in RULES['doctrines']:
+            self.assertFalse(Target(1_000_000, focus_ready=True, primary_homeland=True,
+                                    adjacent=True, renounced=True).eligible(doctrine))
+        with self.assertRaises(ValueError):
+            lost.renounce()
+
+    def test_only_foreign_lost_claim_or_homeland_can_be_waived(self):
+        self.assertTrue(LostTerritory('A', 'RUS', 'CHI', homeland=True).eligible())
+        self.assertFalse(LostTerritory('A', 'CHI', 'CHI', claimed=True).eligible())
+        self.assertFalse(LostTerritory('A', 'RUS', 'CHI').eligible())
+
+    def test_target_regime_and_local_conditions_change_cost(self):
+        self.assertEqual(claim_infamy('strategic_frontiers', 'security', 'autocracy'), 2)
+        self.assertEqual(claim_infamy('strategic_frontiers', 'security', 'democracy'), 3)
+        neutral = integration_cost(1_000_000, 'strategic_frontiers', fast=False)
+        inherited = integration_cost(1_000_000, 'strategic_frontiers', fast=False, source_power='autocracy')
+        damaged = integration_cost(1_000_000, 'strategic_frontiers', fast=False, turmoil=.5,
+                                   devastation=.5, accepted_share=.5)
+        self.assertGreater(inherited, neutral)
+        self.assertGreater(damaged, inherited)
+        with self.assertRaises(ValueError):
+            integration_cost(1, 'status_quo', fast=False, accepted_share=1.1)
 
 
 class BillTests(unittest.TestCase):

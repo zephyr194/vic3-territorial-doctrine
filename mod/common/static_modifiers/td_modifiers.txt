@@ -14,3 +14,4 @@ td_focus_imperial_expansion = {
 td_project_cost = { country_bureaucracy_add = -1 }
 td_pledge_fulfilled = { interest_group_approval_add = 2 }
 td_pledge_broken = { interest_group_approval_add = -5 }
+td_requires_admission = { state_disallow_incorporation = yes }

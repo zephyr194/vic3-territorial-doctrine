@@ -1,10 +1,10 @@
 {
   "name": "Territorial Doctrine — 国家领土原则",
   "id": "territorial_doctrine",
-  "version": "0.2.0-alpha.1",
+  "version": "0.3.0-alpha.1",
   "game_id": "victoria3",
   "supported_game_version": "1.13.*",
-  "short_description": "Spain–Al Rif territorial legislation prototype / 西班牙—阿尔里夫领土立法原型",
+  "short_description": "Individual territorial admission and contextual justifications / 逐州领土接纳与体制理由",
   "tags": [
     "Gameplay",
     "Politics"

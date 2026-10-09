@@ -92,6 +92,51 @@ def outputs() -> dict[Path, bytes]:
         values += f'td_bill_{key} = {value}\n'
     values += 'td_fast_months = 12\ntd_fallback_months = 6\n'
     put('common/script_values/td_constants.txt', values)
+    policy = HEADER
+    policy += '''td_power_category = {
+    value = 0
+    if = { limit = { OR = { has_law = law_type:law_autocracy has_law = law_type:law_single_party_state } } value = 1 }
+    else_if = { limit = { OR = { has_law = law_type:law_census_suffrage has_law = law_type:law_universal_suffrage } } value = 2 }
+}
+td_government_category = {
+    value = 0
+    if = { limit = { has_law = law_type:law_monarchy } value = 1 }
+    else_if = { limit = { OR = { has_law = law_type:law_presidential_republic has_law = law_type:law_parliamentary_republic } } value = 2 }
+}
+'''
+    policy += 'td_reason_bonus = {\n    value = 0\n'
+    for reason in RULES['reasons'].values():
+        policy += f'    if = {{ limit = {{ var:td_reason = {reason["id"]} }}\n'
+        for category, mapping in (('government', {'other': 0, 'monarchy': 1, 'republic': 2}), ('power', {'other': 0, 'autocracy': 1, 'democracy': 2})):
+            for name, index in mapping.items():
+                bonus = reason[category][name]
+                if bonus:
+                    policy += f'        if = {{ limit = {{ td_{category}_category = {index} }} add = {bonus} }}\n'
+        policy += '    }\n'
+    policy += '}\ntd_reason_cost_multiplier = {\n    value = 1\n'
+    for reason in RULES['reasons'].values():
+        policy += f'    if = {{ limit = {{ var:td_reason = {reason["id"]} }} value = {reason["cost_multiplier"]} }}\n'
+    policy += '}\ntd_actor_cost_multiplier = {\n    value = 1\n'
+    for regime in RULES['regimes'].values():
+        policy += f'    if = {{ limit = {{ td_power_category = {regime["id"]} }} value = {regime["actor_administration_multiplier"]} }}\n'
+    policy += '}\n'
+    put('common/script_values/td_policy_values.txt', policy)
+    cache = HEADER + '''# Country scope with PREV = state. Store literal values so extinct former
+# owners do not erase the institutional cost of territory they lost.
+td_store_power_on_prev_state_effect = {
+'''
+    for regime in RULES['regimes'].values():
+        cache += f'''    if = {{
+        limit = {{ td_power_category = {regime['id']} }}
+        prev = {{
+            set_variable = {{ name = td_live_power value = {regime['id']} }}
+            set_variable = {{ name = td_live_diplomatic value = {regime['diplomatic_multiplier']} }}
+            set_variable = {{ name = td_live_administration value = {regime['inherited_administration_multiplier']} }}
+        }}
+    }}
+'''
+    cache += '}\n'
+    put('common/scripted_effects/td_regime_cache.txt', cache)
     modifiers = HEADER
     for doctrine, data in RULES['doctrines'].items():
         if data['focus_limit']:
@@ -103,6 +148,7 @@ def outputs() -> dict[Path, bytes]:
     modifiers += '''td_project_cost = { country_bureaucracy_add = -1 }
 td_pledge_fulfilled = { interest_group_approval_add = 2 }
 td_pledge_broken = { interest_group_approval_add = -5 }
+td_requires_admission = { state_disallow_incorporation = yes }
 '''
     put('common/static_modifiers/td_modifiers.txt', modifiers)
     for language, label in [('english', 'en'), ('simp_chinese', 'zh')]:
@@ -124,7 +170,7 @@ td_pledge_broken = { interest_group_approval_add = -5 }
         'name': 'Territorial Doctrine — 国家领土原则',
         'id': 'territorial_doctrine', 'version': RULES['version'],
         'game_id': 'victoria3', 'supported_game_version': '1.13.*',
-        'short_description': 'Spain–Al Rif territorial legislation prototype / 西班牙—阿尔里夫领土立法原型',
+        'short_description': 'Individual territorial admission and contextual justifications / 逐州领土接纳与体制理由',
         'tags': ['Gameplay', 'Politics'], 'relationships': [],
         'game_custom_data': {'multiplayer_synchronized': True}
     }
