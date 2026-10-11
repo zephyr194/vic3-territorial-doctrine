@@ -1,5 +1,5 @@
 {
-  "version": "0.4.1-alpha.1",
+  "version": "0.5.0-alpha.1",
   "doctrines": {
     "status_quo": {
       "zh": "领土现状主义",
@@ -18,7 +18,9 @@
       },
       "country_modifiers": {
         "country_bureaucracy_mult": 0.05,
-        "country_prestige_mult": -0.05
+        "country_prestige_mult": -0.05,
+        "country_infamy_decay_mult": 0.15,
+        "country_legitimacy_base_add": 5
       },
       "description": {
         "zh": "维护现有边界，把政治与行政资源用于国内建设。知识分子、工会与乡村民众得到更多影响力，军方的扩张议程受到约束；行政效率提高，但对外威望有所降低。",
@@ -27,6 +29,15 @@
       "eligibility": {
         "zh": "不提出新领土宣称；仍可逐州接纳已有领土或放弃失地宣称。",
         "en": "Does not propose territorial claims; owned states may still be admitted individually and lost claims relinquished."
+      },
+      "industry_modifiers": {
+        "building_paper_mill_throughput_mult": 0.05,
+        "building_food_industry_throughput_mult": 0.05,
+        "building_textile_mill_throughput_mult": 0.05
+      },
+      "territory_modifiers": {
+        "state_construction_mult": 0.05,
+        "state_migration_pull_mult": 0.15
       }
     },
     "historical_rights": {
@@ -44,7 +55,10 @@
         "devout": 0.1
       },
       "country_modifiers": {
-        "country_authority_add": 25
+        "country_authority_add": 25,
+        "country_infamy_generation_mult": -0.1,
+        "country_infamy_decay_mult": 0.05,
+        "country_legitimacy_base_add": 5
       },
       "description": {
         "zh": "以既有法理和主体文化家园维护国家疆界，将恢复合法领土置于无条件扩张之前。小市民、地主与宗教传统力量获得更大政治影响，国家权威增强；传统精英也因此更有能力阻碍改革。",
@@ -53,6 +67,14 @@
       "eligibility": {
         "zh": "仅可主张已有真实宣称或主体文化家园的外国州；不凭重点区域创造历史权利。",
         "en": "Foreign targets require an existing real claim or a primary-cultural homeland; a focus region does not create historical rights."
+      },
+      "industry_modifiers": {
+        "building_group_bg_agriculture_throughput_mult": 0.05,
+        "building_group_bg_logging_throughput_mult": 0.05
+      },
+      "territory_modifiers": {
+        "state_construction_mult": 0.1,
+        "state_migration_pull_mult": 0.1
       }
     },
     "strategic_frontiers": {
@@ -71,7 +93,9 @@
       },
       "country_modifiers": {
         "country_diplomatic_play_maneuvers_add": 10,
-        "country_military_goods_cost_mult": 0.05
+        "country_military_goods_cost_mult": 0.05,
+        "country_infamy_generation_mult": 0.1,
+        "country_legitimacy_base_add": 2
       },
       "description": {
         "zh": "通过有限扩张保障边境与区域安全。军方负责边疆部署，实业家参与对外建设，两者政治力量提高；外交博弈有更多回旋余地，但军费负担增加，乡村民众的影响力受到挤压。",
@@ -80,6 +104,17 @@
       "eligibility": {
         "zh": "可主张相邻州，或有原版区域利益和成熟重点、且符合当前殖民或航道安全依据的远方目标。",
         "en": "Claims cover adjacent states, or distant targets with a vanilla regional interest, mature focus and a qualifying colonial or sea-lane security basis."
+      },
+      "industry_modifiers": {
+        "building_steel_mill_throughput_mult": 0.05,
+        "building_tooling_workshop_throughput_mult": 0.05,
+        "building_arms_industry_throughput_mult": 0.05,
+        "building_munition_plant_throughput_mult": 0.05,
+        "building_shipyard_throughput_mult": 0.05
+      },
+      "territory_modifiers": {
+        "state_construction_mult": 0.15,
+        "state_migration_pull_mult": 0.05
       }
     },
     "imperial_expansion": {
@@ -102,7 +137,9 @@
       "country_modifiers": {
         "country_prestige_mult": 0.1,
         "country_military_goods_cost_mult": 0.1,
-        "country_bureaucracy_mult": -0.05
+        "country_bureaucracy_mult": -0.05,
+        "country_infamy_generation_mult": 0.25,
+        "country_legitimacy_base_add": -5
       },
       "description": {
         "zh": "把海外扩张与国家威望列为长期国策。军方、实业家与地主共同获益，民生和改革集团的影响力下降；帝国声望提高，但军事物资更加昂贵，广泛的海外承诺也削弱行政能力。",
@@ -111,6 +148,24 @@
       "eligibility": {
         "zh": "可对已有原版利益且重点区域已成熟的合格外国州提出主张；每个目标仍须单独通过宣称法案。",
         "en": "Eligible foreign states in mature focus regions with a vanilla regional interest may be claimed; each target still needs its own approved bill."
+      },
+      "industry_modifiers": {
+        "building_coal_mine_throughput_mult": 0.1,
+        "building_iron_mine_throughput_mult": 0.1,
+        "building_lead_mine_throughput_mult": 0.1,
+        "building_sulfur_mine_throughput_mult": 0.1,
+        "building_steel_mill_throughput_mult": 0.1,
+        "building_tooling_workshop_throughput_mult": 0.1,
+        "building_chemical_plant_throughput_mult": 0.1,
+        "building_motor_industry_throughput_mult": 0.1,
+        "building_arms_industry_throughput_mult": 0.1,
+        "building_munition_plant_throughput_mult": 0.1,
+        "building_war_machine_industry_throughput_mult": 0.1,
+        "building_shipyard_throughput_mult": 0.1
+      },
+      "territory_modifiers": {
+        "state_construction_mult": 0.2,
+        "state_migration_pull_mult": 0.1
       }
     }
   },
@@ -308,14 +363,10 @@
     }
   },
   "integration": {
-    "valid_months": 12,
-    "fallback_months": 6,
-    "legitimacy": 60,
-    "turmoil_below": 0.2,
-    "devastation_below": 0.1,
-    "market_access": 0.9,
-    "accepted_share": 0.8,
-    "cost_precision": 100000
+    "months": 12,
+    "annual_cost_multiplier": 2,
+    "cost_precision": 100000,
+    "ratification_migration_pull": 0.05
   },
   "prototype": {
     "country": "SPA",
@@ -407,7 +458,8 @@
   "legacy_variables": [
     "td_focus",
     "td_focus_wait",
-    "td_initialized_v3"
+    "td_initialized_v3",
+    "td_regular"
   ],
   "group_politics": {
     "armed_forces": {

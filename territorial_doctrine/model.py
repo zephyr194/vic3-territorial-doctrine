@@ -215,7 +215,8 @@ def reason_bonus(reason: str | None, government: str, power: str) -> float:
 def claim_infamy(doctrine: str, reason: str, target_power: str) -> int:
     return ceil(RULES['doctrines'][doctrine]['infamy']
                 * RULES['reasons'][reason]['cost_multiplier']
-                * RULES['regimes'][target_power]['diplomatic_multiplier'])
+                * RULES['regimes'][target_power]['diplomatic_multiplier']
+                * (1 + RULES['doctrines'][doctrine]['country_modifiers'].get('country_infamy_generation_mult', 0)))
 
 
 def integration_cost(population: int, doctrine: str, *, fast: bool,
@@ -230,7 +231,7 @@ def integration_cost(population: int, doctrine: str, *, fast: bool,
     for value, label in ((turmoil, 'turmoil'), (devastation, 'devastation'), (accepted_share, 'accepted_share')):
         _range(value, 0, 1, label)
     conditions = 1 + .5 * turmoil + .5 * devastation + .25 * (1 - accepted_share)
-    raw = (base * RULES["doctrines"][doctrine]["cost_multiplier"] * (2 if fast else 1)
+    raw = (base * RULES["doctrines"][doctrine]["cost_multiplier"] * (RULES['integration']['annual_cost_multiplier'] if fast else 1)
                 * RULES['regimes'][actor_power]['actor_administration_multiplier']
                 * RULES['regimes'][source_power]['inherited_administration_multiplier']
                 * (RULES['reasons'][reason]['cost_multiplier'] if reason else 1) * conditions
@@ -322,34 +323,25 @@ class Conditions:
     accepted_population_share: float
 
     def valid(self) -> bool:
-        r = RULES["integration"]
-        return (self.sovereign_owner and self.admitted and self.legitimacy >= r["legitimacy"]
-                and self.bureaucracy_after_cost >= 0 and self.turmoil < r["turmoil_below"]
-                and self.devastation < r["devastation_below"]
-                and self.market_access >= r["market_access"]
-                and self.accepted_population_share >= r["accepted_share"])
+        """Eligibility to fund a ratified state's one-year legal integration."""
+        return self.sovereign_owner and self.admitted and self.bureaucracy_after_cost >= 0
 
 
 @dataclass
 class Integration:
     months: int = 0
-    consecutive_invalid: int = 0
-    status: str = "fast"
+    status: str = "annual"
 
     def tick(self, conditions: Conditions) -> str:
-        if self.status != "fast":
-            raise ValueError("Integration is no longer on the fast track")
-        if not conditions.sovereign_owner:
+        if self.status != "annual":
+            raise ValueError("Integration is no longer active")
+        if not conditions.sovereign_owner or not conditions.admitted:
             self.status = "lost"
-        elif conditions.valid():
-            self.months += 1
-            self.consecutive_invalid = 0
-            if self.months == RULES["integration"]["valid_months"]:
-                self.status = "incorporated"
         else:
-            self.consecutive_invalid += 1
-            if self.consecutive_invalid == RULES["integration"]["fallback_months"]:
-                self.status = "regular"
+            # Funding is checked once at project start, not a cultural veto.
+            self.months += 1
+            if self.months == RULES["integration"]["months"]:
+                self.status = "incorporated"
         return self.status
 
 

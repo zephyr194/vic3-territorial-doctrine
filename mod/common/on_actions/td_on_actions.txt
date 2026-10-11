@@ -13,6 +13,7 @@ on_state_created = { on_actions = { td_new_state_created } }
 td_new_state_created = {
     effect = {
         if = { limit = { td_feature_enabled_trigger = yes }
+            set_variable = { name = td_acquired_owner value = owner }
             if = {
                 limit = { owner = { has_variable = td_initialized_v4 } is_treaty_port = no NOT = { is_homeland_of_country_cultures = owner } }
                 set_state_type = unincorporated
@@ -26,6 +27,7 @@ td_colony_created = {
     effect = {
         if = { limit = { td_feature_enabled_trigger = yes }
             set_variable = td_colonial_origin
+            set_variable = { name = td_acquired_owner value = owner }
             td_update_state_owner_effect = yes
         }
     }
@@ -64,7 +66,7 @@ td_country_monthly = {
             # Previously admitted states that lacked budget may start later.
             if = { limit = { is_player = no td_can_select_target_trigger = yes any_scope_state = { td_non_homeland_state_trigger = yes has_variable = td_admitted_owner var:td_admitted_owner = owner } }
                 td_select_admitted_effect = yes
-                if = { limit = { exists = var:td_target bureaucracy >= td_regular_project_cost } td_start_regular_effect = yes }
+                if = { limit = { exists = var:td_target td_fast_ready_trigger = yes } td_start_fast_effect = yes }
             }
             if = { limit = { this = c:SPA } td_pledges_monthly_effect = yes }
             if = { limit = { OR = { has_variable = td_fast has_variable = td_regular } }

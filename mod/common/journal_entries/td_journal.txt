@@ -1,12 +1,18 @@
 je_td_bill = {
     group = td_journal_group
-    is_shown_when_inactive = { td_feature_enabled_trigger = yes is_player = yes }
-    possible = { td_feature_enabled_trigger = yes has_variable = td_bill }
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes is_player = yes has_variable = td_bill NOT = { var:td_bill = 2 } }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_bill NOT = { var:td_bill = 2 } }
+    can_deactivate = yes
+}
+je_td_admission_amendment = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes is_player = yes var:td_bill = 2 exists = var:td_bill_target }
+    possible = { td_feature_enabled_trigger = yes var:td_bill = 2 exists = var:td_bill_target }
     can_deactivate = yes
 }
 je_td_integration = {
     group = td_journal_group
-    is_shown_when_inactive = { td_feature_enabled_trigger = yes is_player = yes }
-    possible = { td_feature_enabled_trigger = yes OR = { has_variable = td_fast has_variable = td_regular } }
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes is_player = yes has_variable = td_fast exists = var:td_project_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_fast exists = var:td_project_target }
     can_deactivate = yes
 }

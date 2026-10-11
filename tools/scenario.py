@@ -25,13 +25,13 @@ def main():
         admission.checkpoint(day, .7, .1)
     assert admission.status.value == 'passed'
     cost = integration_cost(1_000_000, 'strategic_frontiers', fast=True)
-    eligible = Conditions(True, True, 60, 0, .19, .09, .9, .8)
+    eligible = Conditions(True, True, 40, 0, .8, .5, .5, 0)
     project = Integration()
     for _ in range(12):
         project.tick(eligible)
     assert project.status == 'incorporated'
     print(f'Admission passed; fast bureaucracy cost={cost}; '
-          f'{project.months} eligible months -> {project.status}. Cultures/religions unchanged.')
+          f'{project.months} legal months -> {project.status}, even with 0% cultural acceptance. Native completion uses one calendar year.')
     for stage in range(3):
         expansion, acceptance = colonial_tendencies('exploitation', stage)
         print(f'Exploitation stage {stage}: expansion score {expansion:+}; admission score {acceptance:+}')

@@ -1,6 +1,7 @@
 td_initialize_effect = {
     if = { limit = { td_feature_enabled_trigger = yes }
         if = { limit = { NOT = { has_variable = td_generation } } set_variable = { name = td_generation value = 0 } }
+        if = { limit = { NOT = { has_variable = td_bill_generation } } set_variable = { name = td_bill_generation value = 0 } }
         if = { limit = { NOT = { has_variable = td_focus_epoch } } set_variable = { name = td_focus_epoch value = 0 } }
         if = { limit = { NOT = { has_variable = td_focus_count } } set_variable = { name = td_focus_count value = 0 } }
         set_variable = td_initialized_v4
@@ -24,6 +25,7 @@ td_remove_focus_effect = {
 
 td_clear_bill_effect = {
     remove_variable = td_bill
+    remove_variable = td_bill_target
     remove_variable = td_pending_bill
     remove_variable = td_bill_pledge_navy
     remove_variable = td_bill_pledge_railway
@@ -41,6 +43,7 @@ td_doctrine_changed_effect = {
         set_variable = { name = td_doctrine_lock years = 5 }
         td_cancel_bill_effect = yes
         td_remove_focus_effect = yes
+        every_scope_state = { td_refresh_state_development_effect = yes }
         # Existing admission and acquisition pledges persist across doctrine changes.
     }
 }
@@ -101,6 +104,10 @@ td_calculate_politics_effect = {
 td_start_bill_effect = {
     if = {
         limit = { td_feature_enabled_trigger = yes }
+        if = { limit = { NOT = { has_variable = td_bill_generation } } set_variable = { name = td_bill_generation value = 0 } }
+        change_variable = { name = td_bill_generation add = 1 }
+        set_variable = { name = td_bill_target value = var:td_target }
+        save_scope_value_as = { name = td_bill_run value = var:td_bill_generation }
         td_refresh_target_effect = yes
         set_variable = { name = td_successes value = 0 }
         set_variable = { name = td_failures value = 0 }
@@ -112,6 +119,8 @@ td_start_bill_effect = {
 td_pass_bill_effect = {
     if = {
         limit = { td_feature_enabled_trigger = yes }
+        if = { limit = { exists = var:td_bill_target } set_variable = { name = td_target value = var:td_bill_target } }
+        set_variable = { name = td_completed_bill value = var:td_bill }
         if = {
             limit = { has_variable = td_bill_pledge_navy }
             set_variable = td_pending_navy
@@ -133,10 +142,10 @@ td_pass_bill_effect = {
             var:td_target = {
                 set_variable = { name = td_admitted_owner value = owner }
                 set_variable = { name = td_admission_reason value = root.var:td_reason }
-                # Starting a funded project unlocks incorporation; approval alone does not bypass cost.
+                add_modifier = td_admission_ratified
             }
+            set_variable = { name = td_last_amendment_target value = var:td_target }
             trigger_event = td.12
-            if = { limit = { is_player = no bureaucracy >= td_regular_project_cost } td_start_regular_effect = yes }
         }
         else = {
             var:td_target.state_region = { remove_claim = root }
@@ -144,6 +153,8 @@ td_pass_bill_effect = {
             trigger_event = td.19
         }
         td_clear_bill_effect = yes
+        if = { limit = { var:td_completed_bill = 2 td_fast_ready_trigger = yes } td_start_fast_effect = yes }
+        remove_variable = td_completed_bill
     }
 }
 
@@ -170,8 +181,19 @@ td_disabled_cleanup_effect = {
         if = { limit = { has_law = law_type:law_td_historical_rights } deactivate_law = law_type:law_td_historical_rights }
         if = { limit = { has_law = law_type:law_td_strategic_frontiers } deactivate_law = law_type:law_td_strategic_frontiers }
         if = { limit = { has_law = law_type:law_td_imperial_expansion } deactivate_law = law_type:law_td_imperial_expansion }
-        every_scope_state = { remove_modifier = td_requires_admission }
+        every_scope_state = {
+            remove_modifier = td_requires_admission
+            remove_modifier = td_annual_integration
+            remove_modifier = td_admission_ratified
+            td_clear_state_development_effect = yes
+        }
         remove_variable = td_initialized_v3
         remove_variable = td_initialized_v4
     }
+}
+
+# COUNTRY: title the political review after the exact owned state.
+td_open_review_effect = {
+    if = { limit = { var:td_pending_bill = 2 } trigger_event = td.30 }
+    else = { trigger_event = td.21 }
 }

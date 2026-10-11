@@ -6,6 +6,7 @@ import unittest
 from native_runner import EventRunner, policy_context
 from territorial_doctrine.model import DOCTRINES, RULES
 from territorial_doctrine.script import load
+from tools.law_text import INDUSTRY_EFFECTS
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -57,6 +58,9 @@ class LawEffectTests(unittest.TestCase):
             'country_authority_add': ('权威力', 'Authority', 1),
             'country_diplomatic_play_maneuvers_add': ('外交博弈机动点', 'Diplomatic play maneuvers', 1),
             'country_military_goods_cost_mult': ('军事物资花费', 'Military goods cost', 100),
+            'country_infamy_generation_mult': ('恶名产生', 'Infamy generation', 100),
+            'country_infamy_decay_mult': ('恶名衰减', 'Infamy decay', 100),
+            'country_legitimacy_base_add': ('基础合法性', 'Base legitimacy', 1),
         }
         for language, label in (('english', 'en'), ('simp_chinese', 'zh')):
             loc = localization(language, 'td_laws')
@@ -69,6 +73,9 @@ class LawEffectTests(unittest.TestCase):
                     if key.startswith('interest_group_ig_'):
                         group = key.removeprefix('interest_group_ig_').removesuffix('_pol_str_mult')
                         name, scale = RULES['group_politics'][group][label], 100
+                    elif key in INDUSTRY_EFFECTS:
+                        zh, en = INDUSTRY_EFFECTS[key]
+                        name, scale = (zh if label == 'zh' else en), 100
                     else:
                         zh, en, scale = countries[key]
                         name = zh if label == 'zh' else en

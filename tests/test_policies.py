@@ -158,16 +158,16 @@ class ActivationTests(unittest.TestCase):
         self.assertFalse(runner.claims)
         self.assertFalse(runner.incorporated)
 
-    def test_admission_stays_locked_until_funded_project(self):
+    def test_ratification_automatically_funds_only_its_annual_state_project(self):
         runner=EventRunner((.1,.1,.1))
         runner.variables.update(td_bill=2,td_reason=4)
         runner.execute(runner.definitions['td_start_bill_effect'])
         for _ in range(3):runner.next_event()
-        self.assertIn('td_requires_admission',runner.states['A']['modifiers'])
+        self.assertIn('td_annual_integration',runner.states['A']['modifiers'])
         runner.execute(runner.definitions['td_start_regular_effect'])
         self.assertNotIn('td_requires_admission',runner.states['A']['modifiers'])
         self.assertIn('td_requires_admission',runner.states['B']['modifiers'])
-        self.assertEqual(runner.modifiers['td_project_cost'],50)
+        self.assertEqual(runner.modifiers['td_project_cost'],100)
 
     def test_confirming_existing_claim_costs_no_extra_infamy(self):
         runner=EventRunner((.1,.1,.1));runner.claims.add('A')

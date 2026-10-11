@@ -10,6 +10,9 @@ td_update_state_owner_effect = {
             remove_variable = td_admitted_owner
             remove_variable = td_admission_reason
             remove_variable = td_integration_project_owner
+            remove_modifier = td_admission_ratified
+            remove_modifier = td_annual_integration
+            set_variable = { name = td_acquired_owner value = owner }
             if = {
                 limit = { is_treaty_port = no NOT = { is_homeland_of_country_cultures = owner } }
                 set_state_type = unincorporated
@@ -32,6 +35,7 @@ td_update_state_owner_effect = {
             else = { remove_modifier = td_requires_admission }
         }
         else = { remove_modifier = td_requires_admission }
+        td_refresh_state_development_effect = yes
     }
 }
 

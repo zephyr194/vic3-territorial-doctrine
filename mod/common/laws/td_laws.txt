@@ -10,6 +10,11 @@ law_td_status_quo = {
         interest_group_ig_armed_forces_pol_str_mult = -0.1
         country_bureaucracy_mult = 0.05
         country_prestige_mult = -0.05
+        country_infamy_decay_mult = 0.15
+        country_legitimacy_base_add = 5
+        building_paper_mill_throughput_mult = 0.05
+        building_food_industry_throughput_mult = 0.05
+        building_textile_mill_throughput_mult = 0.05
     }
     can_enact = { td_can_legislate_trigger = yes }
     on_enact = { td_doctrine_changed_effect = yes }
@@ -24,6 +29,11 @@ law_td_historical_rights = {
         interest_group_ig_landowners_pol_str_mult = 0.1
         interest_group_ig_devout_pol_str_mult = 0.1
         country_authority_add = 25
+        country_infamy_generation_mult = -0.1
+        country_infamy_decay_mult = 0.05
+        country_legitimacy_base_add = 5
+        building_group_bg_agriculture_throughput_mult = 0.05
+        building_group_bg_logging_throughput_mult = 0.05
     }
     can_enact = { td_can_legislate_trigger = yes }
     on_enact = { td_doctrine_changed_effect = yes }
@@ -39,6 +49,13 @@ law_td_strategic_frontiers = {
         interest_group_ig_rural_folk_pol_str_mult = -0.1
         country_diplomatic_play_maneuvers_add = 10
         country_military_goods_cost_mult = 0.05
+        country_infamy_generation_mult = 0.1
+        country_legitimacy_base_add = 2
+        building_steel_mill_throughput_mult = 0.05
+        building_tooling_workshop_throughput_mult = 0.05
+        building_arms_industry_throughput_mult = 0.05
+        building_munition_plant_throughput_mult = 0.05
+        building_shipyard_throughput_mult = 0.05
     }
     can_enact = { td_can_legislate_trigger = yes }
     on_enact = { td_doctrine_changed_effect = yes }
@@ -58,6 +75,20 @@ law_td_imperial_expansion = {
         country_prestige_mult = 0.1
         country_military_goods_cost_mult = 0.1
         country_bureaucracy_mult = -0.05
+        country_infamy_generation_mult = 0.25
+        country_legitimacy_base_add = -5
+        building_coal_mine_throughput_mult = 0.1
+        building_iron_mine_throughput_mult = 0.1
+        building_lead_mine_throughput_mult = 0.1
+        building_sulfur_mine_throughput_mult = 0.1
+        building_steel_mill_throughput_mult = 0.1
+        building_tooling_workshop_throughput_mult = 0.1
+        building_chemical_plant_throughput_mult = 0.1
+        building_motor_industry_throughput_mult = 0.1
+        building_arms_industry_throughput_mult = 0.1
+        building_munition_plant_throughput_mult = 0.1
+        building_war_machine_industry_throughput_mult = 0.1
+        building_shipyard_throughput_mult = 0.1
     }
     can_enact = { td_can_legislate_trigger = yes }
     on_enact = { td_doctrine_changed_effect = yes }

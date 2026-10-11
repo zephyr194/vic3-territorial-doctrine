@@ -102,10 +102,28 @@ td_fast_ready_trigger = {
     td_feature_enabled_trigger = yes
     td_admission_target_valid_trigger = yes
     var:td_target = { var:td_admitted_owner = owner }
-    legitimacy >= 60
     bureaucracy >= td_unpaid_project_cost
-    var:td_accepted_share >= 0.8
-    var:td_target = { turmoil < 0.2 devastation < 0.1 market_access >= 0.9 }
+}
+td_annual_project_valid_trigger = {
+    exists = var:td_project_target
+    var:td_project_target = {
+        owner = root
+        is_treaty_port = no
+        has_variable = td_admitted_owner
+        var:td_admitted_owner = owner
+        has_variable = td_integration_project_owner
+        var:td_integration_project_owner = owner
+    }
+}
+
+# STATE: actual sovereign ownership, including split states; foreign military
+# occupation grants no construction rights. Existing non-homelands also qualify.
+td_development_target_trigger = {
+    is_treaty_port = no
+    OR = {
+        NOT = { is_homeland_of_country_cultures = owner }
+        AND = { has_variable = td_acquired_owner var:td_acquired_owner = owner }
+    }
 }
 
 # STATE: a wholly lost region, claimed or a primary-cultural homeland.

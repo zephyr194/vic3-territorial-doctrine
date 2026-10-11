@@ -34,7 +34,10 @@ def policy_context(government='other', power='other', doctrine='strategic_fronti
 
 
 class EventRunner:
-    def __init__(self, rolls=()):
+    def __init__(self, rolls=(), *, country='SPA'):
+        self.country = country
+        self.bureaucracy = 1000
+        self.previous_scope = None
         self.definitions = {}
         self.values = {}
         for path in (ROOT / 'mod').rglob('*.txt'):
@@ -50,8 +53,9 @@ class EventRunner:
         self.lists = {}
         self.expirations = {}
         self.modifiers = {}
-        self.states = {key: {'owner': 'SPA', 'state_population': 1_000_000,
+        self.states = {key: {'owner': country, 'state_population': 1_000_000,
                             'turmoil': 0, 'devastation': 0, 'incorporated': False,
+                            'homeland': False, 'treaty_port': False,
                             'region': 'R1' if key == 'A' else 'R2',
                             'variables': {'td_source_administration': 1,
                                           'td_live_administration': 1, 'td_live_diplomatic': 1},
@@ -87,7 +91,7 @@ class EventRunner:
         context = self.policy.copy()
         context.update({'var:' + k: v for k, v in self.variables.items()})
         context.update({'scope:' + k: v for k, v in self.saved.items()})
-        context.update({'is_player': True, 'bureaucracy': 1000, 'authority': 1000, 'root': 'SPA',
+        context.update({'is_player': True, 'bureaucracy': self.bureaucracy, 'authority': 1000, 'root': self.country,
                         'is_subject':False,'is_revolutionary':False,'legitimacy':70,
                         'has_modifier:country_bankruptcy':False,
                         'has_interest_marker_in_region:var:td_target.region':True})
@@ -97,30 +101,32 @@ class EventRunner:
             state = self.states[target]
             context.update({'var:td_target.' + k: v for k, v in state.items() if k not in ('variables', 'modifiers')})
             context.update({'var:td_target.var:' + k: v for k, v in state['variables'].items()})
-            context['var:td_accepted_share'] = 1
+            context['var:td_accepted_share'] = self.variables.get('td_accepted_share', 1)
         context.update({'has_variable:' + k: True for k in self.variables})
         if self.scope in self.groups:
             context.update({'owner.var:' + k: v for k, v in self.variables.items()})
             for name in ('td_colonial_expansion_pull','td_colonial_admission_pull'):
                 context['owner.' + name] = formula(name, context, self.values)
             context.update({'var:' + k: v for k, v in self.storage().items()})
-            context['owner'] = 'SPA'
+            context['owner'] = self.country
         elif self.scope:
             context.update({'var:' + k: v for k, v in self.storage().items()})
-            context.update(owner=self.states[self.scope]['owner'], root='SPA')
+            context.update(owner=self.states[self.scope]['owner'], root=self.country)
+            context['is_treaty_port'] = self.states[self.scope]['treaty_port']
         return context
 
     def resolve(self, value):
         if value == 'owner':
-            return 'SPA' if self.scope in self.groups else self.states[self.scope]['owner']
+            return self.country if self.scope in self.groups or self.scope is None else self.states[self.scope]['owner']
         if value == 'root':
-            return 'SPA'
+            return self.country
         if value.startswith('owner.var:'):
             return self.variables[value.removeprefix('owner.var:')]
         if value.startswith('root.var:'):
             return self.variables[value.removeprefix('root.var:')]
         if value == 'var:td_target.state_region':
-            return self.variables['td_target']
+            target = self.variables['td_target']
+            return self.states[target].get('state_region', target)
         context = self.context()
         if value in context:
             return context[value]
@@ -142,6 +148,11 @@ class EventRunner:
                 self.scope = None
                 result = self.check(e.value)
                 self.scope = previous_scope
+            elif e.key in ('var:td_target','var:td_project_target') and isinstance(e.value, list):
+                previous_scope = self.scope
+                self.scope = self.variables[e.key.removeprefix('var:')]
+                result = self.check(e.value)
+                self.scope = previous_scope
             elif e.key == 'exists':
                 result = ((e.value.removeprefix('var:') in self.variables) if e.value.startswith('var:')
                           else (e.value.removeprefix('scope:') in self.saved))
@@ -152,7 +163,12 @@ class EventRunner:
             elif e.key == 'is_interest_group_type':
                 result = self.scope == 'ig:' + e.value
             elif e.key == 'td_non_homeland_state_trigger':
-                result = (not self.states[self.scope]['incorporated']) == (e.value == 'yes')
+                state = self.states[self.scope]
+                result = (not state['incorporated'] and not state['homeland'] and not state['treaty_port']) == (e.value == 'yes')
+            elif e.key == 'is_homeland_of_country_cultures':
+                result = self.states[self.scope]['homeland']
+            elif e.key == 'td_colonial_target_trigger' and 'var:td_target.td_colonial_target_trigger' in self.policy:
+                result = self.policy['var:td_target.td_colonial_target_trigger'] == (e.value == 'yes')
             elif e.key == 'has_variable':
                 result = e.value in self.storage()
             elif e.key in self.inputs:
@@ -182,14 +198,22 @@ class EventRunner:
                 self.globals[e.value] = 1
             elif e.key in ('every_country','root','owner'):
                 previous_scope = self.scope
+                self.previous_scope = previous_scope
                 self.scope = None
                 self.execute(e.value)
                 self.scope = previous_scope
             elif e.key in ('every_state','every_scope_state','every_interest_group'):
                 previous_scope = self.scope
                 for scoped in (self.groups if e.key == 'every_interest_group' else self.states):
+                    if e.key == 'every_scope_state' and self.states[scoped]['owner'] != self.country:
+                        continue
                     self.scope = scoped
                     self.execute(e.value)
+                self.scope = previous_scope
+            elif e.key == 'prev':
+                previous_scope = self.scope
+                self.scope = self.previous_scope
+                self.execute(e.value)
                 self.scope = previous_scope
             elif e.key in self.groups:
                 previous_scope = self.scope
@@ -301,6 +325,11 @@ class EventRunner:
     def next_event(self):
         self.day, _, name, self.saved = heapq.heappop(self.queue)
         self.fire(name)
+
+    def run_until(self, day):
+        while self.queue and self.queue[0][0] <= day:
+            self.next_event()
+        self.day = day
 
 
 class WarRunner(EventRunner):

@@ -238,34 +238,29 @@ class IntegrationTests(unittest.TestCase):
         self.assertEqual(integration_cost(1_000_000, 'strategic_frontiers', fast=True), 100)
         self.assertEqual(integration_cost(4_000_000, 'imperial_expansion', fast=True), 313)
 
-    def test_every_condition_blocks(self):
+    def test_only_sovereignty_ratification_and_start_budget_block(self):
         for field, value in [('sovereign_owner', False), ('admitted', False),
-                             ('legitimacy', 59), ('bureaucracy_after_cost', -1),
-                             ('turmoil', .2), ('devastation', .1),
-                             ('market_access', .89), ('accepted_population_share', .79)]:
+                             ('bureaucracy_after_cost', -1)]:
             with self.subTest(field=field):
                 self.assertFalse(replace(self.conditions, **{field: value}).valid())
+        non_cultural = replace(self.conditions, legitimacy=0, turmoil=1, devastation=1,
+                               market_access=0, accepted_population_share=0)
+        self.assertTrue(non_cultural.valid())
 
-    def test_twelve_valid_months_and_pause(self):
+    def test_one_year_is_independent_of_cultural_and_local_conditions(self):
         project = Integration()
-        for _ in range(6):
-            project.tick(self.conditions)
-        project.tick(replace(self.conditions, turmoil=.3))
-        self.assertEqual(project.months, 6)
-        for _ in range(6):
-            project.tick(self.conditions)
+        conditions = replace(self.conditions, turmoil=1, devastation=1, market_access=0,
+                             accepted_population_share=0, legitimacy=0)
+        for _ in range(11):
+            project.tick(conditions)
+            self.assertEqual(project.status, 'annual')
+        self.assertEqual(project.tick(conditions), 'incorporated')
+
+    def test_funded_project_keeps_deadline_despite_later_budget_deficit(self):
+        project = Integration()
+        for _ in range(12):
+            project.tick(replace(self.conditions, bureaucracy_after_cost=-100))
         self.assertEqual(project.status, 'incorporated')
-
-    def test_consecutive_invalid_resets_after_valid_month(self):
-        project = Integration()
-        invalid = replace(self.conditions, market_access=.5)
-        for _ in range(5):
-            project.tick(invalid)
-        project.tick(self.conditions)
-        self.assertEqual(project.consecutive_invalid, 0)
-        for _ in range(6):
-            project.tick(invalid)
-        self.assertEqual(project.status, 'regular')
         with self.assertRaises(ValueError):
             project.tick(self.conditions)
 

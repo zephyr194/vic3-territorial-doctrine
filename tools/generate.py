@@ -9,6 +9,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.policy_assets import assets
+from tools.development_assets import assets as development_assets
 from tools.law_text import doctrine_description, group_description
 from territorial_doctrine.model import RULES, DOCTRINES  # noqa: E402
 
@@ -66,6 +67,7 @@ def outputs() -> dict[Path, bytes]:
         effects = {f'interest_group_ig_{group}_pol_str_mult': value
                    for group, value in data['political_strength'].items()}
         effects.update(data['country_modifiers'])
+        effects.update(data['industry_modifiers'])
         modifier = '\n'.join(f'        {key} = {value}' for key, value in effects.items())
         laws += f'''law_td_{doctrine} = {{
     group = lawgroup_territorial_doctrine
@@ -101,7 +103,7 @@ def outputs() -> dict[Path, bytes]:
         values += f'td_{doctrine}_multiplier = {data["cost_multiplier"]}\n'
     for key, value in RULES['bill'].items():
         values += f'td_bill_{key} = {value}\n'
-    values += f'td_fast_months = 12\ntd_fallback_months = 6\ntd_cost_precision = {RULES["integration"]["cost_precision"]}\n'
+    values += f'td_integration_months = {RULES["integration"]["months"]}\ntd_annual_cost_multiplier = {RULES["integration"]["annual_cost_multiplier"]}\ntd_cost_precision = {RULES["integration"]["cost_precision"]}\n'
     put('common/script_values/td_constants.txt', values)
     policy = HEADER
     policy += '''td_power_category = {
@@ -130,6 +132,11 @@ td_government_category = {
     policy += '}\ntd_actor_cost_multiplier = {\n    value = 1\n'
     for regime in RULES['regimes'].values():
         policy += f'    if = {{ limit = {{ td_power_category = {regime["id"]} }} value = {regime["actor_administration_multiplier"]} }}\n'
+    policy += '}\n'
+    policy += 'td_infamy_policy_multiplier = {\n    value = 1\n'
+    for doctrine, info in RULES['doctrines'].items():
+        factor = 1 + info['country_modifiers'].get('country_infamy_generation_mult', 0)
+        policy += f'    if = {{ limit = {{ has_law = law_type:law_td_{doctrine} }} value = {factor} }}\n'
     policy += '}\n'
     put('common/script_values/td_policy_values.txt', policy)
     cache = HEADER + '''# Country scope with PREV = state. Store literal values so extinct former
@@ -161,6 +168,8 @@ td_pledge_fulfilled = { interest_group_approval_add = 2 }
 td_pledge_broken = { interest_group_approval_add = -5 }
 td_requires_admission = { state_disallow_incorporation = yes }
 '''
+    modifiers += f'td_admission_ratified = {{ state_migration_pull_mult = {RULES["integration"]["ratification_migration_pull"]} }}\n'
+    modifiers += 'td_annual_integration = { state_disallow_incorporation = yes }\n'
     put('common/static_modifiers/td_modifiers.txt', modifiers)
     for language, label in [('english', 'en'), ('simp_chinese', 'zh')]:
         loc = f'l_{language}:\n'
@@ -172,6 +181,7 @@ td_requires_admission = { state_disallow_incorporation = yes }
             loc += f' law_td_{doctrine}:0 "{title}"\n law_td_{doctrine}_desc:0 {desc}\n'
             if data['focus_limit']:
                 loc += f' td_focus_{doctrine}:0 "{title} — ' + ('重点区域预留' if label == 'zh' else 'Focus Region Commitments') + '"\n'
+            loc += f' td_territory_{doctrine}:0 "{title} — ' + ('领土开发' if label == 'zh' else 'Territorial Development') + '"\n'
         for group in RULES['groups']:
             name = RULES['group_politics'][group][label]
             loc += f' ideology_td_{group}:0 "' + (f'{name}的领土立场' if label == 'zh' else f'{name} Territorial Position') + '"\n'
@@ -187,6 +197,8 @@ td_requires_admission = { state_disallow_incorporation = yes }
     }
     put('.metadata/metadata.json', json.dumps(metadata, ensure_ascii=False, indent=2) + '\n')
     for path, content in assets().items():
+        put(path, content)
+    for path, content in development_assets().items():
         put(path, content)
     # English is the source fallback; other game languages use identical keys/text
     # until a native translation is supplied. Never alter the game's language setting.

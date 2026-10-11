@@ -133,6 +133,12 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
                                 'acceptance_status_5', 'law_no_colonial_affairs', 'law_colonial_resettlement',
                                 'law_colonial_exploitation', 'egalitarianism', 'human_rights',
                                 'conquer_state', 'annex_country', 'return_state', 'decentralized'} | {f'ig_{g}' for g in RULES['groups']}
+            for doctrine in RULES['doctrines'].values():
+                for key in doctrine['industry_modifiers']:
+                    if key.startswith('building_group_'):
+                        required_vanilla.add(key.removeprefix('building_group_').removesuffix('_throughput_mult'))
+                    else:
+                        required_vanilla.add(key.removesuffix('_throughput_mult'))
             for name in sorted(required_vanilla - vanilla):
                 errors.append(f'Vanilla identifier missing: {name}; check 1.13 game files before loading')
     return sorted(set(errors))

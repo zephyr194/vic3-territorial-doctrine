@@ -104,7 +104,7 @@ class NativeEventTests(unittest.TestCase):
         self.assertTrue(runner.claimed)
         self.assertNotIn('td_admitted_owner', runner.states['A']['variables'])
         self.assertNotIn('td_bill', runner.variables)
-        self.assertEqual(runner.variables['infamy'], 2)
+        self.assertEqual(runner.variables['infamy'], 3)
         self.assertFalse(runner.queue)
         runner.variables['td_bill'] = 2
         runner.execute(runner.definitions['td_start_bill_effect'])
@@ -112,10 +112,10 @@ class NativeEventTests(unittest.TestCase):
             runner.next_event()
         self.assertEqual(runner.states['A']['variables']['td_admitted_owner'], 'SPA')
         self.assertNotIn('td_admitted_owner', runner.states['B']['variables'])
-        self.assertIn('td_requires_admission', runner.states['A']['modifiers'])
+        self.assertIn('td_annual_integration', runner.states['A']['modifiers'])
         self.assertIn('td_requires_admission', runner.states['B']['modifiers'])
         self.assertFalse(runner.incorporated)
-        self.assertEqual(runner.variables['infamy'], 2)
+        self.assertEqual(runner.variables['infamy'], 3)
 
     def test_cancelled_scheduled_round_does_not_restart(self):
         runner = EventRunner(())
@@ -149,39 +149,37 @@ class NativeEventTests(unittest.TestCase):
 
     def test_integration_waits_twelve_checks_and_releases_cost(self):
         runner = EventRunner()
+        runner.states[runner.variables['td_target']]['variables']['td_admitted_owner'] = runner.country
         runner.execute(runner.definitions['td_start_fast_effect'])
         self.assertEqual(runner.modifiers['td_project_cost'], 100)
         self.assertEqual(runner.queue[0][0], 30)
         for _ in range(11):
             runner.next_event()
             self.assertFalse(runner.incorporated)
-        runner.next_event()
+        runner.run_until(364)
+        self.assertFalse(runner.incorporated)
+        runner.run_until(365)
         self.assertTrue(runner.incorporated)
         self.assertNotIn('td_project_cost', runner.modifiers)
         self.assertFalse(runner.queue)
 
-    def test_pause_resets_and_six_bad_months_fall_back(self):
+    def test_cultural_or_political_ineligibility_cannot_extend_ratified_deadline(self):
         runner = EventRunner()
+        runner.states[runner.variables['td_target']]['variables']['td_admitted_owner'] = runner.country
         runner.execute(runner.definitions['td_start_fast_effect'])
-        runner.inputs['td_fast_ready_trigger'] = False
-        for _ in range(5):
-            runner.next_event()
-        runner.inputs['td_fast_ready_trigger'] = True
-        runner.next_event()
-        self.assertEqual(runner.variables['td_invalid_months'], 0)
-        runner.inputs['td_fast_ready_trigger'] = False
-        for _ in range(6):
-            runner.next_event()
-        self.assertNotIn('td_fast', runner.variables)
-        self.assertIn('td_regular', runner.variables)
-        self.assertEqual(runner.modifiers['td_project_cost'], 50)
+        runner.inputs['td_fast_ready_trigger'] = False  # Conditions worsen after funding.
+        runner.run_until(364)
         self.assertFalse(runner.incorporated)
+        runner.run_until(365)
+        self.assertTrue(runner.incorporated)
+        self.assertNotIn('td_project_cost', runner.modifiers)
         self.assertFalse(runner.queue)
 
     def test_losing_target_releases_project_without_incorporation(self):
         runner = EventRunner()
+        runner.states[runner.variables['td_target']]['variables']['td_admitted_owner'] = runner.country
         runner.execute(runner.definitions['td_start_fast_effect'])
-        runner.inputs['td_admission_target_valid_trigger'] = False
+        runner.states['A']['owner'] = 'FRA'
         runner.next_event()
         self.assertNotIn('td_project_cost', runner.modifiers)
         self.assertNotIn('td_fast', runner.variables)
@@ -203,24 +201,25 @@ class NativeEventTests(unittest.TestCase):
     def test_second_state_integration_is_isolated(self):
         runner = EventRunner()
         runner.variables['td_target'] = 'B'
+        runner.states[runner.variables['td_target']]['variables']['td_admitted_owner'] = runner.country
         runner.execute(runner.definitions['td_start_fast_effect'])
-        for _ in range(12):
-            runner.next_event()
+        runner.run_until(365)
         self.assertTrue(runner.states['B']['incorporated'])
         self.assertFalse(runner.states['A']['incorporated'])
 
     def test_old_project_timer_cannot_advance_new_project(self):
         runner = EventRunner()
+        runner.states[runner.variables['td_target']]['variables']['td_admitted_owner'] = runner.country
         runner.execute(runner.definitions['td_start_fast_effect'])
         runner.execute(runner.definitions['td_end_project_effect'])
         runner.variables['td_target'] = 'B'
+        runner.states[runner.variables['td_target']]['variables']['td_admitted_owner'] = runner.country
         runner.execute(runner.definitions['td_start_fast_effect'])
         runner.next_event()  # Timer saved for the old generation.
         self.assertEqual(runner.variables['td_valid_months'], 0)
         runner.next_event()  # New project gets its first month.
         self.assertEqual(runner.variables['td_valid_months'], 1)
-        for _ in range(11):
-            runner.next_event()
+        runner.run_until(365)
         self.assertFalse(runner.states['A']['incorporated'])
         self.assertTrue(runner.states['B']['incorporated'])
 
