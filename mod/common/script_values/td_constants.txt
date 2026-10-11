@@ -12,3 +12,4 @@ td_bill_min_probability = 5
 td_bill_max_probability = 85
 td_fast_months = 12
 td_fallback_months = 6
+td_cost_precision = 100000

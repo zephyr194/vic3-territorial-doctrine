@@ -112,6 +112,7 @@ class NativeEventTests(unittest.TestCase):
             runner.next_event()
         self.assertEqual(runner.states['A']['variables']['td_admitted_owner'], 'SPA')
         self.assertNotIn('td_admitted_owner', runner.states['B']['variables'])
+        self.assertIn('td_requires_admission', runner.states['A']['modifiers'])
         self.assertIn('td_requires_admission', runner.states['B']['modifiers'])
         self.assertFalse(runner.incorporated)
         self.assertEqual(runner.variables['infamy'], 2)

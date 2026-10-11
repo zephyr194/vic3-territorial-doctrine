@@ -13,3 +13,7 @@ jobs:
       - run: python tools/validate.py
       - run: python tools/scenario.py
       - run: python tools/package.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: territorial-doctrine
+          path: dist/*.zip

@@ -1,18 +1,32 @@
 on_game_started = { on_actions = { td_initialize_world } }
 td_initialize_world = {
     effect = {
-        every_country = { td_initialize_effect = yes }
-        every_state = { td_update_state_owner_effect = yes }
+        set_global_variable = td_mod_present
+        if = { limit = { td_feature_enabled_trigger = yes }
+            every_country = { td_initialize_effect = yes }
+            every_state = { td_update_state_owner_effect = yes }
+        }
     }
 }
 on_state_created = { on_actions = { td_new_state_created } }
 td_new_state_created = {
     effect = {
-        if = {
-            limit = { owner = { has_variable = td_initialized_v3 } is_treaty_port = no NOT = { is_homeland_of_country_cultures = owner } }
-            set_state_type = unincorporated
+        if = { limit = { td_feature_enabled_trigger = yes }
+            if = {
+                limit = { owner = { has_variable = td_initialized_v4 } is_treaty_port = no NOT = { is_homeland_of_country_cultures = owner } }
+                set_state_type = unincorporated
+            }
+            td_update_state_owner_effect = yes
         }
-        td_update_state_owner_effect = yes
+    }
+}
+on_colony_created = { on_actions = { td_colony_created } }
+td_colony_created = {
+    effect = {
+        if = { limit = { td_feature_enabled_trigger = yes }
+            set_variable = td_colonial_origin
+            td_update_state_owner_effect = yes
+        }
     }
 }
 on_state_owner_change = { on_actions = { td_state_changed } }
@@ -20,29 +34,64 @@ td_state_changed = { effect = { td_update_state_owner_effect = yes } }
 on_monthly_pulse_country = { on_actions = { td_country_monthly } }
 td_country_monthly = {
     effect = {
-        td_initialize_effect = yes
-        every_scope_state = { td_update_state_owner_effect = yes }
-        # AI also obeys one-state legislation; diplomacy and native incorporation remain vanilla.
-        if = {
-            limit = { is_player = no td_can_start_bill_trigger = yes any_scope_state = { td_needs_admission_trigger = yes } }
-            td_select_owned_effect = yes
-            set_variable = { name = td_reason value = 4 }
-            set_variable = { name = td_bill value = 2 }
-            td_start_bill_effect = yes
-        }
-        if = { limit = { this = c:SPA } td_pledges_monthly_effect = yes }
-        if = {
-            limit = { OR = { has_variable = td_fast has_variable = td_regular } }
-            if = {
-                limit = {
-                    OR = {
-                        NOT = { exists = var:td_project_target }
-                        var:td_project_target = { NOT = { owner = root } }
-                        var:td_project_target = { is_incorporated = yes }
-                    }
+        if = { limit = { td_feature_enabled_trigger = yes }
+            td_initialize_effect = yes
+            every_scope_state = { td_update_state_owner_effect = yes }
+            td_war_monthly_effect = yes
+            # Expansion AI chooses a valid target and legislates using the same
+            # requirements; a focus is funded before its waiting period begins.
+            if = { limit = { is_player = no td_can_start_bill_trigger = yes td_expansion_doctrine_trigger = yes any_state = { td_claim_candidate_trigger = yes } }
+                td_select_claim_effect = yes
+                if = { limit = { td_can_designate_focus_trigger = yes } td_designate_focus_effect = yes }
+                if = { limit = { td_claim_target_valid_trigger = yes OR = { var:td_target = { td_colonial_target_trigger = no } td_colonial_expansion_pull >= 0 } }
+                    if = { limit = { td_security_reason_valid_trigger = yes } set_variable = { name = td_reason value = 1 } }
+                    else_if = { limit = { td_legal_reason_valid_trigger = yes } set_variable = { name = td_reason value = 2 } }
+                    else_if = { limit = { td_colonial_reason_valid_trigger = yes } set_variable = { name = td_reason value = 6 } }
+                    else = { set_variable = { name = td_reason value = 7 } }
+                    set_variable = { name = td_bill value = 1 }
+                    td_start_bill_effect = yes
                 }
-                td_end_project_effect = yes
             }
+            if = { limit = { is_player = no td_can_start_bill_trigger = yes any_scope_state = { td_needs_admission_trigger = yes } }
+                td_select_owned_effect = yes
+                if = { limit = { OR = { var:td_target = { td_colonial_target_trigger = no } td_colonial_admission_pull >= 0 } }
+                    set_variable = { name = td_reason value = 4 }
+                    set_variable = { name = td_bill value = 2 }
+                    td_start_bill_effect = yes
+                }
+            }
+            # Previously admitted states that lacked budget may start later.
+            if = { limit = { is_player = no td_can_select_target_trigger = yes any_scope_state = { td_non_homeland_state_trigger = yes has_variable = td_admitted_owner var:td_admitted_owner = owner } }
+                td_select_admitted_effect = yes
+                if = { limit = { exists = var:td_target bureaucracy >= td_regular_project_cost } td_start_regular_effect = yes }
+            }
+            if = { limit = { this = c:SPA } td_pledges_monthly_effect = yes }
+            if = { limit = { OR = { has_variable = td_fast has_variable = td_regular } }
+                if = { limit = { OR = { NOT = { exists = var:td_project_target } var:td_project_target = { NOT = { owner = root } } var:td_project_target = { is_incorporated = yes } } }
+                    td_end_project_effect = yes
+                }
+            }
+        }
+        else = { td_disabled_cleanup_effect = yes }
+    }
+}
+on_diplo_play_war_start = { on_actions = { td_war_started } }
+td_war_started = {
+    effect = {
+        if = { limit = { td_feature_enabled_trigger = yes exists = war }
+            war = {
+                save_scope_as = td_mandate_war
+                attacker_warleader = { trigger_event = td.27 }
+            }
+        }
+    }
+}
+on_wargoal_added = { on_actions = { td_war_goal_added } }
+td_war_goal_added = {
+    effect = {
+        if = { limit = { td_feature_enabled_trigger = yes is_war = yes exists = war war = { has_variable = td_policy_checked } }
+            # Keep the original declaring country if leadership changes mid-war.
+            war = { save_scope_as = td_mandate_war var:td_policy_country = { trigger_event = td.27 } }
         }
     }
 }

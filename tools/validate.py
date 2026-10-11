@@ -31,7 +31,8 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
     variables = {e.value for tree in trees.values() for e in walk(tree)
                  if e.key == 'name' and isinstance(e.value, str) and e.value.startswith('td_')}
     variables |= {e.value for tree in trees.values() for e in walk(tree)
-                  if e.key == 'set_variable' and isinstance(e.value, str)}
+                  if e.key in ('set_variable', 'set_global_variable') and isinstance(e.value, str)}
+    variables |= set(RULES.get('legacy_variables', ()))
     scopes = {e.value for tree in trees.values() for e in walk(tree) if e.key == 'save_scope_as'}
     for path, tree in trees.items():
         for e in walk(tree):
@@ -49,7 +50,7 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
                     if ('_td_' in ref) and ref not in definitions:
                         errors.append(f'{path}: undefined law/ideology {ref}')
     localizations = {}
-    for lang in ('english', 'simp_chinese'):
+    for lang in RULES['localization']['languages']:
         keys = {}
         for path in sorted((mod / 'localization' / lang).glob('*.yml')):
             raw = path.read_bytes()
@@ -70,8 +71,9 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
                 else:
                     keys[m[1]] = path
         localizations[lang] = keys
-    if localizations['english'].keys() != localizations['simp_chinese'].keys():
-        errors.append('English/Chinese localization keys differ')
+    for lang, keys in localizations.items():
+        if keys.keys() != localizations['english'].keys():
+            errors.append(f'English/{lang} localization keys differ')
     required = set()
     for name, path in definitions.items():
         category = path.parent.name
@@ -128,7 +130,9 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
                                 'law_monarchy', 'law_autocracy', 'law_single_party_state', 'law_census_suffrage',
                                 'law_universal_suffrage', 'law_presidential_republic', 'law_parliamentary_republic',
                                 'building_naval_base', 'building_railway',
-                                'acceptance_status_5'} | {f'ig_{g}' for g in RULES['groups']}
+                                'acceptance_status_5', 'law_no_colonial_affairs', 'law_colonial_resettlement',
+                                'law_colonial_exploitation', 'egalitarianism', 'human_rights',
+                                'conquer_state', 'annex_country', 'return_state', 'decentralized'} | {f'ig_{g}' for g in RULES['groups']}
             for name in sorted(required_vanilla - vanilla):
                 errors.append(f'Vanilla identifier missing: {name}; check 1.13 game files before loading')
     return sorted(set(errors))

@@ -90,7 +90,7 @@ def triggers(entries: list[Entry], context: dict, definitions: dict | None = Non
             result = triggers(e.value, {k.removeprefix(prefix): v for k, v in context.items() if k.startswith(prefix)}, definitions)
         elif e.key == 'exists':
             result = bool(context.get('exists:' + e.value, False))
-        elif e.key in ('has_law', 'has_variable'):
+        elif e.key in ('has_law', 'has_variable', 'has_global_variable', 'has_technology_researched', 'has_claim', 'has_modifier', 'has_interest_marker_in_region'):
             result = bool(context.get(e.key + ':' + e.value, False))
         else:
             lhs = formula(e.key, context, definitions) if e.key in definitions else context[e.key]

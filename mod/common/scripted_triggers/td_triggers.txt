@@ -1,5 +1,7 @@
+td_feature_enabled_trigger = { has_global_variable = td_system_enabled }
 # Country scope unless explicitly labelled state scope.
 td_can_legislate_trigger = {
+    td_feature_enabled_trigger = yes
     is_subject = no
     is_revolutionary = no
     NOT = { exists = civil_war }
@@ -26,16 +28,12 @@ td_needs_admission_trigger = {
     NOT = { AND = { has_variable = td_admitted_owner var:td_admitted_owner = owner } }
 }
 td_claim_target_valid_trigger = {
-    this = c:SPA
     exists = var:td_target
-    var:td_target = { owner = c:MOR state_region = s:STATE_AL_RIF }
-    NOT = { has_claim = s:STATE_AL_RIF }
-    NOT = { is_target_in_variable_list = { name = td_renounced_regions target = s:STATE_AL_RIF } }
-    has_variable = td_focus
-    NOT = { has_variable = td_focus_wait }
+    var:td_target = { td_claim_candidate_trigger = yes }
     OR = {
-        has_law = law_type:law_td_strategic_frontiers
-        has_law = law_type:law_td_imperial_expansion
+        has_law = law_type:law_td_historical_rights
+        AND = { has_law = law_type:law_td_strategic_frontiers is_adjacent_to_state = var:td_target }
+        AND = { is_target_in_variable_list = { name = td_ready_focus_regions target = var:td_target.region } has_interest_marker_in_region = var:td_target.region }
     }
 }
 td_admission_target_valid_trigger = {
@@ -58,6 +56,7 @@ td_bill_target_valid_trigger = {
     }
 }
 td_can_select_target_trigger = {
+    td_feature_enabled_trigger = yes
     NOT = { has_variable = td_bill }
     NOT = { has_variable = td_fast }
     NOT = { has_variable = td_regular }
@@ -71,7 +70,7 @@ td_can_start_bill_trigger = {
 }
 td_security_reason_valid_trigger = {
     OR = {
-        AND = { this = c:SPA OR = { var:td_pending_bill = 1 var:td_bill = 1 } }
+        AND = { this = c:SPA var:td_target = { state_region = s:STATE_AL_RIF } }
         is_adjacent_to_state = var:td_target
     }
 }
@@ -95,9 +94,12 @@ td_reason_valid_trigger = {
         AND = { var:td_reason = 3 td_equality_reason_valid_trigger = yes }
         AND = { var:td_reason = 4 OR = { var:td_pending_bill = 2 var:td_bill = 2 } }
         AND = { var:td_reason = 5 OR = { var:td_pending_bill = 3 var:td_bill = 3 } }
+        AND = { var:td_reason = 6 td_colonial_reason_valid_trigger = yes }
+        AND = { var:td_reason = 7 td_regional_reason_valid_trigger = yes }
     }
 }
 td_fast_ready_trigger = {
+    td_feature_enabled_trigger = yes
     td_admission_target_valid_trigger = yes
     var:td_target = { var:td_admitted_owner = owner }
     legitimacy >= 60
@@ -112,4 +114,87 @@ td_lost_state_trigger = {
     state_region = { NOT = { any_scope_state = { owner = root } } }
     OR = { has_claim_by = root is_homeland_of_country_cultures = root }
     NOT = { root = { is_target_in_variable_list = { name = td_renounced_regions target = prev.state_region } } }
+}
+
+# STATE: historical origin is tracked; owned non-homeland states are subject to
+# colonial administration even if acquired by conquest. This is not a test of
+# vanilla reachability, malaria or permission to start a colony.
+td_colonial_target_trigger = {
+    OR = {
+        is_under_colonization = yes
+        has_variable = td_colonial_origin
+        owner = { is_country_type = decentralized }
+        AND = { owner = root td_non_homeland_state_trigger = yes }
+    }
+}
+td_colonial_law_active_trigger = { NOT = { has_law = law_type:law_no_colonial_affairs } }
+td_colonial_reason_valid_trigger = {
+    td_colonial_law_active_trigger = yes
+    exists = var:td_target
+    var:td_target = { td_colonial_target_trigger = yes }
+    OR = { var:td_pending_bill = 1 var:td_bill = 1 }
+}
+td_regional_reason_valid_trigger = {
+    has_law = law_type:law_td_imperial_expansion
+    exists = var:td_target
+    has_interest_marker_in_region = var:td_target.region
+    OR = { var:td_pending_bill = 1 var:td_bill = 1 }
+}
+# STATE scope, ROOT = proposing country. Existing claims can be legislated
+# without charging new-claim infamy; a vanilla claim alone is not a mandate.
+td_claim_candidate_trigger = {
+    NOT = { owner = root }
+    is_treaty_port = no
+    state_population > 0
+    owner = { NOT = { is_subject_of = root } }
+    NOT = { root = { is_target_in_variable_list = { name = td_renounced_regions target = prev.state_region } } }
+    NOT = { AND = { has_claim_by = root root = { is_target_in_variable_list = { name = td_approved_claim_regions target = prev.state_region } } } }
+    OR = {
+        AND = {
+            root = { has_law = law_type:law_td_historical_rights }
+            OR = { has_claim_by = root is_homeland_of_country_cultures = root }
+        }
+        AND = {
+            root = { has_law = law_type:law_td_strategic_frontiers }
+            OR = {
+                root = { is_adjacent_to_state = prev }
+                AND = { state_region = s:STATE_AL_RIF root = { this = c:SPA has_interest_marker_in_region = prev.region } }
+                AND = { td_colonial_target_trigger = yes root = { td_colonial_law_active_trigger = yes has_interest_marker_in_region = prev.region } }
+            }
+        }
+        AND = { root = { has_law = law_type:law_td_imperial_expansion has_interest_marker_in_region = prev.region } }
+    }
+}
+td_can_designate_focus_trigger = {
+    td_can_start_bill_trigger = yes
+    exists = var:td_target
+    var:td_pending_bill = 1
+    has_interest_marker_in_region = var:td_target.region
+    NOT = { is_target_in_variable_list = { name = td_focus_regions target = var:td_target.region } }
+    var:td_focus_count < td_focus_limit
+    if = { limit = { has_law = law_type:law_td_historical_rights } bureaucracy >= 25 }
+    if = { limit = { has_law = law_type:law_td_strategic_frontiers } bureaucracy >= 50 authority >= 25 }
+    if = { limit = { has_law = law_type:law_td_imperial_expansion } bureaucracy >= 75 authority >= 50 }
+}
+# STATE, ROOT = attacking country, scoped war supplied by event td.27.
+td_war_expansion_target_trigger = {
+    NOT = { owner = root }
+    owner = { scope:td_mandate_war = { is_war_participant = prev } }
+    OR = {
+        AND = {
+            is_target_of_wargoal = root
+            root = { war_participant_has_war_goal_of_type_against = { type = conquer_state target = prev.owner } }
+        }
+        root = { war_participant_has_war_goal_of_type_against = { type = annex_country target = prev.owner } }
+    }
+}
+td_state_has_mandate_trigger = {
+    has_claim_by = root
+    root = {
+        is_target_in_variable_list = { name = td_approved_claim_regions target = prev.state_region }
+        NOT = { is_target_in_variable_list = { name = td_renounced_regions target = prev.state_region } }
+    }
+}
+td_expansion_doctrine_trigger = {
+    OR = { has_law = law_type:law_td_strategic_frontiers has_law = law_type:law_td_imperial_expansion }
 }

@@ -1,10 +1,10 @@
 {
-  "name": "Territorial Doctrine — 国家领土原则",
+  "name": "Territorial Doctrine",
   "id": "territorial_doctrine",
-  "version": "0.3.0-alpha.1",
+  "version": "0.4.0-alpha.1",
   "game_id": "victoria3",
   "supported_game_version": "1.13.*",
-  "short_description": "Individual territorial admission and contextual justifications / 逐州领土接纳与体制理由",
+  "short_description": "Opt-in territorial legislation, colonial policy and war mandates",
   "tags": [
     "Gameplay",
     "Politics"

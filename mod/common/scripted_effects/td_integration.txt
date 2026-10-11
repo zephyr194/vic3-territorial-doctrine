@@ -27,30 +27,45 @@ td_begin_project_effect = {
     change_variable = { name = td_generation add = 1 }
     set_variable = { name = td_project_target value = var:td_target }
     save_scope_value_as = { name = td_project_run value = var:td_generation }
+    var:td_target = { set_variable = { name = td_integration_project_owner value = owner } remove_modifier = td_requires_admission }
 }
 td_end_project_effect = {
+    if = { limit = { exists = var:td_project_target }
+        var:td_project_target = {
+            if = { limit = { has_variable = td_integration_project_owner var:td_integration_project_owner = root }
+                remove_variable = td_integration_project_owner
+                if = { limit = { td_feature_enabled_trigger = yes td_non_homeland_state_trigger = yes } add_modifier = td_requires_admission }
+            }
+        }
+    }
     remove_modifier = td_project_cost
     remove_variable = td_fast
     remove_variable = td_regular
     remove_variable = td_project_target
 }
 td_start_fast_effect = {
-    td_refresh_target_effect = yes
     if = {
-        limit = { td_fast_ready_trigger = yes }
-        td_begin_project_effect = yes
-        set_variable = { name = td_project_cost_snapshot value = td_fast_project_cost }
-        add_modifier = { name = td_project_cost multiplier = var:td_project_cost_snapshot }
-        set_variable = td_fast
-        set_variable = { name = td_valid_months value = 0 }
-        set_variable = { name = td_invalid_months value = 0 }
-        trigger_event = { id = td.2 months = 1 }
+        limit = { td_feature_enabled_trigger = yes }
+        td_refresh_target_effect = yes
+        if = {
+            limit = { td_fast_ready_trigger = yes }
+            td_begin_project_effect = yes
+            set_variable = { name = td_project_cost_snapshot value = td_fast_project_cost }
+            add_modifier = { name = td_project_cost multiplier = var:td_project_cost_snapshot }
+            set_variable = td_fast
+            set_variable = { name = td_valid_months value = 0 }
+            set_variable = { name = td_invalid_months value = 0 }
+            trigger_event = { id = td.2 months = 1 }
+        }
     }
 }
 td_start_regular_effect = {
-    td_begin_project_effect = yes
-    set_variable = { name = td_project_cost_snapshot value = td_regular_project_cost }
-    add_modifier = { name = td_project_cost multiplier = var:td_project_cost_snapshot }
-    set_variable = td_regular
-    # State approval has unlocked the vanilla incorporation button for this state.
+    if = {
+        limit = { td_feature_enabled_trigger = yes }
+        td_begin_project_effect = yes
+        set_variable = { name = td_project_cost_snapshot value = td_regular_project_cost }
+        add_modifier = { name = td_project_cost multiplier = var:td_project_cost_snapshot }
+        set_variable = td_regular
+        # This funded project unlocks the vanilla incorporation button only for its state.
+    }
 }

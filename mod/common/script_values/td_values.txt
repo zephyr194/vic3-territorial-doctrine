@@ -20,6 +20,7 @@ td_claim_infamy = {
     multiply = td_reason_cost_multiplier
     multiply = var:td_target.var:td_live_diplomatic
     if = { limit = { OR = { var:td_pending_bill = 2 var:td_pending_bill = 3 var:td_bill = 2 var:td_bill = 3 } } value = 0 }
+    if = { limit = { has_claim = var:td_target.state_region } value = 0 }
     ceiling = yes
 }
 td_base_project_cost = {
@@ -48,13 +49,14 @@ td_project_cost_before_rounding = {
     multiply = td_actor_cost_multiplier
     multiply = td_inherited_cost_multiplier
     multiply = td_territory_cost_multiplier
+    if = { limit = { var:td_target = { td_colonial_target_trigger = yes } } multiply = td_colonial_admission_multiplier }
 }
 td_inherited_cost_multiplier = {
     value = var:td_target.var:td_source_administration
     if = { limit = { OR = { var:td_pending_bill = 1 var:td_bill = 1 } } value = var:td_target.var:td_live_administration }
 }
-td_regular_project_cost = { value = td_project_cost_before_rounding ceiling = yes }
-td_fast_project_cost = { value = td_project_cost_before_rounding multiply = 2 ceiling = yes }
+td_regular_project_cost = { value = td_project_cost_before_rounding multiply = td_cost_precision round = yes divide = td_cost_precision ceiling = yes }
+td_fast_project_cost = { value = td_project_cost_before_rounding multiply = 2 multiply = td_cost_precision round = yes divide = td_cost_precision ceiling = yes }
 td_unpaid_project_cost = {
     value = td_fast_project_cost
     if = { limit = { has_variable = td_fast } value = 0 }

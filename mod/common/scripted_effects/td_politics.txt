@@ -1,24 +1,20 @@
 td_initialize_effect = {
-    if = { limit = { NOT = { has_variable = td_generation } } set_variable = { name = td_generation value = 0 } }
-    set_variable = td_initialized_v3
-
-    if = {
-        limit = { NOT = { td_has_doctrine_trigger = yes } }
-        activate_law = law_type:law_td_status_quo
-    }
-    every_interest_group = {
-        if = { limit = { is_interest_group_type = ig_armed_forces NOT = { has_ideology = ideology:ideology_td_armed_forces } } add_ideology = ideology_td_armed_forces }
-        if = { limit = { is_interest_group_type = ig_landowners NOT = { has_ideology = ideology:ideology_td_landowners } } add_ideology = ideology_td_landowners }
-        if = { limit = { is_interest_group_type = ig_industrialists NOT = { has_ideology = ideology:ideology_td_industrialists } } add_ideology = ideology_td_industrialists }
-        if = { limit = { is_interest_group_type = ig_petty_bourgeoisie NOT = { has_ideology = ideology:ideology_td_petty_bourgeoisie } } add_ideology = ideology_td_petty_bourgeoisie }
-        if = { limit = { is_interest_group_type = ig_intelligentsia NOT = { has_ideology = ideology:ideology_td_intelligentsia } } add_ideology = ideology_td_intelligentsia }
-        if = { limit = { is_interest_group_type = ig_trade_unions NOT = { has_ideology = ideology:ideology_td_trade_unions } } add_ideology = ideology_td_trade_unions }
-        if = { limit = { is_interest_group_type = ig_rural_folk NOT = { has_ideology = ideology:ideology_td_rural_folk } } add_ideology = ideology_td_rural_folk }
-        if = { limit = { is_interest_group_type = ig_devout NOT = { has_ideology = ideology:ideology_td_devout } } add_ideology = ideology_td_devout }
+    if = { limit = { td_feature_enabled_trigger = yes }
+        if = { limit = { NOT = { has_variable = td_generation } } set_variable = { name = td_generation value = 0 } }
+        if = { limit = { NOT = { has_variable = td_focus_epoch } } set_variable = { name = td_focus_epoch value = 0 } }
+        if = { limit = { NOT = { has_variable = td_focus_count } } set_variable = { name = td_focus_count value = 0 } }
+        set_variable = td_initialized_v4
+        if = { limit = { NOT = { td_has_doctrine_trigger = yes } } activate_law = law_type:law_td_status_quo }
+        td_refresh_colonial_profile_effect = yes
     }
 }
 
 td_remove_focus_effect = {
+    if = { limit = { NOT = { has_variable = td_focus_epoch } } set_variable = { name = td_focus_epoch value = 0 } }
+    change_variable = { name = td_focus_epoch add = 1 }
+    set_variable = { name = td_focus_count value = 0 }
+    clear_variable_list = td_focus_regions
+    clear_variable_list = td_ready_focus_regions
     remove_variable = td_focus
     remove_variable = td_focus_wait
     remove_modifier = td_focus_historical_rights
@@ -40,98 +36,137 @@ td_cancel_bill_effect = {
     }
 }
 td_doctrine_changed_effect = {
-    set_variable = { name = td_doctrine_lock years = 5 }
-    td_cancel_bill_effect = yes
-    td_remove_focus_effect = yes
-    # Existing admission and acquisition pledges persist across doctrine changes.
+    if = {
+        limit = { td_feature_enabled_trigger = yes }
+        set_variable = { name = td_doctrine_lock years = 5 }
+        td_cancel_bill_effect = yes
+        td_remove_focus_effect = yes
+        # Existing admission and acquisition pledges persist across doctrine changes.
+    }
 }
 
 td_calculate_politics_effect = {
-    td_base_scores_effect = yes
-    if = { limit = { var:td_reason = 1 } ig:ig_armed_forces = { change_variable = { name = td_score add = 15 } } }
     if = {
-        limit = { var:td_bill = 2 }
-        ig:ig_intelligentsia = { change_variable = { name = td_score add = 15 } }
-        ig:ig_trade_unions = { change_variable = { name = td_score add = 15 } }
-    }
-    if = {
-        limit = { is_at_war = yes }
-        ig:ig_rural_folk = { change_variable = { name = td_score subtract = 15 } }
-    }
-    if = { limit = { has_variable = td_bill_pledge_navy } ig:ig_armed_forces = { change_variable = { name = td_score add = 10 } } }
-    if = { limit = { has_variable = td_bill_pledge_railway } ig:ig_industrialists = { change_variable = { name = td_score add = 10 } } }
-    if = {
-        limit = { var:td_bill = 3 }
-        ig:ig_armed_forces = { change_variable = { name = td_score subtract = 20 } }
-        ig:ig_landowners = { change_variable = { name = td_score subtract = 10 } }
-        ig:ig_petty_bourgeoisie = { change_variable = { name = td_score subtract = 15 } }
-        ig:ig_intelligentsia = { change_variable = { name = td_score add = 10 } }
-        ig:ig_trade_unions = { change_variable = { name = td_score add = 10 } }
-        ig:ig_rural_folk = { change_variable = { name = td_score add = 10 } }
-    }
-    set_variable = { name = td_support value = 0 }
-    set_variable = { name = td_opposition value = 0 }
-    every_interest_group = {
-        if = { limit = { has_variable = td_broken_pledge } change_variable = { name = td_score subtract = 10 } }
+        limit = { td_feature_enabled_trigger = yes }
+        td_base_scores_effect = yes
+        td_colonial_bill_scores_effect = yes
+        if = { limit = { var:td_reason = 1 } ig:ig_armed_forces = { change_variable = { name = td_score add = 15 } } }
         if = {
-            limit = { var:td_score >= 20 }
-            owner = { change_variable = { name = td_support add = { value = prev.ig_clout multiply = 100 } } }
+            limit = { var:td_bill = 2 }
+            ig:ig_intelligentsia = { change_variable = { name = td_score add = 15 } }
+            ig:ig_trade_unions = { change_variable = { name = td_score add = 15 } }
         }
-        else_if = {
-            limit = { var:td_score >= 5 }
-            owner = { change_variable = { name = td_support add = { value = prev.ig_clout multiply = 50 } } }
+        if = {
+            limit = { is_at_war = yes }
+            ig:ig_rural_folk = { change_variable = { name = td_score subtract = 15 } }
         }
-        else_if = {
-            limit = { var:td_score <= -20 }
-            owner = { change_variable = { name = td_opposition add = { value = prev.ig_clout multiply = 100 } } }
+        if = { limit = { has_variable = td_bill_pledge_navy } ig:ig_armed_forces = { change_variable = { name = td_score add = 10 } } }
+        if = { limit = { has_variable = td_bill_pledge_railway } ig:ig_industrialists = { change_variable = { name = td_score add = 10 } } }
+        if = {
+            limit = { var:td_bill = 3 }
+            ig:ig_armed_forces = { change_variable = { name = td_score subtract = 20 } }
+            ig:ig_landowners = { change_variable = { name = td_score subtract = 10 } }
+            ig:ig_petty_bourgeoisie = { change_variable = { name = td_score subtract = 15 } }
+            ig:ig_intelligentsia = { change_variable = { name = td_score add = 10 } }
+            ig:ig_trade_unions = { change_variable = { name = td_score add = 10 } }
+            ig:ig_rural_folk = { change_variable = { name = td_score add = 10 } }
         }
-        else_if = {
-            limit = { var:td_score <= -5 }
-            owner = { change_variable = { name = td_opposition add = { value = prev.ig_clout multiply = 50 } } }
+        set_variable = { name = td_support value = 0 }
+        set_variable = { name = td_opposition value = 0 }
+        every_interest_group = {
+            if = { limit = { has_variable = td_broken_pledge } change_variable = { name = td_score subtract = 10 } }
+            if = {
+                limit = { var:td_score >= 20 }
+                owner = { change_variable = { name = td_support add = { value = prev.ig_clout multiply = 100 } } }
+            }
+            else_if = {
+                limit = { var:td_score >= 5 }
+                owner = { change_variable = { name = td_support add = { value = prev.ig_clout multiply = 50 } } }
+            }
+            else_if = {
+                limit = { var:td_score <= -20 }
+                owner = { change_variable = { name = td_opposition add = { value = prev.ig_clout multiply = 100 } } }
+            }
+            else_if = {
+                limit = { var:td_score <= -5 }
+                owner = { change_variable = { name = td_opposition add = { value = prev.ig_clout multiply = 50 } } }
+            }
         }
+        td_refresh_target_effect = yes
+        set_variable = { name = td_population_ratio value = { value = var:td_target.state_population divide = total_population } }
+        set_variable = { name = td_chance value = td_success_probability }
     }
-    td_refresh_target_effect = yes
-    set_variable = { name = td_population_ratio value = { value = var:td_target.state_population divide = total_population } }
-    set_variable = { name = td_chance value = td_success_probability }
 }
 
 td_start_bill_effect = {
-    td_refresh_target_effect = yes
-    set_variable = { name = td_successes value = 0 }
-    set_variable = { name = td_failures value = 0 }
-    td_calculate_politics_effect = yes
-    trigger_event = { id = td.1 days = td_bill_round_days }
+    if = {
+        limit = { td_feature_enabled_trigger = yes }
+        td_refresh_target_effect = yes
+        set_variable = { name = td_successes value = 0 }
+        set_variable = { name = td_failures value = 0 }
+        td_calculate_politics_effect = yes
+        trigger_event = { id = td.1 days = td_bill_round_days }
+    }
 }
 
 td_pass_bill_effect = {
     if = {
-        limit = { has_variable = td_bill_pledge_navy }
-        set_variable = td_pending_navy
-    }
-    if = {
-        limit = { has_variable = td_bill_pledge_railway }
-        set_variable = td_pending_railway
-    }
-    if = {
-        limit = { var:td_bill = 1 }
-        var:td_target.state_region = { add_claim = root }
-        change_infamy = td_claim_infamy
-        trigger_event = td.11
-    }
-    else_if = {
-        limit = { var:td_bill = 2 }
-        var:td_target = {
-            set_variable = { name = td_admitted_owner value = owner }
-            set_variable = { name = td_admission_reason value = root.var:td_reason }
-            remove_modifier = td_requires_admission
+        limit = { td_feature_enabled_trigger = yes }
+        if = {
+            limit = { has_variable = td_bill_pledge_navy }
+            set_variable = td_pending_navy
         }
-        trigger_event = td.12
-        if = { limit = { is_player = no bureaucracy >= td_regular_project_cost } td_start_regular_effect = yes }
+        if = {
+            limit = { has_variable = td_bill_pledge_railway }
+            set_variable = td_pending_railway
+        }
+        if = {
+            limit = { var:td_bill = 1 }
+            set_variable = { name = td_claim_infamy_snapshot value = td_claim_infamy }
+            var:td_target.state_region = { add_claim = root }
+            change_infamy = var:td_claim_infamy_snapshot
+            if = { limit = { NOT = { is_target_in_variable_list = { name = td_approved_claim_regions target = var:td_target.state_region } } } add_to_variable_list = { name = td_approved_claim_regions target = var:td_target.state_region } }
+            trigger_event = td.11
+        }
+        else_if = {
+            limit = { var:td_bill = 2 }
+            var:td_target = {
+                set_variable = { name = td_admitted_owner value = owner }
+                set_variable = { name = td_admission_reason value = root.var:td_reason }
+                # Starting a funded project unlocks incorporation; approval alone does not bypass cost.
+            }
+            trigger_event = td.12
+            if = { limit = { is_player = no bureaucracy >= td_regular_project_cost } td_start_regular_effect = yes }
+        }
+        else = {
+            var:td_target.state_region = { remove_claim = root }
+            add_to_variable_list = { name = td_renounced_regions target = var:td_target.state_region }
+            trigger_event = td.19
+        }
+        td_clear_bill_effect = yes
     }
-    else = {
-        var:td_target.state_region = { remove_claim = root }
-        add_to_variable_list = { name = td_renounced_regions target = var:td_target.state_region }
-        trigger_event = td.19
+}
+
+td_enable_system_effect = {
+    if = {
+        limit = { NOT = { td_feature_enabled_trigger = yes } }
+        every_country = { td_disabled_cleanup_effect = yes }
+        set_global_variable = td_mod_present
+        set_global_variable = td_system_enabled
+        every_country = { td_initialize_effect = yes }
+        every_state = { td_update_state_owner_effect = yes }
+        trigger_event = td.24
     }
-    td_clear_bill_effect = yes
+}
+td_disabled_cleanup_effect = {
+    if = {
+        limit = { OR = { has_variable = td_initialized_v3 has_variable = td_initialized_v4 } }
+        td_cancel_bill_effect = yes
+        td_end_project_effect = yes
+        td_remove_focus_effect = yes
+        td_remove_territorial_ideologies_effect = yes
+        every_scope_state = { remove_modifier = td_requires_admission }
+        remove_variable = td_initialized_v3
+        remove_variable = td_initialized_v4
+    }
 }

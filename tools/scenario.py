@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-"""Run a deterministic Spain -> Al Rif reference scenario, without the game."""
+"""Run deterministic territorial, colonial and war-policy examples offline."""
 from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from territorial_doctrine.model import (Bill, Conditions, Integration, Target,
-    final_probability, integration_cost, round_probability)  # noqa: E402
+    final_probability, integration_cost, round_probability, colonial_tendencies,
+    WarGoal, WarMandate)  # noqa: E402
 
 
 def main():
@@ -31,6 +32,16 @@ def main():
     assert project.status == 'incorporated'
     print(f'Admission passed; fast bureaucracy cost={cost}; '
           f'{project.months} eligible months -> {project.status}. Cultures/religions unchanged.')
+    for stage in range(3):
+        expansion, acceptance = colonial_tendencies('exploitation', stage)
+        print(f'Exploitation stage {stage}: expansion score {expansion:+}; admission score {acceptance:+}')
+    mandate = WarMandate('imperial_expansion', (WarGoal('conquer_state', ('A','B')),), {'A'})
+    total = sum(mandate.tick() for _ in range(12))
+    assert total == 20
+    print(f'Only A approved for war targeting A+B: extra exhaustion {total} (capped).')
+    authorized = WarMandate('imperial_expansion', (WarGoal('conquer_state', ('A','B')),), {'A','B'})
+    assert authorized.tick() == 0
+    print('Both targets approved with expansion doctrine: no additional mod exhaustion.')
 
 
 if __name__ == '__main__':

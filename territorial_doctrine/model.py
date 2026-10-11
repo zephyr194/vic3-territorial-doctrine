@@ -30,6 +30,8 @@ def political_weight(score: float) -> float:
 
 def group_scores(doctrine: str, *, admission: bool = False,
                  renunciation: bool = False,
+                 colonial_target: bool = False, colonial_policy: str = "none",
+                 humanitarian_stage: int = 0,
                  security: bool = False, scarce_resource: bool = False,
                  compatriots: bool = False, discriminatory: bool = False,
                  conscription: bool = False, great_power_risk: bool = False,
@@ -40,6 +42,10 @@ def group_scores(doctrine: str, *, admission: bool = False,
     if len(pledges) > 2 or len(set(pledges)) != len(pledges):
         raise ValueError("At most two pledges to distinct groups")
     scores = {g: row[index] * 10.0 for g, row in RULES["groups"].items()}
+    if colonial_target and not renunciation:
+        expansion, acceptance = colonial_tendencies(colonial_policy, humanitarian_stage)
+        for group, weight in RULES['colonial']['weights'].items():
+            scores[group] += weight * (acceptance if admission else expansion)
     for g in (*pledges, *broken_pledges, *(leader_adjustments or {})):
         if g not in scores:
             raise ValueError(f"Unknown interest group: {g}")
@@ -215,17 +221,22 @@ def claim_infamy(doctrine: str, reason: str, target_power: str) -> int:
 def integration_cost(population: int, doctrine: str, *, fast: bool,
                      reason: str | None = None, actor_power: str = "other",
                      source_power: str = "other", turmoil: float = 0,
-                     devastation: float = 0, accepted_share: float = 1) -> int:
+                     devastation: float = 0, accepted_share: float = 1,
+                     colonial_target: bool = False, colonial_policy: str = "none",
+                     humanitarian_stage: int = 0) -> int:
     if population < 0:
         raise ValueError("Population must be nonnegative")
     base = ceil(25 + 25 * population / 1_000_000)
     for value, label in ((turmoil, 'turmoil'), (devastation, 'devastation'), (accepted_share, 'accepted_share')):
         _range(value, 0, 1, label)
     conditions = 1 + .5 * turmoil + .5 * devastation + .25 * (1 - accepted_share)
-    return ceil(base * RULES["doctrines"][doctrine]["cost_multiplier"] * (2 if fast else 1)
+    raw = (base * RULES["doctrines"][doctrine]["cost_multiplier"] * (2 if fast else 1)
                 * RULES['regimes'][actor_power]['actor_administration_multiplier']
                 * RULES['regimes'][source_power]['inherited_administration_multiplier']
-                * (RULES['reasons'][reason]['cost_multiplier'] if reason else 1) * conditions)
+                * (RULES['reasons'][reason]['cost_multiplier'] if reason else 1) * conditions
+                * (colonial_admission_multiplier(colonial_policy, humanitarian_stage) if colonial_target else 1))
+    precision = RULES['integration']['cost_precision']
+    return ceil(round(raw * precision) / precision)
 
 
 @dataclass
@@ -368,3 +379,56 @@ class ConstructionPledge:
             elif owns_target and building_levels > self.baseline:
                 self.status = "fulfilled"
         return self.status
+
+
+def colonial_tendencies(policy: str, humanitarian_stage: int) -> tuple[float, float]:
+    if humanitarian_stage not in (0, 1, 2):
+        raise ValueError('Humanitarian stage must be 0, 1 or 2')
+    p = RULES['colonial']['policies'][policy]
+    shift = RULES['colonial']['stage_shift'] * humanitarian_stage
+    return p['expansion'] - shift, p['admission'] + shift
+
+
+def colonial_admission_multiplier(policy: str, humanitarian_stage: int) -> float:
+    colonial_tendencies(policy, humanitarian_stage)
+    return RULES['colonial']['policies'][policy]['cost_multiplier'] * (1 + RULES['colonial']['rights_cost_per_stage'] * humanitarian_stage)
+
+
+def doctrine_scores(doctrine: str, policy: str = 'none', humanitarian_stage: int = 0) -> dict[str, float]:
+    expansion, _ = colonial_tendencies(policy, humanitarian_stage)
+    direction = RULES['colonial']['doctrine_directions'][doctrine]
+    index = DOCTRINES.index(doctrine)
+    return {g: row[index] * 10 + expansion * direction * RULES['colonial']['weights'][g]
+            for g, row in RULES['groups'].items()}
+
+
+@dataclass(frozen=True)
+class WarGoal:
+    kind: str
+    regions: tuple[str, ...] = ()
+
+
+@dataclass
+class WarMandate:
+    doctrine: str
+    goals: tuple[WarGoal, ...]
+    approved_regions: set[str]
+    enabled: bool = True
+    attacker: bool = True
+    renounced_regions: set[str] = field(default_factory=set)
+    cumulative_exhaustion: float = 0
+    unauthorized: bool = field(init=False)
+
+    def __post_init__(self):
+        land = [g for g in self.goals if g.kind in RULES['war']['territorial_goals']]
+        self.unauthorized = bool(self.enabled and self.attacker and land and (
+            self.doctrine not in RULES['war']['expansion_doctrines'] or
+            any(not g.regions or any(r not in self.approved_regions or r in self.renounced_regions
+                for r in g.regions) for g in land)))
+
+    def tick(self, *, at_war: bool = True, enabled: bool = True) -> float:
+        if not enabled or not at_war or not self.unauthorized:
+            return 0
+        amount = min(RULES['war']['monthly_exhaustion'], RULES['war']['exhaustion_cap'] - self.cumulative_exhaustion)
+        self.cumulative_exhaustion += amount
+        return amount

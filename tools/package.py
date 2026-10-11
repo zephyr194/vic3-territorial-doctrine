@@ -20,7 +20,7 @@ NAME = 'territorial_doctrine'
 def descriptor(path: str) -> str:
     if any(c in path for c in ('"', '\n', '\r')):
         raise ValueError('Installation path contains unsupported characters')
-    return (f'name="Territorial Doctrine - 国家领土原则"\nversion="{RULES["version"]}"\n'
+    return (f'name="Territorial Doctrine"\nversion="{RULES["version"]}"\n'
             'supported_version="1.13.*"\ntags={ "Gameplay" "Politics" }\n'
             f'path="{path}"\n')
 

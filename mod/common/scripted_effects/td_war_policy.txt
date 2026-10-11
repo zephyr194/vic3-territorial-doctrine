@@ -1,0 +1,47 @@
+# COUNTRY ROOT. Called by country event td.27, with a saved war scope.
+# Only the attacking warleader is assessed. Defense/return_state/reparations
+# supply no expansion targets. Snapshot failures cannot be erased mid-war.
+td_snapshot_war_mandate_effect = {
+    if = {
+        limit = {
+            td_feature_enabled_trigger = yes
+            exists = scope:td_mandate_war
+            scope:td_mandate_war = {
+                OR = { NOT = { has_variable = td_policy_checked } var:td_policy_country = root }
+            }
+        }
+        scope:td_mandate_war = {
+            if = { limit = { NOT = { has_variable = td_policy_checked } }
+                set_variable = td_policy_checked
+                set_variable = { name = td_policy_country value = root }
+                set_variable = { name = td_extra_exhaustion value = 0 }
+            }
+        }
+        if = {
+            limit = {
+                any_state = { td_war_expansion_target_trigger = yes }
+                OR = {
+                    NOT = { td_expansion_doctrine_trigger = yes }
+                    any_state = { td_war_expansion_target_trigger = yes NOT = { td_state_has_mandate_trigger = yes } }
+                }
+            }
+            scope:td_mandate_war = { set_variable = td_unauthorized_war }
+        }
+    }
+}
+# COUNTRY monthly. Counters live on each war; monthly events do not schedule
+# additional monthly events, and the saved war disappears after peace.
+td_war_monthly_effect = {
+    if = { limit = { td_feature_enabled_trigger = yes }
+        set_variable = { name = td_penalized_wars value = 0 }
+        every_scope_war = {
+            limit = { has_variable = td_policy_checked var:td_policy_country = root has_variable = td_unauthorized_war }
+            if = { limit = { var:td_extra_exhaustion < td_war_exhaustion_cap }
+                set_variable = { name = td_last_exhaustion value = td_war_next_exhaustion }
+                add_war_exhaustion = { target = root value = var:td_last_exhaustion }
+                change_variable = { name = td_extra_exhaustion add = var:td_last_exhaustion }
+                root = { change_variable = { name = td_penalized_wars add = 1 } }
+            }
+        }
+    }
+}

@@ -35,6 +35,16 @@ td_reason_bonus = {
         if = { limit = { td_power_category = 1 } add = -2 }
         if = { limit = { td_power_category = 2 } add = 2 }
     }
+    if = { limit = { var:td_reason = 6 }
+        if = { limit = { td_government_category = 1 } add = 1 }
+        if = { limit = { td_power_category = 1 } add = 2 }
+        if = { limit = { td_power_category = 2 } add = -1 }
+    }
+    if = { limit = { var:td_reason = 7 }
+        if = { limit = { td_government_category = 1 } add = 1 }
+        if = { limit = { td_power_category = 1 } add = 2 }
+        if = { limit = { td_power_category = 2 } add = -1 }
+    }
 }
 td_reason_cost_multiplier = {
     value = 1
@@ -43,6 +53,8 @@ td_reason_cost_multiplier = {
     if = { limit = { var:td_reason = 3 } value = 1.1 }
     if = { limit = { var:td_reason = 4 } value = 1.0 }
     if = { limit = { var:td_reason = 5 } value = 1.0 }
+    if = { limit = { var:td_reason = 6 } value = 1.1 }
+    if = { limit = { var:td_reason = 7 } value = 1.15 }
 }
 td_actor_cost_multiplier = {
     value = 1
