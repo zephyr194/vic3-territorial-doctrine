@@ -15,5 +15,5 @@ td_project_cost = { country_bureaucracy_add = -1 }
 td_pledge_fulfilled = { interest_group_approval_add = 2 }
 td_pledge_broken = { interest_group_approval_add = -5 }
 td_requires_admission = { state_disallow_incorporation = yes }
-td_admission_ratified = { state_migration_pull_mult = 0.05 }
+td_admission_ratified = {} # Legal record; all economic incentives belong to new territory.
 td_annual_integration = { state_disallow_incorporation = yes }

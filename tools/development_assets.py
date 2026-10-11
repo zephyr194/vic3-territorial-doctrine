@@ -14,7 +14,8 @@ def assets():
 '''
     for index, (doctrine, info) in enumerate(RULES['doctrines'].items(), 1):
         modifiers += f'td_territory_{doctrine} = {{\n'
-        modifiers += ''.join(f'    {key} = {value}\n' for key, value in info['territory_modifiers'].items())
+        modifiers += ''.join(f'    {key} = {value}\n' for key, value in
+                             (info['territory_modifiers'] | info['industry_modifiers']).items())
         modifiers += '}\n'
         cleanup += f'    remove_modifier = td_territory_{doctrine}\n'
         refresh += f'            if = {{ limit = {{ has_law = law_type:law_td_{doctrine} }} prev = {{ set_variable = {{ name = td_desired_development value = {index} }} }} }}\n'

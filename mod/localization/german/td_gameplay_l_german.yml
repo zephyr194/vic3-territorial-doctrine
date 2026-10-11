@@ -28,7 +28,7 @@
  td.11.t:0 "Selected Territorial Bill Passed"
  td.11.d:0 "The selected state region has a claim and recorded legislative approval. New-claim infamy is charged once; confirming an existing claim charges none. An expansion doctrine plus approval of every target is required for an authorized territorial war. Construction pledges, if any, remain binding."
  td.12.t:0 "Ratified: Admission Amendment for [ROOT.GetCountry.MakeScope.Var('td_last_amendment_target').GetState.GetName]"
- td.12.d:0 "Only [ROOT.GetCountry.MakeScope.Var('td_last_amendment_target').GetState.GetName] is legally admitted, granting migration attraction +5%. If the annual bureaucracy reserve is affordable, its one-year project starts immediately; otherwise the amendment remains ratified until you fund this state. All other states keep their own review requirement. Cultures and homelands are preserved."
+ td.12.d:0 "Only [ROOT.GetCountry.MakeScope.Var('td_last_amendment_target').GetState.GetName] is legally admitted. Ratification reduces local radicals and adds local loyalists by 2% of this state’s population, or 3% with the Equal Rights justification, subject to vanilla population caps. This is a one-time response and does not change citizenship or discrimination laws. If the annual bureaucracy reserve is affordable, its one-year project starts immediately; otherwise the amendment remains ratified until you fund this state. All other states keep their own review requirement. Cultures and homelands are preserved."
  td.13.t:0 "Territorial Bill Rejected"
  td.13.d:0 "Three failures have accumulated. Territorial bills are blocked for two years. Pledges from this rejected bill create no obligations; previously passed pledges persist."
  td.14.t:0 "Territorial Bill Withdrawn"

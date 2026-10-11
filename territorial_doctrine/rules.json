@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0-alpha.1",
+  "version": "0.6.0-alpha.1",
   "doctrines": {
     "status_quo": {
       "zh": "领土现状主义",
@@ -19,8 +19,7 @@
       "country_modifiers": {
         "country_bureaucracy_mult": 0.05,
         "country_prestige_mult": -0.05,
-        "country_infamy_decay_mult": 0.15,
-        "country_legitimacy_base_add": 5
+        "country_infamy_decay_mult": 0.15
       },
       "description": {
         "zh": "维护现有边界，把政治与行政资源用于国内建设。知识分子、工会与乡村民众得到更多影响力，军方的扩张议程受到约束；行政效率提高，但对外威望有所降低。",
@@ -37,7 +36,14 @@
       },
       "territory_modifiers": {
         "state_construction_mult": 0.05,
-        "state_migration_pull_mult": 0.15
+        "state_migration_pull_mult": 0.15,
+        "state_radicals_from_discrimination_mult": -0.15,
+        "state_radicals_from_sol_change_mult": -0.1,
+        "state_loyalists_from_sol_change_mult": 0.15
+      },
+      "acquisition_reaction": {
+        "radicals": 0,
+        "loyalists": 0.02
       }
     },
     "historical_rights": {
@@ -57,8 +63,7 @@
       "country_modifiers": {
         "country_authority_add": 25,
         "country_infamy_generation_mult": -0.1,
-        "country_infamy_decay_mult": 0.05,
-        "country_legitimacy_base_add": 5
+        "country_infamy_decay_mult": 0.05
       },
       "description": {
         "zh": "以既有法理和主体文化家园维护国家疆界，将恢复合法领土置于无条件扩张之前。小市民、地主与宗教传统力量获得更大政治影响，国家权威增强；传统精英也因此更有能力阻碍改革。",
@@ -74,7 +79,14 @@
       },
       "territory_modifiers": {
         "state_construction_mult": 0.1,
-        "state_migration_pull_mult": 0.1
+        "state_migration_pull_mult": 0.1,
+        "state_radicals_from_discrimination_mult": -0.05,
+        "state_radicals_from_sol_change_mult": 0,
+        "state_loyalists_from_sol_change_mult": 0.1
+      },
+      "acquisition_reaction": {
+        "radicals": 0.01,
+        "loyalists": 0.02
       }
     },
     "strategic_frontiers": {
@@ -94,8 +106,7 @@
       "country_modifiers": {
         "country_diplomatic_play_maneuvers_add": 10,
         "country_military_goods_cost_mult": 0.05,
-        "country_infamy_generation_mult": 0.1,
-        "country_legitimacy_base_add": 2
+        "country_infamy_generation_mult": 0.1
       },
       "description": {
         "zh": "通过有限扩张保障边境与区域安全。军方负责边疆部署，实业家参与对外建设，两者政治力量提高；外交博弈有更多回旋余地，但军费负担增加，乡村民众的影响力受到挤压。",
@@ -114,7 +125,14 @@
       },
       "territory_modifiers": {
         "state_construction_mult": 0.15,
-        "state_migration_pull_mult": 0.05
+        "state_migration_pull_mult": 0.05,
+        "state_radicals_from_discrimination_mult": 0.05,
+        "state_radicals_from_sol_change_mult": 0.05,
+        "state_loyalists_from_sol_change_mult": 0.05
+      },
+      "acquisition_reaction": {
+        "radicals": 0.03,
+        "loyalists": 0.01
       }
     },
     "imperial_expansion": {
@@ -138,8 +156,7 @@
         "country_prestige_mult": 0.1,
         "country_military_goods_cost_mult": 0.1,
         "country_bureaucracy_mult": -0.05,
-        "country_infamy_generation_mult": 0.25,
-        "country_legitimacy_base_add": -5
+        "country_infamy_generation_mult": 0.25
       },
       "description": {
         "zh": "把海外扩张与国家威望列为长期国策。军方、实业家与地主共同获益，民生和改革集团的影响力下降；帝国声望提高，但军事物资更加昂贵，广泛的海外承诺也削弱行政能力。",
@@ -165,7 +182,14 @@
       },
       "territory_modifiers": {
         "state_construction_mult": 0.2,
-        "state_migration_pull_mult": 0.1
+        "state_migration_pull_mult": 0.1,
+        "state_radicals_from_discrimination_mult": 0.2,
+        "state_radicals_from_sol_change_mult": 0.1,
+        "state_loyalists_from_sol_change_mult": -0.1
+      },
+      "acquisition_reaction": {
+        "radicals": 0.05,
+        "loyalists": 0
       }
     }
   },
@@ -366,7 +390,8 @@
     "months": 12,
     "annual_cost_multiplier": 2,
     "cost_precision": 100000,
-    "ratification_migration_pull": 0.05
+    "admission_reaction_share": 0.02,
+    "equal_rights_reaction_share": 0.03
   },
   "prototype": {
     "country": "SPA",
@@ -526,5 +551,15 @@
         "en": "Value traditional communities and historical legitimacy, favoring historical rights while responding to colonial and humanitarian policy."
       }
     }
+  },
+  "territorial_success": {
+    "months": 36,
+    "acquisition_legitimacy": {
+      "status_quo": 0,
+      "historical_rights": 6,
+      "strategic_frontiers": 8,
+      "imperial_expansion": 12
+    },
+    "admission_legitimacy": 3
   }
 }

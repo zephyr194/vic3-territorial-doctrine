@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from tools.policy_assets import assets
 from tools.development_assets import assets as development_assets
+from tools.success_assets import assets as success_assets
 from tools.law_text import doctrine_description, group_description
 from territorial_doctrine.model import RULES, DOCTRINES  # noqa: E402
 
@@ -67,7 +68,6 @@ def outputs() -> dict[Path, bytes]:
         effects = {f'interest_group_ig_{group}_pol_str_mult': value
                    for group, value in data['political_strength'].items()}
         effects.update(data['country_modifiers'])
-        effects.update(data['industry_modifiers'])
         modifier = '\n'.join(f'        {key} = {value}' for key, value in effects.items())
         laws += f'''law_td_{doctrine} = {{
     group = lawgroup_territorial_doctrine
@@ -168,7 +168,7 @@ td_pledge_fulfilled = { interest_group_approval_add = 2 }
 td_pledge_broken = { interest_group_approval_add = -5 }
 td_requires_admission = { state_disallow_incorporation = yes }
 '''
-    modifiers += f'td_admission_ratified = {{ state_migration_pull_mult = {RULES["integration"]["ratification_migration_pull"]} }}\n'
+    modifiers += 'td_admission_ratified = {} # Legal record; all economic incentives belong to new territory.\n'
     modifiers += 'td_annual_integration = { state_disallow_incorporation = yes }\n'
     put('common/static_modifiers/td_modifiers.txt', modifiers)
     for language, label in [('english', 'en'), ('simp_chinese', 'zh')]:
@@ -182,6 +182,9 @@ td_requires_admission = { state_disallow_incorporation = yes }
             if data['focus_limit']:
                 loc += f' td_focus_{doctrine}:0 "{title} — ' + ('重点区域预留' if label == 'zh' else 'Focus Region Commitments') + '"\n'
             loc += f' td_territory_{doctrine}:0 "{title} — ' + ('领土开发' if label == 'zh' else 'Territorial Development') + '"\n'
+            if RULES['territorial_success']['acquisition_legitimacy'][doctrine]:
+                loc += f' td_success_{doctrine}:0 "{title} — ' + ('领土成果合法性' if label == 'zh' else 'Territorial Success Legitimacy') + '"\n'
+        loc += ' td_success_admission:0 "' + ('完成逐州接纳的政治信誉' if label == 'zh' else 'Political Credit for Completed State Admission') + '"\n'
         for group in RULES['groups']:
             name = RULES['group_politics'][group][label]
             loc += f' ideology_td_{group}:0 "' + (f'{name}的领土立场' if label == 'zh' else f'{name} Territorial Position') + '"\n'
@@ -199,6 +202,8 @@ td_requires_admission = { state_disallow_incorporation = yes }
     for path, content in assets().items():
         put(path, content)
     for path, content in development_assets().items():
+        put(path, content)
+    for path, content in success_assets().items():
         put(path, content)
     # English is the source fallback; other game languages use identical keys/text
     # until a native translation is supplied. Never alter the game's language setting.

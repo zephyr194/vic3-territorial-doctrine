@@ -172,6 +172,7 @@ td.28 = {
                     remove_modifier = td_requires_admission
                     set_state_type = incorporated
                 }
+                td_award_admission_success_effect = yes
                 td_end_project_effect = yes
                 trigger_event = td.15
             }

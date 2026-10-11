@@ -3,6 +3,10 @@ td_initialize_world = {
     effect = {
         set_global_variable = td_mod_present
         if = { limit = { td_feature_enabled_trigger = yes }
+            if = { limit = { NOT = { has_global_variable = td_original_registry_ready } }
+                every_state = { td_register_original_territory_effect = yes }
+                set_global_variable = td_original_registry_ready
+            }
             every_country = { td_initialize_effect = yes }
             every_state = { td_update_state_owner_effect = yes }
         }
@@ -40,6 +44,7 @@ td_country_monthly = {
         if = { limit = { td_feature_enabled_trigger = yes }
             td_initialize_effect = yes
             every_scope_state = { td_update_state_owner_effect = yes }
+            td_refresh_success_credit_effect = yes
             td_war_monthly_effect = yes
             # Expansion AI chooses a valid target and legislates using the same
             # requirements; a focus is funded before its waiting period begins.

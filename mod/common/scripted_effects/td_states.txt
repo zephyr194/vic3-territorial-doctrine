@@ -4,7 +4,10 @@ td_update_state_owner_effect = {
         limit = { td_feature_enabled_trigger = yes }
         if = {
             limit = { has_variable = td_recorded_owner NOT = { var:td_recorded_owner = owner } }
-            if = { limit = { exists = var:td_recorded_owner } var:td_recorded_owner = { td_store_power_on_prev_state_effect = yes } }
+            if = { limit = { exists = var:td_recorded_owner } var:td_recorded_owner = {
+                td_revoke_success_on_prev_state_effect = yes
+                td_store_power_on_prev_state_effect = yes
+            } }
             set_variable = { name = td_source_administration value = var:td_live_administration }
             set_variable = { name = td_source_power value = var:td_live_power }
             remove_variable = td_admitted_owner
@@ -36,6 +39,7 @@ td_update_state_owner_effect = {
         }
         else = { remove_modifier = td_requires_admission }
         td_refresh_state_development_effect = yes
+        td_process_acquisition_effect = yes
     }
 }
 

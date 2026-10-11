@@ -53,6 +53,7 @@ class EventRunner:
         self.lists = {}
         self.expirations = {}
         self.modifiers = {}
+        self.modifier_expirations = {}
         self.states = {key: {'owner': country, 'state_population': 1_000_000,
                             'turmoil': 0, 'devastation': 0, 'incorporated': False,
                             'homeland': False, 'treaty_port': False,
@@ -85,6 +86,11 @@ class EventRunner:
         return self.states[self.scope]['variables'] if self.scope else self.variables
 
     def context(self):
+        for key, day in list(self.modifier_expirations.items()):
+            if day <= self.day:
+                scope, modifier = key
+                (self.states[scope]['modifiers'] if scope else self.modifiers).pop(modifier, None)
+                del self.modifier_expirations[key]
         for key in [k for k, day in self.expirations.items() if day <= self.day]:
             self.variables.pop(key, None)
             del self.expirations[key]
@@ -94,7 +100,8 @@ class EventRunner:
         context.update({'is_player': True, 'bureaucracy': self.bureaucracy, 'authority': 1000, 'root': self.country,
                         'is_subject':False,'is_revolutionary':False,'legitimacy':70,
                         'has_modifier:country_bankruptcy':False,
-                        'has_interest_marker_in_region:var:td_target.region':True})
+                        'has_interest_marker_in_region:var:td_target.region':True,
+                        'prev': self.previous_scope})
         context['has_claim:var:td_target.state_region'] = self.variables.get('td_target') in self.claims
         target = self.variables.get('td_target')
         if target:
@@ -116,6 +123,10 @@ class EventRunner:
         return context
 
     def resolve(self, value):
+        if value == 'prev':
+            return self.previous_scope
+        if value == 'prev.state_region':
+            return self.states[self.previous_scope].get('state_region', self.previous_scope)
         if value == 'owner':
             return self.country if self.scope in self.groups or self.scope is None else self.states[self.scope]['owner']
         if value == 'root':
@@ -148,14 +159,20 @@ class EventRunner:
                 self.scope = None
                 result = self.check(e.value)
                 self.scope = previous_scope
-            elif e.key in ('var:td_target','var:td_project_target') and isinstance(e.value, list):
+            elif e.key in ('var:td_target','var:td_project_target','var:td_success_state') and isinstance(e.value, list):
                 previous_scope = self.scope
                 self.scope = self.variables[e.key.removeprefix('var:')]
                 result = self.check(e.value)
                 self.scope = previous_scope
             elif e.key == 'exists':
-                result = ((e.value.removeprefix('var:') in self.variables) if e.value.startswith('var:')
+                result = ((e.value.removeprefix('var:') in self.storage()) if e.value.startswith('var:')
                           else (e.value.removeprefix('scope:') in self.saved))
+                if result and e.value in ('var:td_target', 'var:td_project_target', 'var:td_success_state'):
+                    result = self.storage()[e.value.removeprefix('var:')] in self.states
+            elif e.key == 'has_claim':
+                region = self.resolve(e.value)
+                result = region in self.claims or any(
+                    self.states[s].get('state_region', s) == region for s in self.claims if s in self.states)
             elif e.key == 'has_global_variable':
                 result = e.value in self.globals
             elif e.key == 'has_ideology':
@@ -288,9 +305,18 @@ class EventRunner:
                 settings = ({'name':e.value} if isinstance(e.value, str) else {v.key:v.value for v in e.value})
                 modifiers = self.states[self.scope]['modifiers'] if self.scope else self.modifiers
                 modifiers[settings['name']] = formula(settings.get('multiplier', '1'), self.context(), self.values)
+                delay = sum(days * formula(settings[unit], self.context(), self.values)
+                            for unit, days in [('days', 1), ('months', 30), ('years', 365)] if unit in settings)
+                if delay:
+                    self.modifier_expirations[self.scope, settings['name']] = self.day + delay
             elif e.key == 'remove_modifier':
                 modifiers = self.states[self.scope]['modifiers'] if self.scope else self.modifiers
                 modifiers.pop(e.value, None)
+                self.modifier_expirations.pop((self.scope, e.value), None)
+            elif e.key in ('add_radicals_in_state', 'add_loyalists_in_state'):
+                settings = {v.key: v.value for v in e.value}
+                self.states[self.scope].setdefault('political_changes', []).append(
+                    (e.key, formula(settings['value'], self.context(), self.values)))
             elif e.key in ('var:td_target', 'var:td_project_target', 'var:td_target.state_region','var:td_target.region'):
                 previous_scope = self.scope
                 self.scope = (self.states[self.variables['td_target']]['region'] if e.key == 'var:td_target.region'

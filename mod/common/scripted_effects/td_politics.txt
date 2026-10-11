@@ -143,6 +143,7 @@ td_pass_bill_effect = {
                 set_variable = { name = td_admitted_owner value = owner }
                 set_variable = { name = td_admission_reason value = root.var:td_reason }
                 add_modifier = td_admission_ratified
+                td_admission_reaction_effect = yes
             }
             set_variable = { name = td_last_amendment_target value = var:td_target }
             trigger_event = td.12
@@ -164,6 +165,8 @@ td_enable_system_effect = {
         every_country = { td_disabled_cleanup_effect = yes }
         set_global_variable = td_mod_present
         set_global_variable = td_system_enabled
+        every_state = { td_register_original_territory_effect = yes }
+        set_global_variable = td_original_registry_ready
         every_country = { td_initialize_effect = yes }
         every_state = { td_update_state_owner_effect = yes }
         trigger_event = td.24
@@ -176,6 +179,9 @@ td_disabled_cleanup_effect = {
         td_end_project_effect = yes
         td_remove_focus_effect = yes
         td_remove_territorial_ideologies_effect = yes
+        td_clear_success_modifiers_effect = yes
+        remove_variable = td_success_window
+        remove_variable = td_success_state
         # Laws now carry native modifiers; disabled legacy laws must release them.
         if = { limit = { has_law = law_type:law_td_status_quo } deactivate_law = law_type:law_td_status_quo }
         if = { limit = { has_law = law_type:law_td_historical_rights } deactivate_law = law_type:law_td_historical_rights }

@@ -117,13 +117,13 @@ td_annual_project_valid_trigger = {
 }
 
 # STATE: actual sovereign ownership, including split states; foreign military
-# occupation grants no construction rights. Existing non-homelands also qualify.
+# occupation grants no construction rights. Original owned states never qualify,
+# including original non-homelands and land later lost and recovered.
 td_development_target_trigger = {
     is_treaty_port = no
-    OR = {
-        NOT = { is_homeland_of_country_cultures = owner }
-        AND = { has_variable = td_acquired_owner var:td_acquired_owner = owner }
-    }
+    has_variable = td_acquired_owner
+    var:td_acquired_owner = owner
+    NOT = { AND = { has_variable = td_original_owner var:td_original_owner = owner } }
 }
 
 # STATE: a wholly lost region, claimed or a primary-cultural homeland.

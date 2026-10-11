@@ -6,7 +6,7 @@ import unittest
 from native_runner import EventRunner, policy_context
 from territorial_doctrine.model import RULES, claim_infamy
 from territorial_doctrine.script import load, parse
-from tools.law_text import TERRITORY_EFFECTS
+from tools.law_text import TERRITORY_EFFECTS, INDUSTRY_EFFECTS
 from test_law_effects import localization
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -138,10 +138,11 @@ class DevelopmentTests(unittest.TestCase):
     def refresh(self, runner):
         runner.execute(parse('every_scope_state = { td_refresh_state_development_effect = yes }'))
 
-    def test_owned_non_homeland_and_new_home_state_receive_only_current_policy(self):
+    def test_only_newly_acquired_states_receive_current_policy(self):
         runner = EventRunner(country='POR')
         runner.policy.update(policy_context(doctrine='imperial_expansion'))
         runner.states['B']['homeland'] = True
+        runner.states['A']['variables']['td_acquired_owner'] = 'POR'
         self.refresh(runner)
         self.assertIn('td_territory_imperial_expansion',runner.states['A']['modifiers'])
         self.assertNotIn('td_territory_imperial_expansion',runner.states['B']['modifiers'])
@@ -161,6 +162,7 @@ class DevelopmentTests(unittest.TestCase):
         runner = EventRunner(country='POR')
         runner.states['B']['owner'] = 'CHI'
         runner.states['A']['treaty_port'] = True
+        runner.states['A']['variables']['td_acquired_owner'] = 'POR'
         self.refresh(runner)
         for state in runner.states.values():
             self.assertFalse(any(m.startswith('td_territory_') for m in state['modifiers']))
@@ -176,18 +178,21 @@ class DevelopmentTests(unittest.TestCase):
             loc=localization(language,'td_laws')
             for doctrine in RULES['doctrines']:
                 for modifier in modifiers['td_territory_'+doctrine]:
-                    expected=TERRITORY_EFFECTS[modifier.key][index] + f' {float(modifier.value)*100:+g}%'
+                    expected=(TERRITORY_EFFECTS | INDUSTRY_EFFECTS)[modifier.key][index] + f' {float(modifier.value)*100:+g}%'
                     self.assertIn(expected,loc['law_td_'+doctrine+'_desc'])
 
     def test_imperial_military_supply_chain_has_ten_percent_throughput(self):
         laws={e.key:e.value for e in load(ROOT/'mod/common/laws/td_laws.txt')}
         effects={e.key:float(e.value) for e in next(e.value for e in laws['law_td_imperial_expansion'] if e.key=='modifier')}
+        territory={e.key:e.value for e in load(ROOT/'mod/common/static_modifiers/td_territory_modifiers.txt')}
+        local={e.key:float(e.value) for e in territory['td_territory_imperial_expansion']}
         chain=('coal_mine','iron_mine','lead_mine','sulfur_mine','steel_mill','tooling_workshop',
                'chemical_plant','motor_industry','arms_industry','munition_plant','war_machine_industry','shipyard')
         for industry in chain:
-            self.assertEqual(effects[f'building_{industry}_throughput_mult'],.10)
+            self.assertNotIn(f'building_{industry}_throughput_mult', effects)
+            self.assertEqual(local[f'building_{industry}_throughput_mult'],.10)
         self.assertEqual(effects['country_infamy_generation_mult'],.25)
-        self.assertEqual(effects['country_legitimacy_base_add'],-5)
+        self.assertNotIn('country_legitimacy_base_add', effects)
         self.assertGreater(claim_infamy('imperial_expansion','security','democracy'),
                            claim_infamy('imperial_expansion','security','autocracy'))
 

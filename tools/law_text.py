@@ -38,6 +38,9 @@ INDUSTRY_EFFECTS = {
 TERRITORY_EFFECTS = {
     'state_construction_mult': ('建设效率', 'Construction efficiency'),
     'state_migration_pull_mult': ('移民吸引力', 'Migration attraction'),
+    'state_radicals_from_discrimination_mult': ('歧视产生的激进派', 'Radicals from discrimination'),
+    'state_radicals_from_sol_change_mult': ('生活水平下降产生的激进派', 'Radicals from falling living standards'),
+    'state_loyalists_from_sol_change_mult': ('生活水平上升产生的效忠派', 'Loyalists from rising living standards'),
 }
 
 
@@ -70,12 +73,21 @@ def doctrine_description(doctrine, label):
     territory_effects = ', '.join(
         TERRITORY_EFFECTS[key][0 if label == 'zh' else 1] + ' ' + signed(value, percent=True)
         for key, value in info['territory_modifiers'].items())
+    success = RULES['territorial_success']
+    earned = success['acquisition_legitimacy'][doctrine]
+    reaction = info['acquisition_reaction']
+    reaction_effects = ', '.join(
+        (('激进派' if kind == 'radicals' else '效忠派') if label == 'zh' else
+         ('Radicals' if kind == 'radicals' else 'Loyalists')) + ' ' + signed(value, percent=True)
+        for kind, value in reaction.items())
     if label == 'zh':
         focus = (f'重点区域上限{info["focus_limit"]}；每区域预留行政力{info["bureaucracy"]}、权威力{info["authority"]}，'
                  f'等待{info["wait_months"]}个月成熟。' if info['focus_limit'] else '不设扩张重点区域。')
         details = [f'集团政治力量：{group_effects}。', f'国家效果：{country_effects}。',
-                   f'产业吞吐量：{industry_effects}。吞吐量同时增加投入需求与产出。',
-                   f'拥有的新领土与非文化家园州：{territory_effects}；遵循原版迁移法律。',
+                   f'新取得州内产业吞吐量：{industry_effects}。吞吐量同时增加投入需求与产出。',
+                   f'仅限启用后新取得的普通拥有州：{territory_effects}；原有州（包括非文化家园）不享有这些修正，遵循原版迁移与歧视法律。',
+                   f'新领土取得时一次性居民反应：{reaction_effects}（人口比例，仍受原版人数上限约束）。持续的激进/效忠修正只改变对应来源的生成量，不每月直接改变人口比例。',
+                   (f'实际取得已通过目标法案且宣称有效的领土后，合法性+{earned}。' if earned else '本原则不因取得外国领土直接奖励合法性。') + f'完成一州接纳整合可获合法性+{success["admission_legitimacy"]}。所有成果合法性持续{success["months"]}个月，共用期限，不叠加、不续期；失去获奖州提前移除收益，锁定期限保留。宣称或宣战本身不发放奖励。',
                    f'宣称资格：{info["eligibility"][label]}',
                    f'基础立场：{baseline_positions(doctrine, label)}。殖民政策与人文科技会调整立场。',
                    focus + f'新宣称基础额外恶名{info["infamy"]}，另计本法律恶名倍率；逐州整合基础成本×{info["cost_multiplier"]}。接纳修正案通过后，为该州支付项目成本并整合一年。']
@@ -84,8 +96,10 @@ def doctrine_description(doctrine, label):
                  f'{info["authority"]} authority per region; maturity after {info["wait_months"]} months.'
                  if info['focus_limit'] else 'No expansion focus regions.')
         details = [f'Interest-group political strength: {group_effects}.', f'National effects: {country_effects}.',
-                   f'Industry throughput: {industry_effects}. Throughput increases both input demand and output.',
-                   f'Owned newly acquired and non-homeland states: {territory_effects}; vanilla migration laws apply.',
+                   f'Industry throughput inside newly acquired states: {industry_effects}. Throughput increases both input demand and output.',
+                   f'Only ordinary owned states newly acquired after activation: {territory_effects}. Original states, including non-homelands, receive none of these modifiers. Vanilla migration and discrimination laws apply.',
+                   f'One-time local acquisition reaction: {reaction_effects} (population shares, subject to vanilla population caps). Ongoing radical/loyalist modifiers affect their named sources, not a monthly population conversion.',
+                   (f'Acquiring territory with an approved target bill and a still-valid claim grants legitimacy +{earned}. ' if earned else 'This doctrine grants no legitimacy merely for acquiring foreign territory. ') + f'Completing one state admission grants legitimacy +{success["admission_legitimacy"]}. All success rewards last {success["months"]} months and share one window; they never stack or renew during it. Losing the credited state removes the reward but retains the window. Claims and declarations alone earn nothing.',
                    f'Claim eligibility: {info["eligibility"][label]}',
                    f'Base positions: {baseline_positions(doctrine, label)}. Colonial policy and humanitarian research adjust positions.',
                    focus + f' Base additional new-claim infamy {info["infamy"]}, adjusted by this law’s infamy factor; individual integration base cost x{info["cost_multiplier"]}. Ratified admission amendments give their funded state a one-year integration project.']
