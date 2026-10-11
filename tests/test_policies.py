@@ -126,6 +126,9 @@ class ColonialTests(unittest.TestCase):
 class ActivationTests(unittest.TestCase):
     def test_loaded_disabled_world_has_no_country_or_state_initialization(self):
         runner=EventRunner();runner.globals.clear()
+        # A fresh disabled save has no enacted territorial doctrine to clean up.
+        for doctrine in RULES['doctrines']:
+            runner.policy['has_law:law_type:law_td_' + doctrine] = False
         original=deepcopy(runner.variables)
         runner.execute(next(e.value for e in runner.definitions['td_initialize_world'] if e.key=='effect'))
         self.assertEqual(runner.globals,{'td_mod_present':1})

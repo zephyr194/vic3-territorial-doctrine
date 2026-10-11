@@ -1,10 +1,10 @@
 # 安装与启用（目标 Vic3 1.13）
 
-版本 `0.4.0-alpha.1`，尚未在游戏内验收。使用新测试存档、仅本模组的播放集。
+版本 `0.4.1-alpha.1`，尚未在游戏内验收。使用新测试存档、仅本模组的播放集。
 
 ## 安装ZIP
 
-解压 `territorial_doctrine-0.4.0-alpha.1.zip`，将 `territorial_doctrine/` 和 `territorial_doctrine.mod` 放入用户数据目录的 `Victoria 3/mod/`：
+解压 `territorial_doctrine-0.4.1-alpha.1.zip`，将 `territorial_doctrine/` 和 `territorial_doctrine.mod` 放入用户数据目录的 `Victoria 3/mod/`：
 
 - Windows：`文档/Paradox Interactive/Victoria 3/mod/`，文档可能由OneDrive重定向。
 - Linux：`~/.local/share/Paradox Interactive/Victoria 3/mod/`。

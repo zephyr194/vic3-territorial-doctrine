@@ -3,6 +3,14 @@ law_td_status_quo = {
     group = lawgroup_territorial_doctrine
     icon = "gfx/interface/icons/td/status_quo.dds"
     progressiveness = 0
+    modifier = {
+        interest_group_ig_intelligentsia_pol_str_mult = 0.1
+        interest_group_ig_trade_unions_pol_str_mult = 0.1
+        interest_group_ig_rural_folk_pol_str_mult = 0.1
+        interest_group_ig_armed_forces_pol_str_mult = -0.1
+        country_bureaucracy_mult = 0.05
+        country_prestige_mult = -0.05
+    }
     can_enact = { td_can_legislate_trigger = yes }
     on_enact = { td_doctrine_changed_effect = yes }
     ai_enact_weight_modifier = { value = 1 }
@@ -11,6 +19,12 @@ law_td_historical_rights = {
     group = lawgroup_territorial_doctrine
     icon = "gfx/interface/icons/td/historical_rights.dds"
     progressiveness = 10
+    modifier = {
+        interest_group_ig_petty_bourgeoisie_pol_str_mult = 0.15
+        interest_group_ig_landowners_pol_str_mult = 0.1
+        interest_group_ig_devout_pol_str_mult = 0.1
+        country_authority_add = 25
+    }
     can_enact = { td_can_legislate_trigger = yes }
     on_enact = { td_doctrine_changed_effect = yes }
     ai_enact_weight_modifier = { value = 1 }
@@ -19,6 +33,13 @@ law_td_strategic_frontiers = {
     group = lawgroup_territorial_doctrine
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     progressiveness = 20
+    modifier = {
+        interest_group_ig_armed_forces_pol_str_mult = 0.15
+        interest_group_ig_industrialists_pol_str_mult = 0.1
+        interest_group_ig_rural_folk_pol_str_mult = -0.1
+        country_diplomatic_play_maneuvers_add = 10
+        country_military_goods_cost_mult = 0.05
+    }
     can_enact = { td_can_legislate_trigger = yes }
     on_enact = { td_doctrine_changed_effect = yes }
     ai_enact_weight_modifier = { value = 1 }
@@ -27,6 +48,17 @@ law_td_imperial_expansion = {
     group = lawgroup_territorial_doctrine
     icon = "gfx/interface/icons/td/imperial_expansion.dds"
     progressiveness = 30
+    modifier = {
+        interest_group_ig_armed_forces_pol_str_mult = 0.2
+        interest_group_ig_industrialists_pol_str_mult = 0.15
+        interest_group_ig_landowners_pol_str_mult = 0.1
+        interest_group_ig_intelligentsia_pol_str_mult = -0.1
+        interest_group_ig_trade_unions_pol_str_mult = -0.1
+        interest_group_ig_rural_folk_pol_str_mult = -0.1
+        country_prestige_mult = 0.1
+        country_military_goods_cost_mult = 0.1
+        country_bureaucracy_mult = -0.05
+    }
     can_enact = { td_can_legislate_trigger = yes }
     on_enact = { td_doctrine_changed_effect = yes }
     ai_enact_weight_modifier = { value = 1 }

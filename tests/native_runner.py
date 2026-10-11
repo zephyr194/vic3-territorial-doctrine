@@ -255,6 +255,11 @@ class EventRunner:
                 self.variables['td_chance'] = 42  # Formula itself tested separately.
             elif e.key == 'td_refresh_target_effect':
                 pass  # Explicit population and eligibility fixtures.
+            elif e.key in ('activate_law', 'deactivate_law'):
+                if e.key == 'activate_law':
+                    for doctrine in RULES['doctrines']:
+                        self.policy['has_law:law_type:law_td_' + doctrine] = False
+                self.policy['has_law:' + e.value] = e.key == 'activate_law'
             elif e.key == 'add_modifier':
                 settings = ({'name':e.value} if isinstance(e.value, str) else {v.key:v.value for v in e.value})
                 modifiers = self.states[self.scope]['modifiers'] if self.scope else self.modifiers

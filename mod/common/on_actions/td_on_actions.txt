@@ -6,6 +6,7 @@ td_initialize_world = {
             every_country = { td_initialize_effect = yes }
             every_state = { td_update_state_owner_effect = yes }
         }
+        else = { every_country = { td_disabled_cleanup_effect = yes } }
     }
 }
 on_state_created = { on_actions = { td_new_state_created } }

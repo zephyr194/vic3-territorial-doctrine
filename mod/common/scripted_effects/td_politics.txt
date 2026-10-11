@@ -160,11 +160,16 @@ td_enable_system_effect = {
 }
 td_disabled_cleanup_effect = {
     if = {
-        limit = { OR = { has_variable = td_initialized_v3 has_variable = td_initialized_v4 } }
+        limit = { OR = { has_variable = td_initialized_v3 has_variable = td_initialized_v4 td_has_doctrine_trigger = yes } }
         td_cancel_bill_effect = yes
         td_end_project_effect = yes
         td_remove_focus_effect = yes
         td_remove_territorial_ideologies_effect = yes
+        # Laws now carry native modifiers; disabled legacy laws must release them.
+        if = { limit = { has_law = law_type:law_td_status_quo } deactivate_law = law_type:law_td_status_quo }
+        if = { limit = { has_law = law_type:law_td_historical_rights } deactivate_law = law_type:law_td_historical_rights }
+        if = { limit = { has_law = law_type:law_td_strategic_frontiers } deactivate_law = law_type:law_td_strategic_frontiers }
+        if = { limit = { has_law = law_type:law_td_imperial_expansion } deactivate_law = law_type:law_td_imperial_expansion }
         every_scope_state = { remove_modifier = td_requires_admission }
         remove_variable = td_initialized_v3
         remove_variable = td_initialized_v4
