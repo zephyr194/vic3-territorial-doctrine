@@ -200,6 +200,9 @@ td_disabled_cleanup_effect = {
 
 # COUNTRY: title the political review after the exact owned state.
 td_open_review_effect = {
-    if = { limit = { var:td_pending_bill = 2 } trigger_event = td.30 }
-    else = { trigger_event = td.21 }
+    if = { limit = { exists = var:td_target }
+        if = { limit = { var:td_pending_bill = 2 } trigger_event = td.30 }
+        else = { trigger_event = td.21 }
+    }
+    else = { trigger_event = td.31 }
 }

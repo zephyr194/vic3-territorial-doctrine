@@ -18,6 +18,9 @@ class PackagingTests(unittest.TestCase):
                 self.assertIn('territorial_doctrine/.metadata/metadata.json', names)
                 self.assertIn('territorial_doctrine.mod', names)
                 self.assertIn('INSTALL.md', names)
+                for document in ('README.en.md', 'DESIGN.md', 'TESTING.md', 'COLONIAL_WAR_RULES.md'):
+                    self.assertIn(document, names)
+                self.assertEqual(len(names), len(set(names)))
                 self.assertFalse(any(name.startswith('/') or '..' in Path(name).parts for name in names))
 
     def test_install_uses_absolute_path_and_refuses_overwrite(self):

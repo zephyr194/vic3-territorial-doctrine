@@ -43,8 +43,10 @@ def package(output: Path) -> None:
                 archive.write(file, Path(NAME) / file.relative_to(ROOT / 'mod'))
         archive.write(ROOT / 'LICENSE', f'{NAME}/LICENSE')
         archive.writestr(f'{NAME}.mod', descriptor(f'mod/{NAME}'))
-        archive.write(ROOT / 'docs/INSTALL.md', 'INSTALL.md')
-        archive.write(ROOT / 'docs/README.en.md', 'README.en.md')
+        # Keep relative links between installation, rules and acceptance docs
+        # usable in the delivered ZIP, without needing the GitHub checkout.
+        for document in sorted((ROOT / 'docs').glob('*.md')):
+            archive.write(document, document.name)
     print(f'Packaged: {output.resolve()}')
 
 

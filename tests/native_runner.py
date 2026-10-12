@@ -227,6 +227,24 @@ class EventRunner:
                     self.scope = scoped
                     self.execute(e.value)
                 self.scope = previous_scope
+            elif e.key in ('ordered_state', 'ordered_scope_state'):
+                previous_scope = self.scope
+                limit = next((v.value for v in e.value if v.key == 'limit'), [])
+                candidates = []
+                for state in self.states:
+                    if e.key == 'ordered_scope_state' and self.states[state]['owner'] != self.country:
+                        continue
+                    self.scope = state
+                    if self.check(limit):
+                        candidates.append(state)
+                # Explicit fixture for the engine's population ordering.
+                candidates.sort(key=lambda s: self.states[s]['state_population'], reverse=True)
+                maximum = next((int(v.value) for v in e.value if v.key == 'max'), len(candidates))
+                body = [v for v in e.value if v.key not in ('limit', 'order_by', 'max')]
+                for state in candidates[:maximum]:
+                    self.scope = state
+                    self.execute(body)
+                self.scope = previous_scope
             elif e.key == 'prev':
                 previous_scope = self.scope
                 self.scope = self.previous_scope
@@ -364,11 +382,13 @@ class WarRunner(EventRunner):
     Membership of a state in this war's conquest/annexation targets is supplied
     by tests. This deliberately does not claim to emulate 1.13 war-goal scopes.
     """
-    def __init__(self):
-        super().__init__()
+    def __init__(self, *, country='SPA'):
+        super().__init__(country=country)
         self.wars = {'W1': {'variables': {}, 'engine_exhaustion': 0},
                      'W2': {'variables': {}, 'engine_exhaustion': 0}}
         self.targets = {'W1': {'A','B'}, 'W2': {'B'}}
+        self.attacker_warleaders = {'W1': country, 'W2': country}
+        self.participants = {'W1': {country, 'ENEMY'}, 'W2': {country, 'ENEMY'}}
         self.claims.update(('A','B'))
         self.saved['td_mandate_war'] = 'W1'
         self.previous_scope = None
@@ -389,8 +409,6 @@ class WarRunner(EventRunner):
         return context
 
     def resolve(self, value):
-        if value == 'prev.state_region':
-            return self.previous_scope
         return super().resolve(value)
 
     def check(self, entries):
@@ -411,6 +429,10 @@ class WarRunner(EventRunner):
                 self.scope = previous
             elif e.key == 'td_war_expansion_target_trigger':
                 result = (self.scope in self.targets[self.saved['td_mandate_war']]) == (e.value == 'yes')
+            elif e.key == 'attacker_warleader':
+                result = self.attacker_warleaders[self.scope] == self.resolve(e.value)
+            elif e.key == 'is_war_participant':
+                result = self.resolve(e.value) in self.participants[self.scope]
             elif e.key == 'has_claim_by':
                 result = self.scope in self.claims
             elif e.key == 'root' and isinstance(e.value,list):
@@ -449,7 +471,7 @@ class WarRunner(EventRunner):
             self.scope = previous
         elif e.key == 'add_war_exhaustion':
             settings = {v.key:v.value for v in e.value}
-            if self.resolve(settings['target']) != 'SPA':
+            if self.resolve(settings['target']) != self.country:
                 raise ValueError('Unexpected exhaustion recipient')
             self.wars[self.scope]['engine_exhaustion'] += self.resolve(settings['value'])
         else:

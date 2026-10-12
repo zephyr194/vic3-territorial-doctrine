@@ -85,3 +85,5 @@
  td_annual_integration:0 "This State’s One-Year Legal Integration"
  td.30.t:0 "Review Admission Amendment: [ROOT.GetCountry.MakeScope.Var('td_target').GetState.GetName]"
  td.30.d:0 "The only target is your owned state [ROOT.GetCountry.MakeScope.Var('td_target').GetState.GetName]. Common base chance 10%; justification adjustment [ROOT.GetCountry.MakeScope.Var('td_preview_reason_bonus').GetValue]. Expected annual bureaucracy reserve: [ROOT.GetCountry.MakeScope.Var('td_preview_fast_cost').GetValue]. Ratification legally admits this state and starts its one-year integration when affordable. Other states, including another owner’s portion of the same region, receive no approval."
+ td.31.t:0 "No Eligible Territorial Target"
+ td.31.d:0 "No eligible target is currently available, or the selected state has changed. Review your territorial doctrine, regional interests and the state’s ownership, then use the decisions menu to select an eligible target again. No bill was submitted and no administrative reserve was charged."

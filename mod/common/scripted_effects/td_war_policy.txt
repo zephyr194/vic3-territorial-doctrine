@@ -7,7 +7,11 @@ td_snapshot_war_mandate_effect = {
             td_feature_enabled_trigger = yes
             exists = scope:td_mandate_war
             scope:td_mandate_war = {
-                OR = { NOT = { has_variable = td_policy_checked } var:td_policy_country = root }
+                is_war_participant = root
+                OR = {
+                    AND = { NOT = { has_variable = td_policy_checked } attacker_warleader = root }
+                    AND = { has_variable = td_policy_checked var:td_policy_country = root }
+                }
             }
         }
         scope:td_mandate_war = {
@@ -35,7 +39,7 @@ td_war_monthly_effect = {
     if = { limit = { td_feature_enabled_trigger = yes }
         set_variable = { name = td_penalized_wars value = 0 }
         every_scope_war = {
-            limit = { has_variable = td_policy_checked var:td_policy_country = root has_variable = td_unauthorized_war }
+            limit = { has_variable = td_policy_checked var:td_policy_country = root has_variable = td_unauthorized_war is_war_participant = root }
             if = { limit = { var:td_extra_exhaustion < td_war_exhaustion_cap }
                 set_variable = { name = td_last_exhaustion value = td_war_next_exhaustion }
                 add_war_exhaustion = { target = root value = var:td_last_exhaustion }

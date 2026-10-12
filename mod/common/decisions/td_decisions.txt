@@ -17,7 +17,7 @@ td_mod_status = {
 td_select_claim = {
     is_shown = { td_feature_enabled_trigger = yes NOT = { has_law = law_type:law_td_status_quo } }
     possible = { td_can_start_bill_trigger = yes any_state = { td_claim_candidate_trigger = yes } }
-    when_taken = { clear_variable_list = td_seen_claim_regions td_select_claim_effect = yes trigger_event = td.20 }
+    when_taken = { clear_variable_list = td_seen_claim_regions td_select_claim_effect = yes td_open_target_menu_effect = yes }
     ai_chance = { value = 0 }
 }
 td_remove_focus = {
@@ -34,26 +34,26 @@ td_claim_al_rif = {
         set_variable = { name = td_pending_bill value = 1 }
         set_variable = { name = td_reason value = 0 }
         td_refresh_target_effect = yes
-        trigger_event = td.20
+        td_open_target_menu_effect = yes
     }
     ai_chance = { value = 0 }
 }
 td_select_owned = {
     is_shown = { td_feature_enabled_trigger = yes any_scope_state = { td_needs_admission_trigger = yes } }
     possible = { td_can_start_bill_trigger = yes }
-    when_taken = { clear_variable_list = td_seen_owned_states td_select_owned_effect = yes trigger_event = td.20 }
+    when_taken = { clear_variable_list = td_seen_owned_states td_select_owned_effect = yes td_open_target_menu_effect = yes }
     ai_chance = { value = 0 }
 }
 td_renounce_lost = {
     is_shown = { td_feature_enabled_trigger = yes any_state = { td_lost_state_trigger = yes } }
     possible = { td_can_start_bill_trigger = yes }
-    when_taken = { clear_variable_list = td_seen_lost_regions td_select_lost_effect = yes trigger_event = td.20 }
+    when_taken = { clear_variable_list = td_seen_lost_regions td_select_lost_effect = yes td_open_target_menu_effect = yes }
     ai_chance = { value = 0 }
 }
 td_select_integration = {
     is_shown = { td_feature_enabled_trigger = yes any_scope_state = { td_non_homeland_state_trigger = yes var:td_admitted_owner = owner } }
     possible = { NOT = { has_variable = td_bill } NOT = { has_variable = td_fast } NOT = { has_variable = td_regular } }
-    when_taken = { clear_variable_list = td_seen_admitted_states td_select_admitted_effect = yes trigger_event = td.22 }
+    when_taken = { clear_variable_list = td_seen_admitted_states td_select_admitted_effect = yes td_open_integration_menu_effect = yes }
     ai_chance = { value = 0 }
 }
 td_pledge_navy = {

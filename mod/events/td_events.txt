@@ -90,12 +90,12 @@ td.20 = {
         if = { limit = { var:td_pending_bill = 2 } td_select_owned_effect = yes }
         else_if = { limit = { var:td_pending_bill = 3 } td_select_lost_effect = yes }
         else = { td_select_claim_effect = yes }
-        trigger_event = td.20
+        td_open_target_menu_effect = yes
         ai_chance = { base = 0 }
     }
     option = { name = td.reason.colonial_development trigger = { td_can_start_bill_trigger = yes td_colonial_reason_valid_trigger = yes } set_variable = { name = td_reason value = 6 } td_open_review_effect = yes }
     option = { name = td.reason.regional_interest trigger = { td_can_start_bill_trigger = yes td_regional_reason_valid_trigger = yes } set_variable = { name = td_reason value = 7 } td_open_review_effect = yes }
-    option = { name = td.designate_focus trigger = { td_can_designate_focus_trigger = yes } td_designate_focus_effect = yes trigger_event = td.20 ai_chance = { base = 0 } }
+    option = { name = td.designate_focus trigger = { td_can_designate_focus_trigger = yes } td_designate_focus_effect = yes td_open_target_menu_effect = yes ai_chance = { base = 0 } }
     option = { name = td.cancel_menu remove_variable = td_pending_bill ai_chance = { base = 0 } }
 }
 td.21 = {
@@ -124,7 +124,7 @@ td.21 = {
         set_variable = { name = td_bill value = var:td_pending_bill }
         td_start_bill_effect = yes
     }
-    option = { name = td.change_reason trigger = { td_can_start_bill_trigger = yes } trigger_event = td.20 ai_chance = { base = 0 } }
+    option = { name = td.change_reason trigger = { td_can_start_bill_trigger = yes } td_open_target_menu_effect = yes ai_chance = { base = 0 } }
     option = { name = td.cancel_menu remove_variable = td_pending_bill ai_chance = { base = 0 } }
 }
 td.22 = {
@@ -137,7 +137,7 @@ td.22 = {
         trigger = { td_feature_enabled_trigger = yes NOT = { has_variable = td_bill } NOT = { has_variable = td_fast } NOT = { has_variable = td_regular } td_fast_ready_trigger = yes }
         td_start_fast_effect = yes
     }
-    option = { name = td.next_state trigger = { td_can_select_target_trigger = yes } td_select_admitted_effect = yes trigger_event = td.22 ai_chance = { base = 0 } }
+    option = { name = td.next_state trigger = { td_can_select_target_trigger = yes } td_select_admitted_effect = yes td_open_integration_menu_effect = yes ai_chance = { base = 0 } }
     option = { name = td.cancel_menu ai_chance = { base = 0 } }
 }
 
@@ -208,6 +208,15 @@ td.30 = {
         set_variable = { name = td_bill value = var:td_pending_bill }
         td_start_bill_effect = yes
     }
-    option = { name = td.change_reason trigger = { td_can_start_bill_trigger = yes } trigger_event = td.20 ai_chance = { base = 0 } }
+    option = { name = td.change_reason trigger = { td_can_start_bill_trigger = yes } td_open_target_menu_effect = yes ai_chance = { base = 0 } }
     option = { name = td.cancel_menu remove_variable = td_pending_bill ai_chance = { base = 0 } }
+}
+
+# No state interpolation: stale windows and exhausted candidate lists land here.
+td.31 = {
+    type = country_event
+    title = td.31.t
+    desc = td.31.d
+    flavor = td.flavor
+    option = { name = td.close remove_variable = td_pending_bill }
 }

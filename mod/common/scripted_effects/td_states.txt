@@ -64,7 +64,8 @@ td_select_owned_effect = {
         remove_variable = td_target
         td_pick_owned_effect = yes
         if = { limit = { NOT = { has_variable = td_target } } clear_variable_list = td_seen_owned_states td_pick_owned_effect = yes }
-        set_variable = { name = td_pending_bill value = 2 }
+        if = { limit = { exists = var:td_target } set_variable = { name = td_pending_bill value = 2 } }
+        else = { remove_variable = td_pending_bill }
         set_variable = { name = td_reason value = 0 }
         td_refresh_target_effect = yes
     }
@@ -119,7 +120,8 @@ td_select_lost_effect = {
         remove_variable = td_target
         td_pick_lost_effect = yes
         if = { limit = { NOT = { has_variable = td_target } } clear_variable_list = td_seen_lost_regions td_pick_lost_effect = yes }
-        set_variable = { name = td_pending_bill value = 3 }
+        if = { limit = { exists = var:td_target } set_variable = { name = td_pending_bill value = 3 } }
+        else = { remove_variable = td_pending_bill }
         set_variable = { name = td_reason value = 0 }
         td_refresh_target_effect = yes
     }
@@ -144,10 +146,22 @@ td_select_claim_effect = {
         remove_variable = td_target
         td_pick_claim_effect = yes
         if = { limit = { NOT = { has_variable = td_target } } clear_variable_list = td_seen_claim_regions td_pick_claim_effect = yes }
-        set_variable = { name = td_pending_bill value = 1 }
+        if = { limit = { exists = var:td_target } set_variable = { name = td_pending_bill value = 1 } }
+        else = { remove_variable = td_pending_bill }
         set_variable = { name = td_reason value = 0 }
         td_refresh_target_effect = yes
     }
+}
+
+# COUNTRY: a target may disappear while a browsing window is open. Never open
+# a dynamic state title or cost preview without an existing selected state.
+td_open_target_menu_effect = {
+    if = { limit = { exists = var:td_target } trigger_event = td.20 }
+    else = { trigger_event = td.31 }
+}
+td_open_integration_menu_effect = {
+    if = { limit = { exists = var:td_target } trigger_event = td.22 }
+    else = { trigger_event = td.31 }
 }
 td_designate_focus_effect = {
     if = { limit = { td_can_designate_focus_trigger = yes }

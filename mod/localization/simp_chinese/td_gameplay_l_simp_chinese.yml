@@ -85,3 +85,5 @@
  td_annual_integration:0 "本州接纳修正案：一年整合中"
  td.30.t:0 "复核《[ROOT.GetCountry.MakeScope.Var('td_target').GetState.GetName]领土接纳修正案》"
  td.30.d:0 "唯一目标为本国拥有的[ROOT.GetCountry.MakeScope.Var('td_target').GetState.GetName]。共同基础率10%，理由修正[ROOT.GetCountry.MakeScope.Var('td_preview_reason_bonus').GetValue]点；预计年度行政力预留[ROOT.GetCountry.MakeScope.Var('td_preview_fast_cost').GetValue]。通过后本州获得法律接纳，预算足够时立即开始一年整合。其他州以及同一州区域内他国拥有的部分均不会获得批准。"
+ td.31.t:0 "暂无合格领土目标"
+ td.31.d:0 "当前没有可用的合格目标，或原选定州已发生变化。请检查国家领土原则、区域利益和州的主权归属，再通过决议选择合格目标。本次未提交法案，也未预留行政成本。"
