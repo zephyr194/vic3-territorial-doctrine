@@ -2,6 +2,10 @@
 
 版本 `0.6.1-alpha.1`，尚未在游戏内验收。使用新测试存档、仅本模组的播放集。
 
+## 阅读设计与实际行为
+
+[DESIGN.md](DESIGN.md) 的前半部分是国内博弈的新规范与旧效果审计，后半部分才是当前0.6.1运行记录。新谈判流程与效果替换尚未进入脚本；此版安装包继续复现运行记录，不能用新规范代替对当前效果的实机检查。
+
 ## 安装ZIP
 
 ZIP内同时包含完整规则、计划交付说明与验收清单。解压 `territorial_doctrine-0.6.1-alpha.1.zip`，将 `territorial_doctrine/` 和 `territorial_doctrine.mod` 放入用户数据目录的 `Victoria 3/mod/`：

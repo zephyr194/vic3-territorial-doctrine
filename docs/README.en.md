@@ -2,6 +2,8 @@
 
 Version **0.6.1-alpha.1** adds four territorial doctrine laws and individual claim, admission and lost-claim relinquishment bills.
 
+**The design goal is domestic bargaining over expansion and admission.** The revised [design and effect audit](DESIGN.md) distinguishes the new specification from the running 0.6.1 prototype. Concrete group interests, funded commitments and accountability should drive the process. Current fixed doctrine bonuses are experimental effects scheduled for replacement, not quantified historical findings; a doctrine name alone cannot make factories more efficient or residents more loyal. The complete general bargaining flow is not implemented yet.
+
 **The system starts disabled.** Take **Enable National Territorial Doctrine** in the decisions menu to activate it for every country in this save. The enable decision and the permanently visible mod-status decision indicate that the mod is loaded. AI cannot activate it. This alpha has no disable decision; use a new test save.
 
 Game language settings select the text. English is the canonical default, Simplified Chinese is translated, and French, German, Spanish, Polish, Russian, Brazilian Portuguese, Japanese, Korean and Turkish catalogs currently contain English fallback text. This does not change the game's language setting or claim translations into those languages.
