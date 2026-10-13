@@ -32,12 +32,15 @@ def group_scores(doctrine: str, *, admission: bool = False,
                  renunciation: bool = False,
                  colonial_target: bool = False, colonial_policy: str = "none",
                  humanitarian_stage: int = 0,
-                 security: bool = False, scarce_resource: bool = False,
+                 security: bool = False, equal_rights: bool = False,
+                 civil_administration: bool = False, scarce_resource: bool = False,
                  compatriots: bool = False, discriminatory: bool = False,
                  conscription: bool = False, great_power_risk: bool = False,
                  pledges: tuple[str, ...] = (),
                  leader_adjustments: dict[str, float] | None = None,
                  broken_pledges: tuple[str, ...] = ()) -> dict[str, float]:
+    # Inputs represent verified argument conditions/funded pledges. Resource and
+    # compatriot inputs are design fixtures, not predicates enabled in the mod.
     index = DOCTRINES.index(doctrine)
     if len(pledges) > 2 or len(set(pledges)) != len(pledges):
         raise ValueError("At most two pledges to distinct groups")
@@ -55,9 +58,11 @@ def group_scores(doctrine: str, *, admission: bool = False,
         scores["industrialists"] += 15
     if compatriots:
         scores["petty_bourgeoisie"] += 15
-    if admission:
+    if equal_rights:
         scores["intelligentsia"] += 15
         scores["trade_unions"] += 15
+    if civil_administration:
+        scores["petty_bourgeoisie"] += 10
     if renunciation:
         for group, value in {'armed_forces': -20, 'landowners': -10,
                              'petty_bourgeoisie': -15, 'intelligentsia': 10,
@@ -70,9 +75,9 @@ def group_scores(doctrine: str, *, admission: bool = False,
     if great_power_risk:
         scores["armed_forces"] -= 15
     for g in pledges:
-        scores[g] += 10
+        scores[g] += RULES["negotiation"]["support_bonus"]
     for g in broken_pledges:
-        scores[g] -= 10
+        scores[g] += RULES["negotiation"]["broken_support"]
     for g, adjustment in (leader_adjustments or {}).items():
         scores[g] += adjustment
     return scores
@@ -230,7 +235,7 @@ def integration_cost(population: int, doctrine: str, *, fast: bool,
     base = ceil(25 + 25 * population / 1_000_000)
     for value, label in ((turmoil, 'turmoil'), (devastation, 'devastation'), (accepted_share, 'accepted_share')):
         _range(value, 0, 1, label)
-    conditions = 1 + .5 * turmoil + .5 * devastation + .25 * (1 - accepted_share)
+    conditions = 1 + .5 * turmoil + .5 * devastation
     raw = (base * RULES["doctrines"][doctrine]["cost_multiplier"] * (RULES['integration']['annual_cost_multiplier'] if fast else 1)
                 * RULES['regimes'][actor_power]['actor_administration_multiplier']
                 * RULES['regimes'][source_power]['inherited_administration_multiplier']
@@ -419,7 +424,7 @@ class WarMandate:
                 for r in g.regions) for g in land)))
 
     def tick(self, *, at_war: bool = True, enabled: bool = True) -> float:
-        if not enabled or not at_war or not self.unauthorized:
+        if RULES['war']['monthly_exhaustion'] <= 0 or not enabled or not at_war or not self.unauthorized:
             return 0
         amount = min(RULES['war']['monthly_exhaustion'], RULES['war']['exhaustion_cap'] - self.cumulative_exhaustion)
         self.cumulative_exhaustion += amount

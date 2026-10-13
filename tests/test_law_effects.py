@@ -25,22 +25,10 @@ class LawEffectTests(unittest.TestCase):
                              for effect in next(entry.value for entry in law if entry.key == 'modifier')}
                        for name, law in cls.laws.items()}
 
-    def test_laws_provide_distinct_political_benefits_and_national_tradeoffs(self):
-        effects = {d: self.effects['law_td_' + d] for d in DOCTRINES}
-        self.assertEqual(effects['status_quo']['interest_group_ig_trade_unions_pol_str_mult'], .10)
-        self.assertEqual(effects['status_quo']['country_bureaucracy_mult'], .05)
-        self.assertLess(effects['status_quo']['country_prestige_mult'], 0)
-        self.assertEqual(effects['historical_rights']['interest_group_ig_petty_bourgeoisie_pol_str_mult'], .15)
-        self.assertEqual(effects['historical_rights']['country_authority_add'], 25)
-        self.assertEqual(effects['strategic_frontiers']['interest_group_ig_armed_forces_pol_str_mult'], .15)
-        self.assertEqual(effects['strategic_frontiers']['country_diplomatic_play_maneuvers_add'], 10)
-        self.assertGreater(effects['strategic_frontiers']['country_military_goods_cost_mult'], 0)
-        self.assertGreater(effects['imperial_expansion']['interest_group_ig_armed_forces_pol_str_mult'],
-                           effects['strategic_frontiers']['interest_group_ig_armed_forces_pol_str_mult'])
-        self.assertGreater(effects['imperial_expansion']['country_military_goods_cost_mult'],
-                           effects['strategic_frontiers']['country_military_goods_cost_mult'])
-        self.assertLess(effects['imperial_expansion']['country_bureaucracy_mult'], 0)
-        self.assertEqual(len({tuple(sorted(e.items())) for e in effects.values()}), 4)
+    def test_laws_frame_preferences_without_national_attribute_packages(self):
+        for doctrine in DOCTRINES:
+            self.assertEqual(self.effects['law_td_'+doctrine], {})
+        self.assertEqual(RULES['bill']['base_probability'],10)
 
     def test_group_beneficiaries_follow_baseline_political_interests(self):
         for index, doctrine in enumerate(DOCTRINES):

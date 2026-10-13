@@ -1,5 +1,5 @@
 {
-  "version": "0.6.1-alpha.1",
+  "version": "0.7.0-alpha.1",
   "doctrines": {
     "status_quo": {
       "zh": "领土现状主义",
@@ -9,186 +9,99 @@
       "authority": 0,
       "wait_months": 0,
       "infamy": 0,
-      "cost_multiplier": 0.8,
-      "political_strength": {
-        "intelligentsia": 0.1,
-        "trade_unions": 0.1,
-        "rural_folk": 0.1,
-        "armed_forces": -0.1
-      },
-      "country_modifiers": {
-        "country_bureaucracy_mult": 0.05,
-        "country_prestige_mult": -0.05,
-        "country_infamy_decay_mult": 0.15
-      },
+      "cost_multiplier": 1,
+      "political_strength": {},
+      "country_modifiers": {},
       "description": {
-        "zh": "维护现有边界，把政治与行政资源用于国内建设。知识分子、工会与乡村民众得到更多影响力，军方的扩张议程受到约束；行政效率提高，但对外威望有所降低。",
-        "en": "Preserve existing borders and direct political and administrative resources toward domestic development. Civilian reformers, organized labor and rural communities gain influence over the military expansion agenda. Administration improves at the expense of international prestige."
+        "zh": "维护现有边界，把政治与行政资源用于国内建设。这一原则仅提供领土理由与集团偏好的背景，不直接增加产能、政治力量或合法性。",
+        "en": "Preserve existing borders and direct political and administrative resources toward domestic development. This doctrine frames territorial arguments and group preferences; it grants no direct production, political-strength or legitimacy bonus."
       },
       "eligibility": {
         "zh": "不提出新领土宣称；仍可逐州接纳已有领土或放弃失地宣称。",
         "en": "Does not propose territorial claims; owned states may still be admitted individually and lost claims relinquished."
       },
-      "industry_modifiers": {
-        "building_paper_mill_throughput_mult": 0.05,
-        "building_food_industry_throughput_mult": 0.05,
-        "building_textile_mill_throughput_mult": 0.05
-      },
-      "territory_modifiers": {
-        "state_construction_mult": 0.05,
-        "state_migration_pull_mult": 0.15,
-        "state_radicals_from_discrimination_mult": -0.15,
-        "state_radicals_from_sol_change_mult": -0.1,
-        "state_loyalists_from_sol_change_mult": 0.15
-      },
+      "industry_modifiers": {},
+      "territory_modifiers": {},
       "acquisition_reaction": {
         "radicals": 0,
-        "loyalists": 0.02
+        "loyalists": 0
       }
     },
     "historical_rights": {
       "zh": "历史权利主义",
       "en": "Historical Rights",
       "focus_limit": 1,
-      "bureaucracy": 25,
+      "bureaucracy": 0,
       "authority": 0,
-      "wait_months": 6,
+      "wait_months": 0,
       "infamy": 0,
-      "cost_multiplier": 0.8,
-      "political_strength": {
-        "petty_bourgeoisie": 0.15,
-        "landowners": 0.1,
-        "devout": 0.1
-      },
-      "country_modifiers": {
-        "country_authority_add": 25,
-        "country_infamy_generation_mult": -0.1,
-        "country_infamy_decay_mult": 0.05
-      },
+      "cost_multiplier": 1,
+      "political_strength": {},
+      "country_modifiers": {},
       "description": {
-        "zh": "以既有法理和主体文化家园维护国家疆界，将恢复合法领土置于无条件扩张之前。小市民、地主与宗教传统力量获得更大政治影响，国家权威增强；传统精英也因此更有能力阻碍改革。",
-        "en": "Ground national borders in existing legal claims and primary-cultural homelands, placing lawful restoration ahead of unrestricted expansion. National-minded middle classes, landed elites and religious authorities gain influence, strengthening state authority and the traditional interests that can resist reform."
+        "zh": "以既有法理和主体文化家园维护国家疆界，将恢复合法领土置于无条件扩张之前。这一原则仅提供领土理由与集团偏好的背景，不直接增加产能、政治力量或合法性。",
+        "en": "Ground national borders in existing legal claims and primary-cultural homelands, placing lawful restoration ahead of unrestricted expansion. This doctrine frames territorial arguments and group preferences; it grants no direct production, political-strength or legitimacy bonus."
       },
       "eligibility": {
         "zh": "仅可主张已有真实宣称或主体文化家园的外国州；不凭重点区域创造历史权利。",
         "en": "Foreign targets require an existing real claim or a primary-cultural homeland; a focus region does not create historical rights."
       },
-      "industry_modifiers": {
-        "building_group_bg_agriculture_throughput_mult": 0.05,
-        "building_group_bg_logging_throughput_mult": 0.05
-      },
-      "territory_modifiers": {
-        "state_construction_mult": 0.1,
-        "state_migration_pull_mult": 0.1,
-        "state_radicals_from_discrimination_mult": -0.05,
-        "state_radicals_from_sol_change_mult": 0,
-        "state_loyalists_from_sol_change_mult": 0.1
-      },
+      "industry_modifiers": {},
+      "territory_modifiers": {},
       "acquisition_reaction": {
-        "radicals": 0.01,
-        "loyalists": 0.02
+        "radicals": 0,
+        "loyalists": 0
       }
     },
     "strategic_frontiers": {
       "zh": "战略边疆主义",
       "en": "Strategic Frontiers",
       "focus_limit": 2,
-      "bureaucracy": 50,
-      "authority": 25,
-      "wait_months": 6,
-      "infamy": 2,
-      "cost_multiplier": 1.0,
-      "political_strength": {
-        "armed_forces": 0.15,
-        "industrialists": 0.1,
-        "rural_folk": -0.1
-      },
-      "country_modifiers": {
-        "country_diplomatic_play_maneuvers_add": 10,
-        "country_military_goods_cost_mult": 0.05,
-        "country_infamy_generation_mult": 0.1
-      },
+      "bureaucracy": 0,
+      "authority": 0,
+      "wait_months": 0,
+      "infamy": 0,
+      "cost_multiplier": 1,
+      "political_strength": {},
+      "country_modifiers": {},
       "description": {
-        "zh": "通过有限扩张保障边境与区域安全。军方负责边疆部署，实业家参与对外建设，两者政治力量提高；外交博弈有更多回旋余地，但军费负担增加，乡村民众的影响力受到挤压。",
-        "en": "Pursue limited expansion to secure borders and regional interests. Military planners and industrial sponsors gain political influence, and diplomacy gains room to maneuver. Higher military supply costs and weaker rural representation are the domestic price."
+        "zh": "通过有限扩张保障边境与区域安全。这一原则仅提供领土理由与集团偏好的背景，不直接增加产能、政治力量或合法性。",
+        "en": "Pursue limited expansion to secure borders and regional interests. This doctrine frames territorial arguments and group preferences; it grants no direct production, political-strength or legitimacy bonus."
       },
       "eligibility": {
-        "zh": "可主张相邻州，或有原版区域利益和成熟重点、且符合当前殖民或航道安全依据的远方目标。",
-        "en": "Claims cover adjacent states, or distant targets with a vanilla regional interest, mature focus and a qualifying colonial or sea-lane security basis."
+        "zh": "可主张相邻州，或有原版区域利益、且符合当前殖民或航道安全依据的远方目标。",
+        "en": "Claims cover adjacent states, or distant targets with a vanilla regional interest and a qualifying colonial or sea-lane security basis."
       },
-      "industry_modifiers": {
-        "building_steel_mill_throughput_mult": 0.05,
-        "building_tooling_workshop_throughput_mult": 0.05,
-        "building_arms_industry_throughput_mult": 0.05,
-        "building_munition_plant_throughput_mult": 0.05,
-        "building_shipyard_throughput_mult": 0.05
-      },
-      "territory_modifiers": {
-        "state_construction_mult": 0.15,
-        "state_migration_pull_mult": 0.05,
-        "state_radicals_from_discrimination_mult": 0.05,
-        "state_radicals_from_sol_change_mult": 0.05,
-        "state_loyalists_from_sol_change_mult": 0.05
-      },
+      "industry_modifiers": {},
+      "territory_modifiers": {},
       "acquisition_reaction": {
-        "radicals": 0.03,
-        "loyalists": 0.01
+        "radicals": 0,
+        "loyalists": 0
       }
     },
     "imperial_expansion": {
       "zh": "帝国扩张主义",
       "en": "Imperial Expansion",
       "focus_limit": 3,
-      "bureaucracy": 75,
-      "authority": 50,
-      "wait_months": 12,
-      "infamy": 5,
-      "cost_multiplier": 1.25,
-      "political_strength": {
-        "armed_forces": 0.2,
-        "industrialists": 0.15,
-        "landowners": 0.1,
-        "intelligentsia": -0.1,
-        "trade_unions": -0.1,
-        "rural_folk": -0.1
-      },
-      "country_modifiers": {
-        "country_prestige_mult": 0.1,
-        "country_military_goods_cost_mult": 0.1,
-        "country_bureaucracy_mult": -0.05,
-        "country_infamy_generation_mult": 0.25
-      },
+      "bureaucracy": 0,
+      "authority": 0,
+      "wait_months": 0,
+      "infamy": 0,
+      "cost_multiplier": 1,
+      "political_strength": {},
+      "country_modifiers": {},
       "description": {
-        "zh": "把海外扩张与国家威望列为长期国策。军方、实业家与地主共同获益，民生和改革集团的影响力下降；帝国声望提高，但军事物资更加昂贵，广泛的海外承诺也削弱行政能力。",
-        "en": "Make overseas expansion and national prestige a permanent state mission. Military, industrial and landed interests gain at the expense of civilian reformers, labor and rural communities. Imperial prestige rises, while military supplies cost more and overseas commitments strain bureaucracy."
+        "zh": "把海外扩张与国家威望列为长期国策。这一原则仅提供领土理由与集团偏好的背景，不直接增加产能、政治力量或合法性。",
+        "en": "Make overseas expansion and national prestige a permanent state mission. This doctrine frames territorial arguments and group preferences; it grants no direct production, political-strength or legitimacy bonus."
       },
       "eligibility": {
-        "zh": "可对已有原版利益且重点区域已成熟的合格外国州提出主张；每个目标仍须单独通过宣称法案。",
-        "en": "Eligible foreign states in mature focus regions with a vanilla regional interest may be claimed; each target still needs its own approved bill."
+        "zh": "可对已有原版区域利益的合格外国州提出主张；每个目标仍须单独通过宣称法案。",
+        "en": "Eligible foreign states in regions with a vanilla regional interest may be claimed; each target still needs its own approved bill."
       },
-      "industry_modifiers": {
-        "building_coal_mine_throughput_mult": 0.1,
-        "building_iron_mine_throughput_mult": 0.1,
-        "building_lead_mine_throughput_mult": 0.1,
-        "building_sulfur_mine_throughput_mult": 0.1,
-        "building_steel_mill_throughput_mult": 0.1,
-        "building_tooling_workshop_throughput_mult": 0.1,
-        "building_chemical_plant_throughput_mult": 0.1,
-        "building_motor_industry_throughput_mult": 0.1,
-        "building_arms_industry_throughput_mult": 0.1,
-        "building_munition_plant_throughput_mult": 0.1,
-        "building_war_machine_industry_throughput_mult": 0.1,
-        "building_shipyard_throughput_mult": 0.1
-      },
-      "territory_modifiers": {
-        "state_construction_mult": 0.2,
-        "state_migration_pull_mult": 0.1,
-        "state_radicals_from_discrimination_mult": 0.2,
-        "state_radicals_from_sol_change_mult": 0.1,
-        "state_loyalists_from_sol_change_mult": -0.1
-      },
+      "industry_modifiers": {},
+      "territory_modifiers": {},
       "acquisition_reaction": {
-        "radicals": 0.05,
+        "radicals": 0,
         "loyalists": 0
       }
     }
@@ -258,48 +171,48 @@
       "zh": "边疆与航道安全",
       "en": "Border and Sea Lane Security",
       "government": {
-        "monarchy": 3,
+        "monarchy": 0,
         "republic": 0,
         "other": 0
       },
       "power": {
-        "autocracy": 4,
-        "democracy": -2,
+        "autocracy": 0,
+        "democracy": 0,
         "other": 0
       },
-      "cost_multiplier": 1.0
+      "cost_multiplier": 1
     },
     "historical_right": {
       "id": 2,
       "zh": "已有法理权利",
       "en": "Existing Legal Rights",
       "government": {
-        "monarchy": 4,
-        "republic": -2,
+        "monarchy": 0,
+        "republic": 0,
         "other": 0
       },
       "power": {
-        "autocracy": 2,
+        "autocracy": 0,
         "democracy": 0,
         "other": 0
       },
-      "cost_multiplier": 0.9
+      "cost_multiplier": 1
     },
     "equal_rights": {
       "id": 3,
       "zh": "居民平等权利",
       "en": "Equal Rights for Residents",
       "government": {
-        "monarchy": -2,
-        "republic": 3,
+        "monarchy": 0,
+        "republic": 0,
         "other": 0
       },
       "power": {
-        "autocracy": -5,
-        "democracy": 5,
+        "autocracy": 0,
+        "democracy": 0,
         "other": 0
       },
-      "cost_multiplier": 1.1
+      "cost_multiplier": 1
     },
     "civil_administration": {
       "id": 4,
@@ -311,11 +224,11 @@
         "other": 0
       },
       "power": {
-        "autocracy": 2,
-        "democracy": 2,
+        "autocracy": 0,
+        "democracy": 0,
         "other": 0
       },
-      "cost_multiplier": 1.0
+      "cost_multiplier": 1
     },
     "peace_settlement": {
       "id": 5,
@@ -327,71 +240,71 @@
         "other": 0
       },
       "power": {
-        "autocracy": -2,
-        "democracy": 2,
+        "autocracy": 0,
+        "democracy": 0,
         "other": 0
       },
-      "cost_multiplier": 1.0
+      "cost_multiplier": 1
     },
     "colonial_development": {
       "id": 6,
       "zh": "殖民开发与迁居",
       "en": "Colonial Development and Settlement",
       "government": {
-        "monarchy": 1,
+        "monarchy": 0,
         "republic": 0,
         "other": 0
       },
       "power": {
-        "autocracy": 2,
-        "democracy": -1,
+        "autocracy": 0,
+        "democracy": 0,
         "other": 0
       },
-      "cost_multiplier": 1.1
+      "cost_multiplier": 1
     },
     "regional_interest": {
       "id": 7,
-      "zh": "重点区域的战略利益",
-      "en": "Strategic Interests in a Focus Region",
+      "zh": "区域战略利益",
+      "en": "Strategic Regional Interests",
       "government": {
-        "monarchy": 1,
+        "monarchy": 0,
         "republic": 0,
         "other": 0
       },
       "power": {
-        "autocracy": 2,
-        "democracy": -1,
+        "autocracy": 0,
+        "democracy": 0,
         "other": 0
       },
-      "cost_multiplier": 1.15
+      "cost_multiplier": 1
     }
   },
   "regimes": {
     "autocracy": {
       "id": 1,
-      "diplomatic_multiplier": 0.9,
-      "inherited_administration_multiplier": 1.15,
-      "actor_administration_multiplier": 1.1
+      "diplomatic_multiplier": 1,
+      "inherited_administration_multiplier": 1,
+      "actor_administration_multiplier": 1
     },
     "democracy": {
       "id": 2,
-      "diplomatic_multiplier": 1.25,
-      "inherited_administration_multiplier": 1.0,
-      "actor_administration_multiplier": 0.95
+      "diplomatic_multiplier": 1,
+      "inherited_administration_multiplier": 1,
+      "actor_administration_multiplier": 1
     },
     "other": {
       "id": 0,
-      "diplomatic_multiplier": 1.0,
-      "inherited_administration_multiplier": 1.0,
-      "actor_administration_multiplier": 1.0
+      "diplomatic_multiplier": 1,
+      "inherited_administration_multiplier": 1,
+      "actor_administration_multiplier": 1
     }
   },
   "integration": {
     "months": 12,
-    "annual_cost_multiplier": 2,
+    "annual_cost_multiplier": 1,
     "cost_precision": 100000,
-    "admission_reaction_share": 0.02,
-    "equal_rights_reaction_share": 0.03
+    "admission_reaction_share": 0,
+    "equal_rights_reaction_share": 0
   },
   "prototype": {
     "country": "SPA",
@@ -432,14 +345,14 @@
         "law": "law_colonial_resettlement",
         "expansion": 15,
         "admission": -10,
-        "cost_multiplier": 1.1
+        "cost_multiplier": 1
       },
       "exploitation": {
         "id": 2,
         "law": "law_colonial_exploitation",
         "expansion": 20,
         "admission": -20,
-        "cost_multiplier": 1.25
+        "cost_multiplier": 1
       }
     },
     "humanitarian_technologies": [
@@ -447,7 +360,7 @@
       "human_rights"
     ],
     "stage_shift": 15,
-    "rights_cost_per_stage": 0.1,
+    "rights_cost_per_stage": 0,
     "weights": {
       "armed_forces": 0.5,
       "landowners": 0.5,
@@ -466,8 +379,8 @@
     }
   },
   "war": {
-    "monthly_exhaustion": 2,
-    "exhaustion_cap": 20,
+    "monthly_exhaustion": 0,
+    "exhaustion_cap": 0,
     "expansion_doctrines": [
       "strategic_frontiers",
       "imperial_expansion"
@@ -484,7 +397,11 @@
     "td_focus",
     "td_focus_wait",
     "td_initialized_v3",
-    "td_regular"
+    "td_regular",
+    "td_development_owner",
+    "td_development_profile",
+    "td_success_state",
+    "td_success_window"
   ],
   "group_politics": {
     "armed_forces": {
@@ -556,10 +473,29 @@
     "months": 36,
     "acquisition_legitimacy": {
       "status_quo": 0,
-      "historical_rights": 6,
-      "strategic_frontiers": 8,
-      "imperial_expansion": 12
+      "historical_rights": 0,
+      "strategic_frontiers": 0,
+      "imperial_expansion": 0
     },
-    "admission_legitimacy": 3
-  }
+    "admission_legitimacy": 0
+  },
+  "negotiation": {
+    "survey_cost_per_person": 0.01,
+    "minimum_survey_cost": 5000,
+    "planning_bureaucracy": 10,
+    "support_bonus": 10,
+    "delivery_years": 3,
+    "acquisition_years": 5,
+    "trust_weight": 0.5,
+    "trust_cap": 5,
+    "leader_adjustment": 10,
+    "fulfilled_approval": 2,
+    "broken_approval": -5,
+    "fulfilled_years": 3,
+    "broken_years": 5,
+    "broken_support": -10
+  },
+  "legacy_scopes": [
+    "td_mandate_war"
+  ]
 }

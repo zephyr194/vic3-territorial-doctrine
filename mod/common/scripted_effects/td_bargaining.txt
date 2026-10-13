@@ -1,0 +1,180 @@
+﻿td_clear_navy_pledge_effect = {
+    remove_modifier = td_navy_planning
+    remove_variable = td_navy_target
+    remove_variable = td_navy_region
+    remove_variable = td_navy_baseline
+    remove_variable = td_navy_deadline
+    remove_variable = td_navy_acquisition_deadline
+    remove_variable = td_navy_started
+    remove_variable = td_navy_ratified
+    remove_variable = td_navy_owned_at_sign
+    remove_variable = td_navy_bill_generation
+    remove_variable = td_navy_survey_paid
+    remove_variable = td_pending_navy
+}
+td_sign_navy_pledge_effect = {
+    if = { limit = { td_can_pledge_navy_trigger = yes }
+        set_variable = { name = td_target value = var:td_bill_target }
+        if = { limit = { td_bill_target_valid_trigger = yes }
+            set_variable = { name = td_navy_survey_paid value = td_pledge_survey_cost }
+            add_treasury = { value = var:td_navy_survey_paid multiply = -1 }
+            add_modifier = td_navy_planning
+            set_variable = td_pending_navy
+            set_variable = td_bill_pledge_navy
+            set_variable = { name = td_navy_bill_generation value = var:td_bill_generation }
+            set_variable = { name = td_navy_region value = var:td_bill_target.state_region }
+            if = { limit = { var:td_bill_target = { owner = root } }
+                set_variable = td_navy_owned_at_sign
+                set_variable = { name = td_navy_target value = var:td_bill_target }
+                set_variable = { name = td_navy_baseline value = var:td_bill_target.state_has_building_type_levels:bt:building_naval_base }
+            }
+            td_calculate_politics_effect = yes
+        }
+    }
+}
+td_clear_railway_pledge_effect = {
+    remove_modifier = td_railway_planning
+    remove_variable = td_railway_target
+    remove_variable = td_railway_region
+    remove_variable = td_railway_baseline
+    remove_variable = td_railway_deadline
+    remove_variable = td_railway_acquisition_deadline
+    remove_variable = td_railway_started
+    remove_variable = td_railway_ratified
+    remove_variable = td_railway_owned_at_sign
+    remove_variable = td_railway_bill_generation
+    remove_variable = td_railway_survey_paid
+    remove_variable = td_pending_railway
+}
+td_sign_railway_pledge_effect = {
+    if = { limit = { td_can_pledge_railway_trigger = yes }
+        set_variable = { name = td_target value = var:td_bill_target }
+        if = { limit = { td_bill_target_valid_trigger = yes }
+            set_variable = { name = td_railway_survey_paid value = td_pledge_survey_cost }
+            add_treasury = { value = var:td_railway_survey_paid multiply = -1 }
+            add_modifier = td_railway_planning
+            set_variable = td_pending_railway
+            set_variable = td_bill_pledge_railway
+            set_variable = { name = td_railway_bill_generation value = var:td_bill_generation }
+            set_variable = { name = td_railway_region value = var:td_bill_target.state_region }
+            if = { limit = { var:td_bill_target = { owner = root } }
+                set_variable = td_railway_owned_at_sign
+                set_variable = { name = td_railway_target value = var:td_bill_target }
+                set_variable = { name = td_railway_baseline value = var:td_bill_target.state_has_building_type_levels:bt:building_railway }
+            }
+            td_calculate_politics_effect = yes
+        }
+    }
+}
+td_ratify_pledges_effect = {
+    if = { limit = { has_variable = td_bill_pledge_navy has_variable = td_pending_navy var:td_navy_bill_generation = var:td_bill_generation }
+        set_variable = td_navy_ratified
+        if = { limit = { has_variable = td_navy_owned_at_sign }
+            set_variable = td_navy_started
+            set_variable = { name = td_navy_deadline years = 3 }
+        }
+        else = { set_variable = { name = td_navy_acquisition_deadline years = 5 } }
+    }
+    if = { limit = { has_variable = td_bill_pledge_railway has_variable = td_pending_railway var:td_railway_bill_generation = var:td_bill_generation }
+        set_variable = td_railway_ratified
+        if = { limit = { has_variable = td_railway_owned_at_sign }
+            set_variable = td_railway_started
+            set_variable = { name = td_railway_deadline years = 3 }
+        }
+        else = { set_variable = { name = td_railway_acquisition_deadline years = 5 } }
+    }
+}
+td_release_unratified_pledges_effect = {
+    if = { limit = { has_variable = td_pending_navy NOT = { has_variable = td_navy_ratified } } td_clear_navy_pledge_effect = yes }
+    if = { limit = { has_variable = td_pending_railway NOT = { has_variable = td_railway_ratified } } td_clear_railway_pledge_effect = yes }
+}
+td_release_all_pledges_effect = {
+    td_clear_navy_pledge_effect = yes
+    td_clear_railway_pledge_effect = yes
+}
+td_pledges_monthly_effect = {
+    if = { limit = { td_feature_enabled_trigger = yes }
+        if = { limit = { has_variable = td_pending_navy has_variable = td_navy_ratified }
+            if = { limit = { NOT = { has_variable = td_navy_started } }
+                if = { limit = { NOT = { has_variable = td_navy_acquisition_deadline } }
+                    td_clear_navy_pledge_effect = yes
+                }
+                else = {
+                    ordered_scope_state = {
+                        limit = { state_region = root.var:td_navy_region is_treaty_port = no }
+                        order_by = state_population
+                        max = 1
+                        root = {
+                            set_variable = { name = td_navy_target value = prev }
+                            set_variable = { name = td_navy_baseline value = prev.state_has_building_type_levels:bt:building_naval_base }
+                            set_variable = td_navy_started
+                            set_variable = { name = td_navy_deadline years = 3 }
+                            remove_variable = td_navy_acquisition_deadline
+                        }
+                    }
+                }
+            }
+            if = { limit = { has_variable = td_pending_navy has_variable = td_navy_started }
+                if = { limit = { NOT = { has_variable = td_navy_deadline } }
+                    ig:ig_armed_forces = {
+                        remove_modifier = td_pledge_broken
+                        add_modifier = { name = td_pledge_broken years = 5 }
+                        set_variable = { name = td_broken_pledge years = 5 }
+                    }
+                    td_clear_navy_pledge_effect = yes
+                    trigger_event = td.18
+                }
+                else_if = { limit = { exists = var:td_navy_target var:td_navy_target = {
+                    owner = root
+                    is_treaty_port = no
+                    state_has_building_type_levels:bt:building_naval_base > root.var:td_navy_baseline
+                } }
+                    ig:ig_armed_forces = { remove_modifier = td_pledge_fulfilled add_modifier = { name = td_pledge_fulfilled years = 3 } }
+                    td_clear_navy_pledge_effect = yes
+                    trigger_event = td.17
+                }
+            }
+        }
+        if = { limit = { has_variable = td_pending_railway has_variable = td_railway_ratified }
+            if = { limit = { NOT = { has_variable = td_railway_started } }
+                if = { limit = { NOT = { has_variable = td_railway_acquisition_deadline } }
+                    td_clear_railway_pledge_effect = yes
+                }
+                else = {
+                    ordered_scope_state = {
+                        limit = { state_region = root.var:td_railway_region is_treaty_port = no }
+                        order_by = state_population
+                        max = 1
+                        root = {
+                            set_variable = { name = td_railway_target value = prev }
+                            set_variable = { name = td_railway_baseline value = prev.state_has_building_type_levels:bt:building_railway }
+                            set_variable = td_railway_started
+                            set_variable = { name = td_railway_deadline years = 3 }
+                            remove_variable = td_railway_acquisition_deadline
+                        }
+                    }
+                }
+            }
+            if = { limit = { has_variable = td_pending_railway has_variable = td_railway_started }
+                if = { limit = { NOT = { has_variable = td_railway_deadline } }
+                    ig:ig_industrialists = {
+                        remove_modifier = td_pledge_broken
+                        add_modifier = { name = td_pledge_broken years = 5 }
+                        set_variable = { name = td_broken_pledge years = 5 }
+                    }
+                    td_clear_railway_pledge_effect = yes
+                    trigger_event = td.18
+                }
+                else_if = { limit = { exists = var:td_railway_target var:td_railway_target = {
+                    owner = root
+                    is_treaty_port = no
+                    state_has_building_type_levels:bt:building_railway > root.var:td_railway_baseline
+                } }
+                    ig:ig_industrialists = { remove_modifier = td_pledge_fulfilled add_modifier = { name = td_pledge_fulfilled years = 3 } }
+                    td_clear_railway_pledge_effect = yes
+                    trigger_event = td.17
+                }
+            }
+        }
+    }
+}

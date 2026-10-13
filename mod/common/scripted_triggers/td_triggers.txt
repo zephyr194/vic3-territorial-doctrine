@@ -6,7 +6,6 @@ td_can_legislate_trigger = {
     is_revolutionary = no
     NOT = { exists = civil_war }
     NOT = { has_modifier = country_bankruptcy }
-    legitimacy >= 40
 }
 td_has_doctrine_trigger = {
     OR = {
@@ -30,11 +29,6 @@ td_needs_admission_trigger = {
 td_claim_target_valid_trigger = {
     exists = var:td_target
     var:td_target = { td_claim_candidate_trigger = yes }
-    OR = {
-        has_law = law_type:law_td_historical_rights
-        AND = { has_law = law_type:law_td_strategic_frontiers is_adjacent_to_state = var:td_target }
-        AND = { is_target_in_variable_list = { name = td_ready_focus_regions target = var:td_target.region } has_interest_marker_in_region = var:td_target.region }
-    }
 }
 td_admission_target_valid_trigger = {
     exists = var:td_target
@@ -58,14 +52,10 @@ td_bill_target_valid_trigger = {
 td_can_select_target_trigger = {
     td_feature_enabled_trigger = yes
     NOT = { has_variable = td_bill }
-    NOT = { has_variable = td_fast }
-    NOT = { has_variable = td_regular }
 }
 td_can_start_bill_trigger = {
     td_can_legislate_trigger = yes
     NOT = { has_variable = td_bill }
-    NOT = { has_variable = td_fast }
-    NOT = { has_variable = td_regular }
     NOT = { has_variable = td_bill_cooldown }
 }
 td_security_reason_valid_trigger = {

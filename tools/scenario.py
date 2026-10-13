@@ -37,8 +37,8 @@ def main():
         print(f'Exploitation stage {stage}: expansion score {expansion:+}; admission score {acceptance:+}')
     mandate = WarMandate('imperial_expansion', (WarGoal('conquer_state', ('A','B')),), {'A'})
     total = sum(mandate.tick() for _ in range(12))
-    assert total == 20
-    print(f'Only A approved for war targeting A+B: extra exhaustion {total} (capped).')
+    assert total == 0
+    print(f'Only A approved for A+B: incomplete domestic mandate, extra exhaustion {total}; vanilla warfare applies.')
     authorized = WarMandate('imperial_expansion', (WarGoal('conquer_state', ('A','B')),), {'A','B'})
     assert authorized.tick() == 0
     print('Both targets approved with expansion doctrine: no additional mod exhaustion.')

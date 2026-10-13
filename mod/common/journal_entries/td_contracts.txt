@@ -1,0 +1,24 @@
+﻿je_td_navy_contract = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_navy has_variable = td_navy_started exists = var:td_navy_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_navy has_variable = td_navy_started exists = var:td_navy_target }
+    can_deactivate = yes
+}
+je_td_navy_waiting = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_navy has_variable = td_navy_ratified NOT = { has_variable = td_navy_started } }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_navy has_variable = td_navy_ratified NOT = { has_variable = td_navy_started } }
+    can_deactivate = yes
+}
+je_td_railway_contract = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_railway has_variable = td_railway_started exists = var:td_railway_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_railway has_variable = td_railway_started exists = var:td_railway_target }
+    can_deactivate = yes
+}
+je_td_railway_waiting = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_railway has_variable = td_railway_ratified NOT = { has_variable = td_railway_started } }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_railway has_variable = td_railway_ratified NOT = { has_variable = td_railway_started } }
+    can_deactivate = yes
+}

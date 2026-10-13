@@ -6,24 +6,24 @@ td_store_power_on_prev_state_effect = {
         limit = { td_power_category = 1 }
         prev = {
             set_variable = { name = td_live_power value = 1 }
-            set_variable = { name = td_live_diplomatic value = 0.9 }
-            set_variable = { name = td_live_administration value = 1.15 }
+            set_variable = { name = td_live_diplomatic value = 1 }
+            set_variable = { name = td_live_administration value = 1 }
         }
     }
     if = {
         limit = { td_power_category = 2 }
         prev = {
             set_variable = { name = td_live_power value = 2 }
-            set_variable = { name = td_live_diplomatic value = 1.25 }
-            set_variable = { name = td_live_administration value = 1.0 }
+            set_variable = { name = td_live_diplomatic value = 1 }
+            set_variable = { name = td_live_administration value = 1 }
         }
     }
     if = {
         limit = { td_power_category = 0 }
         prev = {
             set_variable = { name = td_live_power value = 0 }
-            set_variable = { name = td_live_diplomatic value = 1.0 }
-            set_variable = { name = td_live_administration value = 1.0 }
+            set_variable = { name = td_live_diplomatic value = 1 }
+            set_variable = { name = td_live_administration value = 1 }
         }
     }
 }

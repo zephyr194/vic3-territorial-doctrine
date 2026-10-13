@@ -37,7 +37,7 @@ class ColonialTests(unittest.TestCase):
             colonial_target=True, colonial_policy='exploitation')
         late = integration_cost(1_000_000, 'strategic_frontiers', fast=False,
             colonial_target=True, colonial_policy='exploitation', humanitarian_stage=2)
-        self.assertEqual((early, late), (63, 75))
+        self.assertEqual((early, late), (50, 50))
 
     def test_colonial_policy_shapes_national_doctrine_opinions(self):
         for group in RULES['groups']:
@@ -77,9 +77,9 @@ class ColonialTests(unittest.TestCase):
                                      accepted_share=.4,colonial_target=True,colonial_policy=policy,humanitarian_stage=stage))
 
     def test_float_noise_does_not_add_a_bureaucracy_point(self):
-        self.assertEqual(integration_cost(1_000_000,'strategic_frontiers',fast=False,actor_power='autocracy'),55)
+        self.assertEqual(integration_cost(1_000_000,'strategic_frontiers',fast=False,actor_power='autocracy'),50)
         self.assertEqual(integration_cost(3_000_000,'strategic_frontiers',fast=False,colonial_target=True,
-            colonial_policy='resettlement',humanitarian_stage=1),121)
+            colonial_policy='resettlement',humanitarian_stage=1),100)
 
     def test_actual_bill_score_effects_match_policy_weights(self):
         for policy, stage, kind in product(RULES['colonial']['policies'],range(3),(1,2)):
@@ -167,7 +167,7 @@ class ActivationTests(unittest.TestCase):
         runner.execute(runner.definitions['td_start_regular_effect'])
         self.assertNotIn('td_requires_admission',runner.states['A']['modifiers'])
         self.assertIn('td_requires_admission',runner.states['B']['modifiers'])
-        self.assertEqual(runner.modifiers['td_project_cost'],100)
+        self.assertEqual(runner.modifiers['td_project_cost'],50)
 
     def test_confirming_existing_claim_costs_no_extra_infamy(self):
         runner=EventRunner((.1,.1,.1));runner.claims.add('A')
@@ -176,57 +176,6 @@ class ActivationTests(unittest.TestCase):
         for _ in range(3):runner.next_event()
         self.assertEqual(runner.variables['infamy'],0)
         self.assertEqual(runner.lists['td_approved_claim_regions'],{'A'})
-
-
-class FocusTests(unittest.TestCase):
-    def prepare(self, runner):
-        runner.variables.update(td_pending_bill=1,td_reason=1)
-
-    def test_individual_focus_cost_waiting_and_duplicate_guard(self):
-        r=EventRunner();self.prepare(r)
-        r.execute(r.definitions['td_designate_focus_effect'])
-        self.assertEqual(r.variables['td_focus_count'],1)
-        self.assertEqual(r.modifiers['td_focus_strategic_frontiers'],1)
-        self.assertEqual(r.lists['td_focus_regions'],{'R1'})
-        self.assertNotIn('td_ready_focus_regions',r.lists)
-        self.assertEqual(r.queue[0][0],180)
-        r.execute(r.definitions['td_designate_focus_effect'])
-        self.assertEqual(r.variables['td_focus_count'],1)
-        self.assertEqual(len(r.queue),1)
-        r.next_event()
-        self.assertEqual(r.lists['td_ready_focus_regions'],{'R1'})
-
-    def test_wait_event_keeps_original_region_after_browsing(self):
-        r=EventRunner();self.prepare(r)
-        r.execute(r.definitions['td_designate_focus_effect'])
-        r.variables['td_target']='B'
-        r.execute(r.definitions['td_designate_focus_effect'])
-        self.assertEqual(r.variables['td_focus_count'],2)
-        self.assertEqual(r.modifiers['td_focus_strategic_frontiers'],2)
-        r.states['A']['region']='R3';r.variables['td_target']='A'
-        r.execute(r.definitions['td_designate_focus_effect'])
-        self.assertEqual(r.variables['td_focus_count'],2)
-        r.next_event();r.next_event()
-        self.assertEqual(r.lists['td_ready_focus_regions'],{'R1','R2'})
-
-    def test_withdrawal_invalidates_old_wait_timer(self):
-        r=EventRunner();self.prepare(r)
-        r.execute(r.definitions['td_designate_focus_effect'])
-        r.execute(r.definitions['td_remove_focus_effect'])
-        self.assertEqual(r.variables['td_focus_count'],0)
-        self.assertNotIn('td_focus_strategic_frontiers',r.modifiers)
-        r.next_event()
-        self.assertNotIn('td_ready_focus_regions',r.lists)
-
-    def test_empire_waits_twelve_months_and_disabled_cannot_designate(self):
-        r=EventRunner();self.prepare(r)
-        r.policy.update(policy_context(doctrine='imperial_expansion'))
-        r.execute(r.definitions['td_designate_focus_effect'])
-        self.assertEqual(r.queue[0][0],360)
-        r=EventRunner();self.prepare(r);r.globals.clear()
-        r.execute(r.definitions['td_designate_focus_effect'])
-        self.assertFalse(r.queue)
-        self.assertFalse(r.lists)
 
 
 class WarTests(unittest.TestCase):
@@ -258,20 +207,20 @@ class WarTests(unittest.TestCase):
 
     def test_cap_peace_and_saved_state(self):
         m=WarMandate('status_quo',(WarGoal('conquer_state',('A',)),),set())
-        for _ in range(6):self.assertEqual(m.tick(),2)
+        for _ in range(6):self.assertEqual(m.tick(),0)
         saved=asdict(m)
         restored=deepcopy(m)
         self.assertEqual(asdict(restored),saved)
         self.assertEqual(restored.tick(at_war=False),0)
-        self.assertEqual(sum(restored.tick() for _ in range(20)),8)
-        self.assertEqual(restored.cumulative_exhaustion,20)
+        self.assertEqual(sum(restored.tick() for _ in range(20)),0)
+        self.assertEqual(restored.cumulative_exhaustion,0)
 
     def test_late_approval_cannot_erase_start_snapshot(self):
         approved=set()
         m=WarMandate('imperial_expansion',(WarGoal('conquer_state',('A',)),),approved)
         approved.add('A');m.doctrine='strategic_frontiers'
         self.assertTrue(m.unauthorized)
-        self.assertEqual(m.tick(),2)
+        self.assertEqual(m.tick(),0)
         m=WarMandate('imperial_expansion',(WarGoal('conquer_state',('A',)),),{'A'},renounced_regions={'A'})
         self.assertTrue(m.unauthorized)
 
@@ -286,7 +235,7 @@ class NativeWarTests(unittest.TestCase):
         self.snapshot(r)
         self.assertIn('td_unauthorized_war',r.wars['W1']['variables'])
         r.execute(r.definitions['td_war_monthly_effect'])
-        self.assertEqual(r.wars['W1']['engine_exhaustion'],2)
+        self.assertEqual(r.wars['W1']['engine_exhaustion'],0)
         self.assertEqual(r.wars['W2']['engine_exhaustion'],0)
 
     def test_all_approved_targets_and_expansion_doctrine_are_exempt(self):
@@ -310,15 +259,15 @@ class NativeWarTests(unittest.TestCase):
         r=WarRunner()
         self.snapshot(r,'W1');self.snapshot(r,'W2')
         for _ in range(6):r.execute(r.definitions['td_war_monthly_effect'])
-        self.assertEqual(r.wars['W1']['engine_exhaustion'],12)
-        self.assertEqual(r.wars['W2']['engine_exhaustion'],12)
+        self.assertEqual(r.wars['W1']['engine_exhaustion'],0)
+        self.assertEqual(r.wars['W2']['engine_exhaustion'],0)
         r.lists['td_approved_claim_regions']={'A','B'}
         self.snapshot(r,'W1')  # Added war goal rechecks cannot erase bad start.
-        self.assertEqual(r.wars['W1']['variables']['td_extra_exhaustion'],12)
+        self.assertEqual(r.wars['W1']['variables']['td_extra_exhaustion'],0)
         restored=deepcopy(r)
         for _ in range(20):restored.execute(restored.definitions['td_war_monthly_effect'])
-        self.assertEqual(restored.wars['W1']['engine_exhaustion'],20)
-        self.assertEqual(restored.wars['W2']['engine_exhaustion'],20)
+        self.assertEqual(restored.wars['W1']['engine_exhaustion'],00)
+        self.assertEqual(restored.wars['W2']['engine_exhaustion'],00)
 
     def test_disabled_and_pre_activation_wars_are_untouched(self):
         r=WarRunner();r.globals.clear()

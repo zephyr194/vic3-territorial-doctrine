@@ -24,6 +24,8 @@ td_remove_focus_effect = {
 }
 
 td_clear_bill_effect = {
+    td_release_unratified_pledges_effect = yes
+    remove_variable = td_waiting_round
     remove_variable = td_bill
     remove_variable = td_bill_target
     remove_variable = td_pending_bill
@@ -40,7 +42,6 @@ td_cancel_bill_effect = {
 td_doctrine_changed_effect = {
     if = {
         limit = { td_feature_enabled_trigger = yes }
-        set_variable = { name = td_doctrine_lock years = 5 }
         td_cancel_bill_effect = yes
         td_remove_focus_effect = yes
         every_scope_state = { td_refresh_state_development_effect = yes }
@@ -51,20 +52,23 @@ td_doctrine_changed_effect = {
 td_calculate_politics_effect = {
     if = {
         limit = { td_feature_enabled_trigger = yes }
+        set_variable = { name = td_target value = var:td_bill_target }
         td_base_scores_effect = yes
+        every_interest_group = { set_variable = { name = td_component_base value = var:td_score } }
         td_colonial_bill_scores_effect = yes
+        every_interest_group = { set_variable = { name = td_component_colonial value = { value = var:td_score subtract = var:td_component_base } } }
         if = { limit = { var:td_reason = 1 } ig:ig_armed_forces = { change_variable = { name = td_score add = 15 } } }
-        if = {
-            limit = { var:td_bill = 2 }
+        if = { limit = { var:td_reason = 3 has_law = law_type:law_multicultural has_law = law_type:law_total_separation }
             ig:ig_intelligentsia = { change_variable = { name = td_score add = 15 } }
             ig:ig_trade_unions = { change_variable = { name = td_score add = 15 } }
+        }
+        if = { limit = { var:td_reason = 4 bureaucracy >= td_fast_project_cost }
+            ig:ig_petty_bourgeoisie = { change_variable = { name = td_score add = 10 } }
         }
         if = {
             limit = { is_at_war = yes }
             ig:ig_rural_folk = { change_variable = { name = td_score subtract = 15 } }
         }
-        if = { limit = { has_variable = td_bill_pledge_navy } ig:ig_armed_forces = { change_variable = { name = td_score add = 10 } } }
-        if = { limit = { has_variable = td_bill_pledge_railway } ig:ig_industrialists = { change_variable = { name = td_score add = 10 } } }
         if = {
             limit = { var:td_bill = 3 }
             ig:ig_armed_forces = { change_variable = { name = td_score subtract = 20 } }
@@ -74,10 +78,31 @@ td_calculate_politics_effect = {
             ig:ig_trade_unions = { change_variable = { name = td_score add = 10 } }
             ig:ig_rural_folk = { change_variable = { name = td_score add = 10 } }
         }
+        every_interest_group = {
+            set_variable = { name = td_component_target value = { value = var:td_score subtract = var:td_component_base subtract = var:td_component_colonial } }
+            set_variable = { name = td_component_trust value = { value = ig_approval multiply = td_negotiation_trust_weight min = td_negotiation_trust_cap max = { value = td_negotiation_trust_cap multiply = -1 } } }
+            change_variable = { name = td_score add = var:td_component_trust }
+            set_variable = { name = td_component_leader value = 0 }
+            if = { limit = { exists = leader owner = { var:td_bill = 1 } }
+                if = { limit = { leader = { has_ideology = ideology:ideology_jingoist } } set_variable = { name = td_component_leader value = td_negotiation_leader_adjustment } }
+                if = { limit = { leader = { has_ideology = ideology:ideology_pacifist } } set_variable = { name = td_component_leader value = { value = td_negotiation_leader_adjustment multiply = -1 } } }
+            }
+            if = { limit = { exists = leader owner = { var:td_bill = 3 } }
+                if = { limit = { leader = { has_ideology = ideology:ideology_jingoist } } set_variable = { name = td_component_leader value = { value = td_negotiation_leader_adjustment multiply = -1 } } }
+                if = { limit = { leader = { has_ideology = ideology:ideology_pacifist } } set_variable = { name = td_component_leader value = td_negotiation_leader_adjustment } }
+            }
+            change_variable = { name = td_score add = var:td_component_leader }
+            set_variable = { name = td_component_funded value = 0 }
+            if = { limit = { is_interest_group_type = ig_armed_forces owner = { has_variable = td_bill_pledge_navy } } set_variable = { name = td_component_funded value = td_negotiation_support_bonus } }
+            if = { limit = { is_interest_group_type = ig_industrialists owner = { has_variable = td_bill_pledge_railway } } set_variable = { name = td_component_funded value = td_negotiation_support_bonus } }
+            change_variable = { name = td_score add = var:td_component_funded }
+            set_variable = { name = td_component_breach value = 0 }
+            if = { limit = { has_variable = td_broken_pledge } set_variable = { name = td_component_breach value = td_negotiation_broken_support } }
+            change_variable = { name = td_score add = var:td_component_breach }
+        }
         set_variable = { name = td_support value = 0 }
         set_variable = { name = td_opposition value = 0 }
         every_interest_group = {
-            if = { limit = { has_variable = td_broken_pledge } change_variable = { name = td_score subtract = 10 } }
             if = {
                 limit = { var:td_score >= 20 }
                 owner = { change_variable = { name = td_support add = { value = prev.ig_clout multiply = 100 } } }
@@ -95,8 +120,88 @@ td_calculate_politics_effect = {
                 owner = { change_variable = { name = td_opposition add = { value = prev.ig_clout multiply = 50 } } }
             }
         }
+        ig:ig_armed_forces = { owner = {
+            set_variable = { name = td_view_armed_forces_score value = prev.var:td_score }
+            set_variable = { name = td_view_armed_forces_component_base value = prev.var:td_component_base }
+            set_variable = { name = td_view_armed_forces_component_colonial value = prev.var:td_component_colonial }
+            set_variable = { name = td_view_armed_forces_component_target value = prev.var:td_component_target }
+            set_variable = { name = td_view_armed_forces_component_trust value = prev.var:td_component_trust }
+            set_variable = { name = td_view_armed_forces_component_leader value = prev.var:td_component_leader }
+            set_variable = { name = td_view_armed_forces_component_funded value = prev.var:td_component_funded }
+            set_variable = { name = td_view_armed_forces_component_breach value = prev.var:td_component_breach }
+        } }
+        ig:ig_landowners = { owner = {
+            set_variable = { name = td_view_landowners_score value = prev.var:td_score }
+            set_variable = { name = td_view_landowners_component_base value = prev.var:td_component_base }
+            set_variable = { name = td_view_landowners_component_colonial value = prev.var:td_component_colonial }
+            set_variable = { name = td_view_landowners_component_target value = prev.var:td_component_target }
+            set_variable = { name = td_view_landowners_component_trust value = prev.var:td_component_trust }
+            set_variable = { name = td_view_landowners_component_leader value = prev.var:td_component_leader }
+            set_variable = { name = td_view_landowners_component_funded value = prev.var:td_component_funded }
+            set_variable = { name = td_view_landowners_component_breach value = prev.var:td_component_breach }
+        } }
+        ig:ig_industrialists = { owner = {
+            set_variable = { name = td_view_industrialists_score value = prev.var:td_score }
+            set_variable = { name = td_view_industrialists_component_base value = prev.var:td_component_base }
+            set_variable = { name = td_view_industrialists_component_colonial value = prev.var:td_component_colonial }
+            set_variable = { name = td_view_industrialists_component_target value = prev.var:td_component_target }
+            set_variable = { name = td_view_industrialists_component_trust value = prev.var:td_component_trust }
+            set_variable = { name = td_view_industrialists_component_leader value = prev.var:td_component_leader }
+            set_variable = { name = td_view_industrialists_component_funded value = prev.var:td_component_funded }
+            set_variable = { name = td_view_industrialists_component_breach value = prev.var:td_component_breach }
+        } }
+        ig:ig_petty_bourgeoisie = { owner = {
+            set_variable = { name = td_view_petty_bourgeoisie_score value = prev.var:td_score }
+            set_variable = { name = td_view_petty_bourgeoisie_component_base value = prev.var:td_component_base }
+            set_variable = { name = td_view_petty_bourgeoisie_component_colonial value = prev.var:td_component_colonial }
+            set_variable = { name = td_view_petty_bourgeoisie_component_target value = prev.var:td_component_target }
+            set_variable = { name = td_view_petty_bourgeoisie_component_trust value = prev.var:td_component_trust }
+            set_variable = { name = td_view_petty_bourgeoisie_component_leader value = prev.var:td_component_leader }
+            set_variable = { name = td_view_petty_bourgeoisie_component_funded value = prev.var:td_component_funded }
+            set_variable = { name = td_view_petty_bourgeoisie_component_breach value = prev.var:td_component_breach }
+        } }
+        ig:ig_intelligentsia = { owner = {
+            set_variable = { name = td_view_intelligentsia_score value = prev.var:td_score }
+            set_variable = { name = td_view_intelligentsia_component_base value = prev.var:td_component_base }
+            set_variable = { name = td_view_intelligentsia_component_colonial value = prev.var:td_component_colonial }
+            set_variable = { name = td_view_intelligentsia_component_target value = prev.var:td_component_target }
+            set_variable = { name = td_view_intelligentsia_component_trust value = prev.var:td_component_trust }
+            set_variable = { name = td_view_intelligentsia_component_leader value = prev.var:td_component_leader }
+            set_variable = { name = td_view_intelligentsia_component_funded value = prev.var:td_component_funded }
+            set_variable = { name = td_view_intelligentsia_component_breach value = prev.var:td_component_breach }
+        } }
+        ig:ig_trade_unions = { owner = {
+            set_variable = { name = td_view_trade_unions_score value = prev.var:td_score }
+            set_variable = { name = td_view_trade_unions_component_base value = prev.var:td_component_base }
+            set_variable = { name = td_view_trade_unions_component_colonial value = prev.var:td_component_colonial }
+            set_variable = { name = td_view_trade_unions_component_target value = prev.var:td_component_target }
+            set_variable = { name = td_view_trade_unions_component_trust value = prev.var:td_component_trust }
+            set_variable = { name = td_view_trade_unions_component_leader value = prev.var:td_component_leader }
+            set_variable = { name = td_view_trade_unions_component_funded value = prev.var:td_component_funded }
+            set_variable = { name = td_view_trade_unions_component_breach value = prev.var:td_component_breach }
+        } }
+        ig:ig_rural_folk = { owner = {
+            set_variable = { name = td_view_rural_folk_score value = prev.var:td_score }
+            set_variable = { name = td_view_rural_folk_component_base value = prev.var:td_component_base }
+            set_variable = { name = td_view_rural_folk_component_colonial value = prev.var:td_component_colonial }
+            set_variable = { name = td_view_rural_folk_component_target value = prev.var:td_component_target }
+            set_variable = { name = td_view_rural_folk_component_trust value = prev.var:td_component_trust }
+            set_variable = { name = td_view_rural_folk_component_leader value = prev.var:td_component_leader }
+            set_variable = { name = td_view_rural_folk_component_funded value = prev.var:td_component_funded }
+            set_variable = { name = td_view_rural_folk_component_breach value = prev.var:td_component_breach }
+        } }
+        ig:ig_devout = { owner = {
+            set_variable = { name = td_view_devout_score value = prev.var:td_score }
+            set_variable = { name = td_view_devout_component_base value = prev.var:td_component_base }
+            set_variable = { name = td_view_devout_component_colonial value = prev.var:td_component_colonial }
+            set_variable = { name = td_view_devout_component_target value = prev.var:td_component_target }
+            set_variable = { name = td_view_devout_component_trust value = prev.var:td_component_trust }
+            set_variable = { name = td_view_devout_component_leader value = prev.var:td_component_leader }
+            set_variable = { name = td_view_devout_component_funded value = prev.var:td_component_funded }
+            set_variable = { name = td_view_devout_component_breach value = prev.var:td_component_breach }
+        } }
         td_refresh_target_effect = yes
-        set_variable = { name = td_population_ratio value = { value = var:td_target.state_population divide = total_population } }
+        set_variable = { name = td_population_ratio value = { value = var:td_target.state_population divide = { value = total_population max = 1 } } }
         set_variable = { name = td_chance value = td_success_probability }
     }
 }
@@ -109,10 +214,48 @@ td_start_bill_effect = {
         set_variable = { name = td_bill_target value = var:td_target }
         save_scope_value_as = { name = td_bill_run value = var:td_bill_generation }
         td_refresh_target_effect = yes
+        set_variable = { name = td_round_epoch value = 0 }
+        save_scope_value_as = { name = td_round_run value = var:td_round_epoch }
         set_variable = { name = td_successes value = 0 }
         set_variable = { name = td_failures value = 0 }
         td_calculate_politics_effect = yes
         trigger_event = { id = td.1 days = td_bill_round_days }
+    }
+}
+
+td_open_negotiation_effect = {
+    if = { limit = { has_variable = td_bill has_variable = td_waiting_round }
+        if = { limit = { exists = var:td_bill_target }
+            set_variable = { name = td_target value = var:td_bill_target }
+            if = { limit = { td_bill_target_valid_trigger = yes td_can_legislate_trigger = yes }
+                save_scope_value_as = { name = td_bill_run value = var:td_bill_generation }
+                save_scope_value_as = { name = td_round_run value = var:td_round_epoch }
+                var:td_bill_target = { save_scope_as = td_negotiation_target }
+                trigger_event = td.32
+            }
+            else = { td_cancel_bill_effect = yes trigger_event = td.14 }
+        }
+        else = { td_cancel_bill_effect = yes trigger_event = td.14 }
+    }
+}
+td_resolve_round_effect = {
+    if = { limit = { td_active_negotiation_trigger = yes }
+        set_variable = { name = td_target value = var:td_bill_target }
+        if = { limit = { td_bill_target_valid_trigger = no }
+            td_cancel_bill_effect = yes
+            trigger_event = td.14
+        }
+        else = {
+            remove_variable = td_waiting_round
+            td_calculate_politics_effect = yes
+            random_list = {
+                1 = { modifier = { multiply = var:td_chance } change_variable = { name = td_successes add = 1 } }
+                1 = { modifier = { multiply = td_failure_weight } change_variable = { name = td_failures add = 1 } }
+            }
+            if = { limit = { var:td_successes >= td_bill_successes } td_pass_bill_effect = yes }
+            else_if = { limit = { var:td_failures >= td_bill_failures } td_cancel_bill_effect = yes trigger_event = td.13 }
+            else = { trigger_event = { id = td.1 days = td_bill_round_days } }
+        }
     }
 }
 
@@ -121,20 +264,14 @@ td_pass_bill_effect = {
         limit = { td_feature_enabled_trigger = yes }
         if = { limit = { exists = var:td_bill_target } set_variable = { name = td_target value = var:td_bill_target } }
         set_variable = { name = td_completed_bill value = var:td_bill }
-        if = {
-            limit = { has_variable = td_bill_pledge_navy }
-            set_variable = td_pending_navy
-        }
-        if = {
-            limit = { has_variable = td_bill_pledge_railway }
-            set_variable = td_pending_railway
-        }
+        td_ratify_pledges_effect = yes
         if = {
             limit = { var:td_bill = 1 }
             set_variable = { name = td_claim_infamy_snapshot value = td_claim_infamy }
             var:td_target.state_region = { add_claim = root }
             change_infamy = var:td_claim_infamy_snapshot
             if = { limit = { NOT = { is_target_in_variable_list = { name = td_approved_claim_regions target = var:td_target.state_region } } } add_to_variable_list = { name = td_approved_claim_regions target = var:td_target.state_region } }
+            var:td_target = { save_scope_as = td_notice_target }
             trigger_event = td.11
         }
         else_if = {
@@ -143,14 +280,15 @@ td_pass_bill_effect = {
                 set_variable = { name = td_admitted_owner value = owner }
                 set_variable = { name = td_admission_reason value = root.var:td_reason }
                 add_modifier = td_admission_ratified
-                td_admission_reaction_effect = yes
             }
             set_variable = { name = td_last_amendment_target value = var:td_target }
+            var:td_target = { save_scope_as = td_notice_target }
             trigger_event = td.12
         }
         else = {
             var:td_target.state_region = { remove_claim = root }
             add_to_variable_list = { name = td_renounced_regions target = var:td_target.state_region }
+            var:td_target = { save_scope_as = td_notice_target }
             trigger_event = td.19
         }
         td_clear_bill_effect = yes
@@ -179,6 +317,7 @@ td_disabled_cleanup_effect = {
         td_end_project_effect = yes
         td_remove_focus_effect = yes
         td_remove_territorial_ideologies_effect = yes
+        td_release_all_pledges_effect = yes
         td_clear_success_modifiers_effect = yes
         remove_variable = td_success_window
         remove_variable = td_success_state

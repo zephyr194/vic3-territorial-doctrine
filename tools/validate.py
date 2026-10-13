@@ -34,6 +34,7 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
                   if e.key in ('set_variable', 'set_global_variable') and isinstance(e.value, str)}
     variables |= set(RULES.get('legacy_variables', ()))
     scopes = {e.value for tree in trees.values() for e in walk(tree) if e.key == 'save_scope_as'}
+    scopes |= set(RULES.get('legacy_scopes', ()))
     for path, tree in trees.items():
         for e in walk(tree):
             for token in (e.key, e.value if isinstance(e.value, str) else ''):
@@ -129,10 +130,19 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
             required_vanilla = {'SPA', 'MOR', 'STATE_AL_RIF', 'region_north_africa', 'country_bankruptcy',
                                 'law_monarchy', 'law_autocracy', 'law_single_party_state', 'law_census_suffrage',
                                 'law_universal_suffrage', 'law_presidential_republic', 'law_parliamentary_republic',
-                                'building_naval_base', 'building_railway',
+                                'building_naval_base', 'building_railway', 'railways',
+                                'law_multicultural', 'law_total_separation', 'ideology_jingoist', 'ideology_pacifist',
                                 'acceptance_status_5', 'law_no_colonial_affairs', 'law_colonial_resettlement',
                                 'law_colonial_exploitation', 'egalitarianism', 'human_rights',
                                 'conquer_state', 'annex_country', 'return_state', 'decentralized'} | {f'ig_{g}' for g in RULES['groups']}
+            # Derive vanilla database references as well, so newly added law,
+            # ideology and building predicates cannot escape the game-file check.
+            for tree in trees.values():
+                for entry in walk(tree):
+                    for token in (entry.key, entry.value if isinstance(entry.value, str) else ''):
+                        required_vanilla.update(
+                            ref for ref in re.findall(r'(?:law_type|ideology|bt):([A-Za-z_]\w*)', token)
+                            if ref not in definitions)
             for doctrine in RULES['doctrines'].values():
                 for key in doctrine['industry_modifiers']:
                     if key.startswith('building_group_'):

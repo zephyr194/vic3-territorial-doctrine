@@ -78,7 +78,7 @@ class NativeFormulaTests(unittest.TestCase):
 
     def test_active_fast_cost_is_not_double_counted(self):
         context = policy_context()
-        context.update({'var:td_target.state_population': 1_000_000, 'has_variable:td_fast': True,
+        context.update({'var:td_target.state_population': 1_000_000, 'has_variable:td_fast': True, 'var:td_target':'A', 'var:td_project_target':'A',
                         'var:td_target.var:td_source_administration': 1,
                         'var:td_target.turmoil': 0, 'var:td_target.devastation': 0, 'var:td_accepted_share': 1})
         self.assertEqual(formula('td_unpaid_project_cost', context, self.definitions), 0)
@@ -86,7 +86,7 @@ class NativeFormulaTests(unittest.TestCase):
 
 class NativeEventTests(unittest.TestCase):
     def test_old_selection_menu_cannot_change_active_target(self):
-        for flag in ('td_bill', 'td_fast', 'td_regular'):
+        for flag in ('td_bill',):
             runner = EventRunner()
             runner.variables[flag] = 1
             for effect in ('td_select_owned_effect', 'td_select_lost_effect', 'td_select_admitted_effect'):
@@ -104,7 +104,7 @@ class NativeEventTests(unittest.TestCase):
         self.assertTrue(runner.claimed)
         self.assertNotIn('td_admitted_owner', runner.states['A']['variables'])
         self.assertNotIn('td_bill', runner.variables)
-        self.assertEqual(runner.variables['infamy'], 3)
+        self.assertEqual(runner.variables['infamy'], 0)
         self.assertFalse(runner.queue)
         runner.variables['td_bill'] = 2
         runner.execute(runner.definitions['td_start_bill_effect'])
@@ -115,7 +115,7 @@ class NativeEventTests(unittest.TestCase):
         self.assertIn('td_annual_integration', runner.states['A']['modifiers'])
         self.assertIn('td_requires_admission', runner.states['B']['modifiers'])
         self.assertFalse(runner.incorporated)
-        self.assertEqual(runner.variables['infamy'], 3)
+        self.assertEqual(runner.variables['infamy'], 0)
 
     def test_cancelled_scheduled_round_does_not_restart(self):
         runner = EventRunner(())
@@ -129,7 +129,7 @@ class NativeEventTests(unittest.TestCase):
 
     def test_rejection_drops_new_pledges_but_preserves_prior_obligations(self):
         runner = EventRunner((.9, .9, .9))
-        runner.variables.update(td_bill=1, td_bill_pledge_navy=1, td_pending_railway=1)
+        runner.variables.update(td_bill=1, td_bill_pledge_navy=1, td_pending_railway=1, td_railway_ratified=1)
         runner.execute(runner.definitions['td_start_bill_effect'])
         for _ in range(3):
             runner.next_event()
@@ -151,7 +151,7 @@ class NativeEventTests(unittest.TestCase):
         runner = EventRunner()
         runner.states[runner.variables['td_target']]['variables']['td_admitted_owner'] = runner.country
         runner.execute(runner.definitions['td_start_fast_effect'])
-        self.assertEqual(runner.modifiers['td_project_cost'], 100)
+        self.assertEqual(runner.modifiers['td_project_cost'], 50)
         self.assertEqual(runner.queue[0][0], 30)
         for _ in range(11):
             runner.next_event()

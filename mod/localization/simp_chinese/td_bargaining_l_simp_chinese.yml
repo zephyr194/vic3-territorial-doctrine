@@ -1,0 +1,11 @@
+﻿l_simp_chinese:
+ td_navy_planning:0 "海军基地承诺：行政预留"
+ je_td_navy_contract:0 "海军基地交付：[ROOT.GetCountry.MakeScope.Var('td_navy_target').GetState.GetName]"
+ je_td_navy_contract_reason:0 "只检查此州的净新增一级建筑，三年内交付。建筑与维护费用由原版承担；失地、换原则或读档不重置基线与期限。"
+ je_td_navy_waiting:0 "海军基地承诺等待取得主权"
+ je_td_navy_waiting_reason:0 "批准后最多等待五年取得所约区域的普通州。行政预留持续，勘察支出不退还；到期仍未取得则关闭义务，不按未建成建筑惩罚。"
+ td_railway_planning:0 "铁路承诺：行政预留"
+ je_td_railway_contract:0 "铁路交付：[ROOT.GetCountry.MakeScope.Var('td_railway_target').GetState.GetName]"
+ je_td_railway_contract_reason:0 "只检查此州的净新增一级建筑，三年内交付。建筑与维护费用由原版承担；失地、换原则或读档不重置基线与期限。"
+ je_td_railway_waiting:0 "铁路承诺等待取得主权"
+ je_td_railway_waiting_reason:0 "批准后最多等待五年取得所约区域的普通州。行政预留持续，勘察支出不退还；到期仍未取得则关闭义务，不按未建成建筑惩罚。"

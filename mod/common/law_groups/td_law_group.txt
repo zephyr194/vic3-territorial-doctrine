@@ -5,6 +5,5 @@ lawgroup_territorial_doctrine = {
     enable = { td_feature_enabled_trigger = yes }
     change_allowed_trigger = {
         td_can_legislate_trigger = yes
-        NOT = { has_variable = td_doctrine_lock }
     }
 }

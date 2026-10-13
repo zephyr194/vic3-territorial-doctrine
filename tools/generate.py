@@ -11,6 +11,7 @@ sys.path.insert(0, str(ROOT))
 from tools.policy_assets import assets
 from tools.development_assets import assets as development_assets
 from tools.success_assets import assets as success_assets
+from tools.bargaining_assets import assets as bargaining_assets
 from tools.law_text import doctrine_description, group_description
 from territorial_doctrine.model import RULES, DOCTRINES  # noqa: E402
 
@@ -52,7 +53,6 @@ def outputs() -> dict[Path, bytes]:
     enable = { td_feature_enabled_trigger = yes }
     change_allowed_trigger = {
         td_can_legislate_trigger = yes
-        NOT = { has_variable = td_doctrine_lock }
     }
 }
 ''')
@@ -72,7 +72,7 @@ def outputs() -> dict[Path, bytes]:
         laws += f'''law_td_{doctrine} = {{
     group = lawgroup_territorial_doctrine
     icon = "{image}"
-    progressiveness = {i * 10}
+    progressiveness = 0
     modifier = {{
 {modifier}
     }}
@@ -163,10 +163,10 @@ td_store_power_on_prev_state_effect = {
     country_authority_add = -{data['authority']}
 }}
 '''
-    modifiers += '''td_project_cost = { country_bureaucracy_add = -1 }
-td_pledge_fulfilled = { interest_group_approval_add = 2 }
-td_pledge_broken = { interest_group_approval_add = -5 }
-td_requires_admission = { state_disallow_incorporation = yes }
+    modifiers += f'''td_project_cost = {{ country_bureaucracy_add = -1 }}
+td_pledge_fulfilled = {{ interest_group_approval_add = {RULES['negotiation']['fulfilled_approval']} }}
+td_pledge_broken = {{ interest_group_approval_add = {RULES['negotiation']['broken_approval']} }}
+td_requires_admission = {{ state_disallow_incorporation = yes }}
 '''
     modifiers += 'td_admission_ratified = {} # Legal record; all economic incentives belong to new territory.\n'
     modifiers += 'td_annual_integration = { state_disallow_incorporation = yes }\n'
@@ -174,7 +174,7 @@ td_requires_admission = { state_disallow_incorporation = yes }
     for language, label in [('english', 'en'), ('simp_chinese', 'zh')]:
         loc = f'l_{language}:\n'
         loc += ' lawgroup_territorial_doctrine:0 "' + ('国家领土原则' if label == 'zh' else 'National Territorial Doctrine') + '"\n'
-        loc += ' lawgroup_territorial_doctrine_desc:0 "' + ('确立国家守成、恢复法理疆界、保障战略边疆或建立帝国的长期方向。不同原则改变集团政治力量、国家收益与治理负担，并决定逐目标领土法案的资格。' if label == 'zh' else 'Choose a lasting policy of restraint, lawful restoration, strategic frontiers or imperial expansion. Each doctrine changes interest-group political strength, national benefits and governance burdens, and defines eligibility for individual territorial bills.') + '"\n'
+        loc += ' lawgroup_territorial_doctrine_desc:0 "' + ('确立国家守成、恢复法理疆界、保障战略边疆或建立帝国的长期方向。不同原则提供理由与集团偏好的背景，具体利益与付费承诺在逐目标国内审议中处理。' if label == 'zh' else 'Choose a lasting policy of restraint, lawful restoration, strategic frontiers or imperial expansion. Each doctrine frames arguments and group preferences; actual interests and funded commitments are negotiated in individual bills.') + '"\n'
         for doctrine, data in RULES['doctrines'].items():
             title = data[label]
             desc = json.dumps(doctrine_description(doctrine, label), ensure_ascii=False)
@@ -204,6 +204,8 @@ td_requires_admission = { state_disallow_incorporation = yes }
     for path, content in development_assets().items():
         put(path, content)
     for path, content in success_assets().items():
+        put(path, content)
+    for path, content in bargaining_assets().items():
         put(path, content)
     # English is the source fallback; other game languages use identical keys/text
     # until a native translation is supplied. Never alter the game's language setting.

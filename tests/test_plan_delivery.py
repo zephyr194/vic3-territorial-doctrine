@@ -25,6 +25,7 @@ class GeographyRunner(EventRunner):
         self.policy.pop('var:td_target.td_colonial_target_trigger')
         self.interests = {'R1', 'R2'}
         self.adjacent_states = set()
+        self.region_scope = None
         for key, state in self.states.items():
             state.update(owner='ENEMY', state_region='REGION_'+key,
                          subject_of_root=False, decentralized=False,
@@ -61,6 +62,8 @@ class GeographyRunner(EventRunner):
                 for key in self.states:
                     if e.key == 'any_scope_state' and self.states[key]['owner'] != self.country:
                         continue
+                    if self.region_scope and self.states[key]['state_region'] != self.region_scope:
+                        continue
                     self.scope = key
                     if self.check(e.value):
                         result = True
@@ -75,7 +78,13 @@ class GeographyRunner(EventRunner):
                 result = self.scope in self.claims or any(
                     self.states[s]['state_region'] == region for s in self.claims if s in self.states)
             elif e.key == 'state_region' and isinstance(e.value, str):
-                result = self.states[self.scope]['state_region'] == e.value.removeprefix('s:')
+                wanted = self.resolve(e.value) if e.value.startswith(('root.var:', 'var:')) else e.value.removeprefix('s:')
+                result = self.states[self.scope]['state_region'] == wanted
+            elif e.key == 'state_region' and isinstance(e.value,list):
+                old_region = self.region_scope
+                self.region_scope = self.states[self.scope]['state_region']
+                result = self.check(e.value)
+                self.region_scope = old_region
             elif e.key == 'this':
                 result = self.country == e.value.removeprefix('c:')
             elif e.key == 'is_adjacent_to_state':
@@ -99,12 +108,16 @@ def set_colonial_policy(runner, policy):
 def roundtrip(runner, *, rolls=()):
     """Reload a fresh runner from only persisted test state, not Python objects."""
     fields = ('variables','states','policy','globals','saved','expirations',
-              'modifiers','day','serial','bureaucracy','notifications')
+              'modifiers','day','serial','bureaucracy','notifications','gold_reserves',
+              'auto_negotiate','real_politics','total_population','legitimacy','windows')
     payload = {name:getattr(runner,name) for name in fields}
     payload.update(lists={k:sorted(v) for k,v in runner.lists.items()},
                    claims=sorted(runner.claims), queue=runner.queue,
                    modifier_expirations=[[scope,name,day] for (scope,name),day in runner.modifier_expirations.items()],
-                   groups={k:{'variables':v['variables'],'ideologies':sorted(v['ideologies'])}
+                   scoped_expirations=[[scope,name,day] for (scope,name),day in runner.scoped_expirations.items()],
+                   groups={k:{'variables':v['variables'],'ideologies':sorted(v['ideologies']),
+                              'modifiers':v['modifiers'],'approval':v['approval'],'clout':v['clout'],
+                              'leader_ideologies':sorted(v['leader_ideologies']),'leader_exists':v['leader_exists']}
                            for k,v in runner.groups.items()})
     if isinstance(runner, WarRunner):
         payload.update(wars=runner.wars, attacker_warleaders=runner.attacker_warleaders,
@@ -122,9 +135,10 @@ def roundtrip(runner, *, rolls=()):
     restored.lists = {k:set(v) for k,v in saved['lists'].items()}
     restored.queue = [(day,serial,event,scope) for day,serial,event,scope in saved['queue']]
     heapq.heapify(restored.queue)
-    restored.groups = {k:{'variables':v['variables'],'ideologies':set(v['ideologies'])}
+    restored.groups = {k:{**v,'ideologies':set(v['ideologies']),'leader_ideologies':set(v['leader_ideologies'])}
                        for k,v in saved['groups'].items()}
     restored.modifier_expirations = {(scope,name):day for scope,name,day in saved['modifier_expirations']}
+    restored.scoped_expirations = {(scope,name):day for scope,name,day in saved['scoped_expirations']}
     for state in restored.states.values():
         if 'political_changes' in state:
             state['political_changes'] = [tuple(change) for change in state['political_changes']]
@@ -226,7 +240,7 @@ class PlanDeliveryTests(unittest.TestCase):
         self.assertEqual(runner.notifications,['td.31']*3)
 
     def test_old_generic_menu_cannot_replace_active_bill_or_project(self):
-        for flag in ('td_bill','td_fast','td_regular'):
+        for flag in ('td_bill',):
             runner = GeographyRunner()
             runner.variables[flag] = 1
             before = deepcopy(runner.variables)
@@ -272,7 +286,7 @@ class PlanDeliveryTests(unittest.TestCase):
         self.assertEqual(restored.variables['td_project_target'],'A')
         self.assertEqual(restored.states['A']['variables']['td_admitted_owner'],'POR')
         self.assertNotIn('td_admitted_owner',restored.states['B']['variables'])
-        self.assertEqual(restored.modifiers['td_project_cost'],235)
+        self.assertEqual(restored.modifiers['td_project_cost'],50)
         restored = roundtrip(restored)
         restored.bureaucracy = -100
         restored.run_until(634)
@@ -329,7 +343,7 @@ class PlanDeliveryTests(unittest.TestCase):
         runner.execute(runner.definitions['td_war_monthly_effect'])
         runner.participants['W1'].remove(runner.country)
         runner.execute(runner.definitions['td_war_monthly_effect'])
-        self.assertEqual(runner.wars['W1']['engine_exhaustion'],2)
+        self.assertEqual(runner.wars['W1']['engine_exhaustion'],0)
         runner.saved['td_mandate_war'] = 'W2'
         runner.participants['W2'].remove(runner.country)
         runner.execute(runner.definitions['td_snapshot_war_mandate_effect'])
@@ -348,10 +362,10 @@ class PlanDeliveryTests(unittest.TestCase):
         restored = roundtrip(runner)
         restored.lists['td_approved_claim_regions'].add('B')
         restored.execute(restored.definitions['td_snapshot_war_mandate_effect'])
-        self.assertEqual(restored.wars['W1']['variables']['td_extra_exhaustion'],8)
+        self.assertEqual(restored.wars['W1']['variables']['td_extra_exhaustion'],0)
         for _ in range(12):
             restored.execute(restored.definitions['td_war_monthly_effect'])
-        self.assertEqual(restored.wars['W1']['engine_exhaustion'],20)
+        self.assertEqual(restored.wars['W1']['engine_exhaustion'],0)
         self.assertEqual(restored.wars['W2']['engine_exhaustion'],0)
 
     def test_defensive_return_state_target_fixture_is_not_checked_as_expansion(self):

@@ -13,17 +13,7 @@ td_success_probability = {
     max = td_bill_min_probability
 }
 td_failure_weight = { value = 100 subtract = var:td_chance }
-td_claim_infamy = {
-    value = 0
-    if = { limit = { has_law = law_type:law_td_strategic_frontiers } value = 2 }
-    if = { limit = { has_law = law_type:law_td_imperial_expansion } value = 5 }
-    multiply = td_reason_cost_multiplier
-    multiply = var:td_target.var:td_live_diplomatic
-    multiply = td_infamy_policy_multiplier
-    if = { limit = { OR = { var:td_pending_bill = 2 var:td_pending_bill = 3 var:td_bill = 2 var:td_bill = 3 } } value = 0 }
-    if = { limit = { has_claim = var:td_target.state_region } value = 0 }
-    ceiling = yes
-}
+td_claim_infamy = 0 # Domestic passage does not manufacture international legitimacy.
 td_base_project_cost = {
     value = var:td_target.state_population
     divide = 1000000
@@ -41,7 +31,6 @@ td_territory_cost_multiplier = {
     value = 1
     add = { value = var:td_target.turmoil multiply = 0.5 }
     add = { value = var:td_target.devastation multiply = 0.5 }
-    add = { value = 1 subtract = var:td_accepted_share multiply = 0.25 }
 }
 td_project_cost_before_rounding = {
     value = td_base_project_cost
@@ -60,5 +49,5 @@ td_regular_project_cost = { value = td_project_cost_before_rounding multiply = t
 td_fast_project_cost = { value = td_project_cost_before_rounding multiply = td_annual_cost_multiplier multiply = td_cost_precision round = yes divide = td_cost_precision ceiling = yes }
 td_unpaid_project_cost = {
     value = td_fast_project_cost
-    if = { limit = { has_variable = td_fast } value = 0 }
+    if = { limit = { has_variable = td_fast var:td_target = var:td_project_target } value = 0 }
 }

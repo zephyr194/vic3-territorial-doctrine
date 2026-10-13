@@ -20,12 +20,6 @@ td_select_claim = {
     when_taken = { clear_variable_list = td_seen_claim_regions td_select_claim_effect = yes td_open_target_menu_effect = yes }
     ai_chance = { value = 0 }
 }
-td_remove_focus = {
-    is_shown = { td_feature_enabled_trigger = yes var:td_focus_count > 0 }
-    possible = { NOT = { has_variable = td_bill } }
-    when_taken = { td_remove_focus_effect = yes }
-    ai_chance = { value = 0 }
-}
 td_claim_al_rif = {
     is_shown = { td_feature_enabled_trigger = yes this = c:SPA exists = s:STATE_AL_RIF.region_state:MOR NOT = { AND = { has_claim = s:STATE_AL_RIF is_target_in_variable_list = { name = td_approved_claim_regions target = s:STATE_AL_RIF } } } }
     possible = { td_can_start_bill_trigger = yes s:STATE_AL_RIF.region_state:MOR = { td_claim_candidate_trigger = yes } }
@@ -57,15 +51,20 @@ td_select_integration = {
     ai_chance = { value = 0 }
 }
 td_pledge_navy = {
-    is_shown = { td_feature_enabled_trigger = yes this = c:SPA var:td_bill = 1 var:td_target = { state_region = s:STATE_AL_RIF } NOT = { has_variable = td_bill_pledge_navy } }
-    possible = { NOT = { has_variable = td_pending_navy } }
-    when_taken = { set_variable = td_bill_pledge_navy td_calculate_politics_effect = yes }
+    is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill var:td_bill < 3 }
+    possible = { td_can_pledge_navy_trigger = yes }
+    when_taken = { td_sign_navy_pledge_effect = yes }
     ai_chance = { value = 0 }
 }
 td_pledge_railway = {
-    is_shown = { td_feature_enabled_trigger = yes this = c:SPA var:td_bill = 1 var:td_target = { state_region = s:STATE_AL_RIF } NOT = { has_variable = td_bill_pledge_railway } }
-    possible = { NOT = { has_variable = td_pending_railway } }
-    when_taken = { set_variable = td_bill_pledge_railway td_calculate_politics_effect = yes }
+    is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill var:td_bill < 3 }
+    possible = { td_can_pledge_railway_trigger = yes }
+    when_taken = { td_sign_railway_pledge_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_negotiate = {
+    is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill has_variable = td_waiting_round }
+    when_taken = { td_open_negotiation_effect = yes }
     ai_chance = { value = 0 }
 }
 td_bill_status = {

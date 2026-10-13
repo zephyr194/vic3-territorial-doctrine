@@ -1,0 +1,2 @@
+﻿td_navy_planning = { country_bureaucracy_add = -10 }
+td_railway_planning = { country_bureaucracy_add = -10 }

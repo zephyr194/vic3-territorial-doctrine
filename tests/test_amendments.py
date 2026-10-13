@@ -131,71 +131,28 @@ class AdmissionAmendmentTests(unittest.TestCase):
             loc = localization(language,'td_gameplay')
             self.assertIn("Var('td_bill_target').GetState.GetName", loc['je_td_admission_amendment'])
             self.assertIn("Var('td_target').GetState.GetName", loc['td.30.t'])
-            self.assertIn("Var('td_last_amendment_target').GetState.GetName", loc['td.12.t'])
+            self.assertIn("SCOPE.sState('td_notice_target')", loc['td.12.t'])
 
 
 class DevelopmentTests(unittest.TestCase):
-    def refresh(self, runner):
+    def test_legacy_state_packages_are_removed_from_all_owned_states(self):
+        runner=EventRunner(country='POR')
+        for state in runner.states.values():
+            state['modifiers']['td_territory_imperial_expansion']=1
+            state['variables']['td_development_profile']=4
         runner.execute(parse('every_scope_state = { td_refresh_state_development_effect = yes }'))
-
-    def test_only_newly_acquired_states_receive_current_policy(self):
-        runner = EventRunner(country='POR')
-        runner.policy.update(policy_context(doctrine='imperial_expansion'))
-        runner.states['B']['homeland'] = True
-        runner.states['A']['variables']['td_acquired_owner'] = 'POR'
-        self.refresh(runner)
-        self.assertIn('td_territory_imperial_expansion',runner.states['A']['modifiers'])
-        self.assertNotIn('td_territory_imperial_expansion',runner.states['B']['modifiers'])
-        runner.states['B']['variables']['td_acquired_owner'] = 'POR'
-        self.refresh(runner)
-        self.assertIn('td_territory_imperial_expansion',runner.states['B']['modifiers'])
-        runner.policy.update(policy_context(doctrine='status_quo'))
-        self.refresh(runner)
-        before=deepcopy(runner.states)
-        self.refresh(runner)
-        self.assertEqual(runner.states,before)
         for state in runner.states.values():
-            self.assertIn('td_territory_status_quo',state['modifiers'])
             self.assertNotIn('td_territory_imperial_expansion',state['modifiers'])
+            self.assertNotIn('td_development_profile',state['variables'])
 
-    def test_foreign_port_and_disabled_states_receive_no_owner_policy_buff(self):
-        runner = EventRunner(country='POR')
-        runner.states['B']['owner'] = 'CHI'
-        runner.states['A']['treaty_port'] = True
-        runner.states['A']['variables']['td_acquired_owner'] = 'POR'
-        self.refresh(runner)
-        for state in runner.states.values():
-            self.assertFalse(any(m.startswith('td_territory_') for m in state['modifiers']))
-        runner.states['A']['treaty_port'] = False
-        self.refresh(runner)
-        runner.globals.clear()
-        self.refresh(runner)
-        self.assertFalse(any(m.startswith('td_territory_') for m in runner.states['A']['modifiers']))
+    def test_acquisition_and_admission_do_not_create_population_changes(self):
+        runner=EventRunner(country='POR')
+        runner.execute(parse('every_scope_state = { td_process_acquisition_effect = yes td_admission_reaction_effect = yes }'))
+        self.assertTrue(all('political_changes' not in s for s in runner.states.values()))
 
-    def test_state_development_text_matches_actual_state_modifiers(self):
-        modifiers={e.key:e.value for e in load(ROOT/'mod/common/static_modifiers/td_territory_modifiers.txt')}
-        for language,label,index in (('english','en',1),('simp_chinese','zh',0)):
-            loc=localization(language,'td_laws')
-            for doctrine in RULES['doctrines']:
-                for modifier in modifiers['td_territory_'+doctrine]:
-                    expected=(TERRITORY_EFFECTS | INDUSTRY_EFFECTS)[modifier.key][index] + f' {float(modifier.value)*100:+g}%'
-                    self.assertIn(expected,loc['law_td_'+doctrine+'_desc'])
-
-    def test_imperial_military_supply_chain_has_ten_percent_throughput(self):
-        laws={e.key:e.value for e in load(ROOT/'mod/common/laws/td_laws.txt')}
-        effects={e.key:float(e.value) for e in next(e.value for e in laws['law_td_imperial_expansion'] if e.key=='modifier')}
-        territory={e.key:e.value for e in load(ROOT/'mod/common/static_modifiers/td_territory_modifiers.txt')}
-        local={e.key:float(e.value) for e in territory['td_territory_imperial_expansion']}
-        chain=('coal_mine','iron_mine','lead_mine','sulfur_mine','steel_mill','tooling_workshop',
-               'chemical_plant','motor_industry','arms_industry','munition_plant','war_machine_industry','shipyard')
-        for industry in chain:
-            self.assertNotIn(f'building_{industry}_throughput_mult', effects)
-            self.assertEqual(local[f'building_{industry}_throughput_mult'],.10)
-        self.assertEqual(effects['country_infamy_generation_mult'],.25)
-        self.assertNotIn('country_legitimacy_base_add', effects)
-        self.assertGreater(claim_infamy('imperial_expansion','security','democracy'),
-                           claim_infamy('imperial_expansion','security','autocracy'))
+    def test_old_package_definitions_have_no_effects(self):
+        for e in load(ROOT/'mod/common/static_modifiers/td_territory_modifiers.txt'):
+            self.assertEqual(e.value,[])
 
 
-if __name__ == '__main__':
-    unittest.main()
+if __name__ == '__main__':unittest.main()

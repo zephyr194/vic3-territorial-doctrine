@@ -1,0 +1,38 @@
+﻿td_active_negotiation_trigger = {
+    td_feature_enabled_trigger = yes
+    has_variable = td_bill
+    has_variable = td_waiting_round
+    exists = var:td_bill_target
+    scope:td_bill_run = var:td_bill_generation
+    scope:td_round_run = var:td_round_epoch
+}
+td_can_pledge_navy_trigger = {
+    td_can_legislate_trigger = yes
+    has_variable = td_bill
+    var:td_bill < 3
+    exists = var:td_bill_target
+    NOT = { has_variable = td_bill_pledge_navy }
+    NOT = { has_variable = td_pending_navy }
+    gold_reserves >= td_pledge_survey_cost
+    bureaucracy >= 10
+    var:td_bill_target = { is_coastal = yes }
+    var:td_bill_target = {
+        is_treaty_port = no
+        OR = { owner = root NOT = { state_region = { any_scope_state = { owner = root } } } }
+    }
+}
+td_can_pledge_railway_trigger = {
+    td_can_legislate_trigger = yes
+    has_variable = td_bill
+    var:td_bill < 3
+    exists = var:td_bill_target
+    NOT = { has_variable = td_bill_pledge_railway }
+    NOT = { has_variable = td_pending_railway }
+    gold_reserves >= td_pledge_survey_cost
+    bureaucracy >= 10
+    has_technology_researched = railways
+    var:td_bill_target = {
+        is_treaty_port = no
+        OR = { owner = root NOT = { state_region = { any_scope_state = { owner = root } } } }
+    }
+}

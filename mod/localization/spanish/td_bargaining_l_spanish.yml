@@ -1,0 +1,11 @@
+﻿l_spanish:
+ td_navy_planning:0 "Naval Base Commitment: Administrative Reserve"
+ je_td_navy_contract:0 "Naval Base Delivery: [ROOT.GetCountry.MakeScope.Var('td_navy_target').GetState.GetName]"
+ je_td_navy_contract_reason:0 "Add one net building level in this state within three years. Construction and upkeep use vanilla budgets. Transfers, doctrine changes and reloads never reset its baseline or deadline."
+ je_td_navy_waiting:0 "Naval Base Commitment Awaiting Sovereignty"
+ je_td_navy_waiting_reason:0 "Wait at most five years after ratification to acquire an ordinary state in the contracted region. Administration remains reserved; survey expenses are nonrefundable. If sovereignty is never acquired, the obligation closes without a construction breach."
+ td_railway_planning:0 "Railway Commitment: Administrative Reserve"
+ je_td_railway_contract:0 "Railway Delivery: [ROOT.GetCountry.MakeScope.Var('td_railway_target').GetState.GetName]"
+ je_td_railway_contract_reason:0 "Add one net building level in this state within three years. Construction and upkeep use vanilla budgets. Transfers, doctrine changes and reloads never reset its baseline or deadline."
+ je_td_railway_waiting:0 "Railway Commitment Awaiting Sovereignty"
+ je_td_railway_waiting_reason:0 "Wait at most five years after ratification to acquire an ordinary state in the contracted region. Administration remains reserved; survey expenses are nonrefundable. If sovereignty is never acquired, the obligation closes without a construction breach."

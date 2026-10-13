@@ -21,7 +21,9 @@ class PoliticsTests(unittest.TestCase):
 
     def test_claim_and_admission_are_distinct(self):
         claim = group_scores('strategic_frontiers', security=True)
-        admit = group_scores('strategic_frontiers', security=True, admission=True)
+        unconditional = group_scores('strategic_frontiers', security=True, admission=True)
+        self.assertEqual(unconditional, claim)
+        admit = group_scores('strategic_frontiers', security=True, admission=True, equal_rights=True)
         self.assertEqual(claim['intelligentsia'], -10)
         self.assertEqual(admit['intelligentsia'], 5)
 
@@ -37,7 +39,7 @@ class PoliticsTests(unittest.TestCase):
 
     def test_common_base_and_reason_example(self):
         self.assertAlmostEqual(round_probability(55, 20, legitimacy=50,
-            reason='security', government='monarchy', power='autocracy'), .42)
+            reason='security', government='monarchy', power='autocracy'), .35)
         self.assertAlmostEqual(round_probability(55, 20, legitimacy=50), .35)
         self.assertAlmostEqual(round_probability(75, 20, legitimacy=75), .52)
 
@@ -47,10 +49,10 @@ class PoliticsTests(unittest.TestCase):
                 government=government, power=power), .10)
 
     def test_reason_fit_changes_sign(self):
-        self.assertEqual(reason_bonus('security', 'monarchy', 'autocracy'), 7)
-        self.assertEqual(reason_bonus('security', 'republic', 'democracy'), -2)
-        self.assertEqual(reason_bonus('equal_rights', 'monarchy', 'autocracy'), -7)
-        self.assertEqual(reason_bonus('equal_rights', 'republic', 'democracy'), 8)
+        self.assertEqual(reason_bonus('security', 'monarchy', 'autocracy'), 0)
+        self.assertEqual(reason_bonus('security', 'republic', 'democracy'), 0)
+        self.assertEqual(reason_bonus('equal_rights', 'monarchy', 'autocracy'), 0)
+        self.assertEqual(reason_bonus('equal_rights', 'republic', 'democracy'), 0)
 
     def test_renunciation_has_distinct_politics(self):
         normal = group_scores('historical_rights')
@@ -61,7 +63,7 @@ class PoliticsTests(unittest.TestCase):
     def test_probability_bounds_and_risk(self):
         self.assertEqual(round_probability(0, 100, legitimacy=0, at_war=True), .05)
         self.assertEqual(round_probability(100, 0, legitimacy=100,
-            reason='equal_rights', government='republic', power='democracy'), .85)
+            reason='equal_rights', government='republic', power='democracy'), .80)
         baseline = round_probability(55, 20, legitimacy=50)
         self.assertAlmostEqual(round_probability(55, 20, legitimacy=50,
             target_population_ratio=.2), baseline - .05)
@@ -179,13 +181,13 @@ class IndividualTerritoryTests(unittest.TestCase):
         self.assertFalse(LostTerritory('A', 'RUS', 'CHI').eligible())
 
     def test_target_regime_and_local_conditions_change_cost(self):
-        self.assertEqual(claim_infamy('strategic_frontiers', 'security', 'autocracy'), 2)
-        self.assertEqual(claim_infamy('strategic_frontiers', 'security', 'democracy'), 3)
+        self.assertEqual(claim_infamy('strategic_frontiers', 'security', 'autocracy'), 0)
+        self.assertEqual(claim_infamy('strategic_frontiers', 'security', 'democracy'), 0)
         neutral = integration_cost(1_000_000, 'strategic_frontiers', fast=False)
         inherited = integration_cost(1_000_000, 'strategic_frontiers', fast=False, source_power='autocracy')
         damaged = integration_cost(1_000_000, 'strategic_frontiers', fast=False, turmoil=.5,
                                    devastation=.5, accepted_share=.5)
-        self.assertGreater(inherited, neutral)
+        self.assertEqual(inherited, neutral)
         self.assertGreater(damaged, inherited)
         with self.assertRaises(ValueError):
             integration_cost(1, 'status_quo', fast=False, accepted_share=1.1)
@@ -235,8 +237,8 @@ class IntegrationTests(unittest.TestCase):
 
     def test_documented_costs_and_rounding(self):
         self.assertEqual(integration_cost(1_000_000, 'strategic_frontiers', fast=False), 50)
-        self.assertEqual(integration_cost(1_000_000, 'strategic_frontiers', fast=True), 100)
-        self.assertEqual(integration_cost(4_000_000, 'imperial_expansion', fast=True), 313)
+        self.assertEqual(integration_cost(1_000_000, 'strategic_frontiers', fast=True), 50)
+        self.assertEqual(integration_cost(4_000_000, 'imperial_expansion', fast=True), 125)
 
     def test_only_sovereignty_ratification_and_start_budget_block(self):
         for field, value in [('sovereign_owner', False), ('admitted', False),

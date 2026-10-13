@@ -1,0 +1,12 @@
+﻿td_pledge_survey_cost = {
+    value = var:td_bill_target.state_population
+    multiply = 0.01
+    min = 1000000000
+    max = 5000
+    ceiling = yes
+}
+td_negotiation_support_bonus = { value = 10 }
+td_negotiation_trust_weight = { value = 0.5 }
+td_negotiation_trust_cap = { value = 5 }
+td_negotiation_leader_adjustment = { value = 10 }
+td_negotiation_broken_support = { value = -10 }

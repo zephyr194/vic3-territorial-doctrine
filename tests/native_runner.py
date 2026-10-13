@@ -37,6 +37,14 @@ class EventRunner:
     def __init__(self, rolls=(), *, country='SPA'):
         self.country = country
         self.bureaucracy = 1000
+        self.gold_reserves = 1000000
+        self.total_population = 10000000
+        self.legitimacy = 70
+        self.auto_negotiate = True
+        self.real_politics = False
+        self.windows = []
+        self.checking_leader = False
+        self.scoped_expirations = {}
         self.previous_scope = None
         self.definitions = {}
         self.values = {}
@@ -47,7 +55,9 @@ class EventRunner:
                     self.values[e.key] = e.value
         self.globals = {'td_system_enabled': 1}
         self.policy = policy_context()
-        self.groups = {f'ig:ig_{g}': {'variables': {}, 'ideologies': set()} for g in RULES['groups']}
+        self.groups = {f'ig:ig_{g}': {'variables': {}, 'ideologies': set(), 'modifiers': {},
+                        'approval': 0, 'clout': 1/8, 'leader_ideologies': set(), 'leader_exists': True}
+                       for g in RULES['groups']}
         self.owner_updates = 0
         self.variables = {'td_target': 'A', 'td_generation': 0, 'td_reason': 1, 'td_focus_epoch': 0, 'td_focus_count': 0}
         self.lists = {}
@@ -81,36 +91,71 @@ class EventRunner:
         return self.states['A']['incorporated']
 
     def storage(self):
+        for name,day in list(self.expirations.items()):
+            if day <= self.day:
+                self.variables.pop(name,None)
+                del self.expirations[name]
+        for (scope,name),day in list(self.scoped_expirations.items()):
+            if day <= self.day:
+                (self.groups[scope] if scope in self.groups else self.states[scope])['variables'].pop(name,None)
+                del self.scoped_expirations[scope,name]
         if self.scope in self.groups:
             return self.groups[self.scope]['variables']
         return self.states[self.scope]['variables'] if self.scope else self.variables
 
+    def modifier_storage(self, scope=None):
+        if scope in self.groups:
+            return self.groups[scope]['modifiers']
+        return self.states[scope]['modifiers'] if scope else self.modifiers
+
     def context(self):
+        for (scope,name),day in list(self.scoped_expirations.items()):
+            if day <= self.day:
+                (self.groups[scope] if scope in self.groups else self.states[scope])['variables'].pop(name,None)
+                del self.scoped_expirations[scope,name]
         for key, day in list(self.modifier_expirations.items()):
             if day <= self.day:
                 scope, modifier = key
-                (self.states[scope]['modifiers'] if scope else self.modifiers).pop(modifier, None)
+                self.modifier_storage(scope).pop(modifier, None)
                 del self.modifier_expirations[key]
         for key in [k for k, day in self.expirations.items() if day <= self.day]:
             self.variables.pop(key, None)
             del self.expirations[key]
         context = self.policy.copy()
         context.update({'var:' + k: v for k, v in self.variables.items()})
+        context.update({'root.var:' + k: v for k, v in self.variables.items()})
         context.update({'scope:' + k: v for k, v in self.saved.items()})
-        context.update({'is_player': True, 'bureaucracy': self.bureaucracy, 'authority': 1000, 'root': self.country,
-                        'is_subject':False,'is_revolutionary':False,'legitimacy':70,
+        planning = sum(RULES['negotiation']['planning_bureaucracy'] for kind in ('navy','railway') if 'td_'+kind+'_planning' in self.modifiers)
+        context.update({'is_player': True, 'bureaucracy': self.bureaucracy-planning, 'gold_reserves': self.gold_reserves, 'authority': 1000, 'root': self.country,
+                        'is_subject':False,'is_revolutionary':False,'legitimacy':self.legitimacy,
+                        'is_at_war':False,'scaled_debt':0,'total_population':self.total_population,
                         'has_modifier:country_bankruptcy':False,
                         'has_interest_marker_in_region:var:td_target.region':True,
                         'prev': self.previous_scope})
+        for name,key in self.variables.items():
+            if isinstance(key,str) and key in self.states:
+                state = self.states[key]
+                for prop in ('state_population','turmoil','devastation','owner','region'):
+                    context['var:'+name+'.'+prop] = state[prop]
+                for building in ('naval_base','railway'):
+                    context['var:'+name+'.state_has_building_type_levels:bt:building_'+building] = state.get('buildings',{}).get(building,0)
+        if self.previous_scope in self.groups:
+            context['prev.ig_clout'] = self.groups[self.previous_scope]['clout']
+            context.update({'prev.var:'+k:v for k,v in self.groups[self.previous_scope]['variables'].items()})
         context['has_claim:var:td_target.state_region'] = self.variables.get('td_target') in self.claims
         target = self.variables.get('td_target')
-        if target:
+        if target in self.states:
             state = self.states[target]
             context.update({'var:td_target.' + k: v for k, v in state.items() if k not in ('variables', 'modifiers')})
             context.update({'var:td_target.var:' + k: v for k, v in state['variables'].items()})
             context['var:td_accepted_share'] = self.variables.get('td_accepted_share', 1)
         context.update({'has_variable:' + k: True for k in self.variables})
         if self.scope in self.groups:
+            group = self.groups[self.scope]
+            context['ig_approval'] = group['approval'] + sum(
+                RULES['negotiation']['fulfilled_approval'] if name=='td_pledge_fulfilled' else
+                RULES['negotiation']['broken_approval'] if name=='td_pledge_broken' else 0
+                for name in group['modifiers'])
             context.update({'owner.var:' + k: v for k, v in self.variables.items()})
             for name in ('td_colonial_expansion_pull','td_colonial_admission_pull'):
                 context['owner.' + name] = formula(name, context, self.values)
@@ -120,6 +165,9 @@ class EventRunner:
             context.update({'var:' + k: v for k, v in self.storage().items()})
             context.update(owner=self.states[self.scope]['owner'], root=self.country)
             context['is_treaty_port'] = self.states[self.scope]['treaty_port']
+            context['is_coastal'] = self.states[self.scope].get('coastal',True)
+            for building in ('naval_base','railway'):
+                context['state_has_building_type_levels:bt:building_'+building] = self.states[self.scope].get('buildings',{}).get(building,0)
         return context
 
     def resolve(self, value):
@@ -127,6 +175,11 @@ class EventRunner:
             return self.previous_scope
         if value == 'prev.state_region':
             return self.states[self.previous_scope].get('state_region', self.previous_scope)
+        if value.startswith('prev.state_has_building_type_levels:bt:building_'):
+            return self.states[self.previous_scope].get('buildings',{}).get(value.split('building_')[-1],0)
+        if value.startswith('var:') and value.endswith('.state_region'):
+            key = self.variables[value[4:].split('.')[0]]
+            return self.states[key].get('state_region',key)
         if value == 'owner':
             return self.country if self.scope in self.groups or self.scope is None else self.states[self.scope]['owner']
         if value == 'root':
@@ -159,7 +212,7 @@ class EventRunner:
                 self.scope = None
                 result = self.check(e.value)
                 self.scope = previous_scope
-            elif e.key in ('var:td_target','var:td_project_target','var:td_success_state') and isinstance(e.value, list):
+            elif e.key.startswith('var:') and isinstance(e.value, list):
                 previous_scope = self.scope
                 self.scope = self.variables[e.key.removeprefix('var:')]
                 result = self.check(e.value)
@@ -167,7 +220,9 @@ class EventRunner:
             elif e.key == 'exists':
                 result = ((e.value.removeprefix('var:') in self.storage()) if e.value.startswith('var:')
                           else (e.value.removeprefix('scope:') in self.saved))
-                if result and e.value in ('var:td_target', 'var:td_project_target', 'var:td_success_state'):
+                if e.value == 'leader':
+                    result = self.scope in self.groups and self.groups[self.scope]['leader_exists']
+                if result and e.value.startswith('var:') and e.value.endswith(('target','state')):
                     result = self.storage()[e.value.removeprefix('var:')] in self.states
             elif e.key == 'has_claim':
                 region = self.resolve(e.value)
@@ -176,7 +231,12 @@ class EventRunner:
             elif e.key == 'has_global_variable':
                 result = e.value in self.globals
             elif e.key == 'has_ideology':
-                result = e.value.removeprefix('ideology:') in self.groups[self.scope]['ideologies']
+                result = e.value.removeprefix('ideology:') in self.groups[self.scope]['leader_ideologies' if self.checking_leader else 'ideologies']
+            elif e.key == 'leader' and isinstance(e.value,list):
+                old = self.checking_leader
+                self.checking_leader = True
+                result = self.check(e.value)
+                self.checking_leader = old
             elif e.key == 'is_interest_group_type':
                 result = self.scope == 'ig:' + e.value
             elif e.key == 'td_non_homeland_state_trigger':
@@ -275,7 +335,11 @@ class EventRunner:
                                             else formula(value, self.context(), self.values))
                     for unit, days in [('days', 1), ('months', 30), ('years', 365)]:
                         if unit in settings:
-                            self.expirations[name] = self.day + days * formula(settings[unit], self.context(), self.values)
+                            until = self.day + days * formula(settings[unit], self.context(), self.values)
+                            if self.scope:
+                                self.scoped_expirations[self.scope,name] = until
+                            else:
+                                self.expirations[name] = until
             elif e.key == 'change_variable':
                 settings = {v.key: v.value for v in e.value}
                 name = settings['name']
@@ -311,7 +375,10 @@ class EventRunner:
                         break
                     cut -= weight
             elif e.key == 'td_calculate_politics_effect':
-                self.variables['td_chance'] = 42  # Formula itself tested separately.
+                if self.real_politics:
+                    self.execute(self.definitions[e.key])
+                else:
+                    self.variables['td_chance'] = 42  # Explicit old probability fixture.
             elif e.key == 'td_refresh_target_effect':
                 pass  # Explicit population and eligibility fixtures.
             elif e.key in ('activate_law', 'deactivate_law'):
@@ -321,24 +388,24 @@ class EventRunner:
                 self.policy['has_law:' + e.value] = e.key == 'activate_law'
             elif e.key == 'add_modifier':
                 settings = ({'name':e.value} if isinstance(e.value, str) else {v.key:v.value for v in e.value})
-                modifiers = self.states[self.scope]['modifiers'] if self.scope else self.modifiers
+                modifiers = self.modifier_storage(self.scope)
                 modifiers[settings['name']] = formula(settings.get('multiplier', '1'), self.context(), self.values)
                 delay = sum(days * formula(settings[unit], self.context(), self.values)
                             for unit, days in [('days', 1), ('months', 30), ('years', 365)] if unit in settings)
                 if delay:
                     self.modifier_expirations[self.scope, settings['name']] = self.day + delay
             elif e.key == 'remove_modifier':
-                modifiers = self.states[self.scope]['modifiers'] if self.scope else self.modifiers
+                modifiers = self.modifier_storage(self.scope)
                 modifiers.pop(e.value, None)
                 self.modifier_expirations.pop((self.scope, e.value), None)
             elif e.key in ('add_radicals_in_state', 'add_loyalists_in_state'):
                 settings = {v.key: v.value for v in e.value}
                 self.states[self.scope].setdefault('political_changes', []).append(
                     (e.key, formula(settings['value'], self.context(), self.values)))
-            elif e.key in ('var:td_target', 'var:td_project_target', 'var:td_target.state_region','var:td_target.region'):
+            elif e.key.startswith('var:') and isinstance(e.value,list):
                 previous_scope = self.scope
                 self.scope = (self.states[self.variables['td_target']]['region'] if e.key == 'var:td_target.region'
-                              else self.variables['td_project_target' if e.key == 'var:td_project_target' else 'td_target'])
+                              else self.variables[e.key[4:].split('.')[0]])
                 self.execute(e.value)
                 self.scope = previous_scope
             elif e.key == 'add_claim':
@@ -352,6 +419,8 @@ class EventRunner:
                 self.states[self.scope]['incorporated'] = e.value == 'incorporated'
             elif e.key == 'change_infamy':
                 self.variables['infamy'] = self.variables.get('infamy', 0) + self.resolve(e.value)
+            elif e.key == 'add_treasury':
+                self.gold_reserves += formula(e.value,self.context(),self.values)
             elif e.key in self.definitions:
                 self.execute(self.definitions[e.key])
             else:
@@ -364,7 +433,24 @@ class EventRunner:
                 if e.key == 'immediate':
                     self.execute(e.value)
         else:
+            for e in event:
+                if e.key == 'immediate':
+                    self.execute(e.value)
+            if name == 'td.32' and self.auto_negotiate:
+                self.execute(self.definitions['td_resolve_round_effect'])
+                return
+            self.windows.append({'name':name,'saved':self.saved.copy()})
             self.notifications.append(name)
+
+    def choose(self, window, option):
+        self.saved = window['saved'].copy()
+        event = self.definitions[window['name']]
+        block = next(e.value for e in event if e.key == 'option' and any(v.key == 'name' and v.value == option for v in e.value))
+        condition = next((e.value for e in block if e.key == 'trigger'),[])
+        if not self.check(condition):
+            return False
+        self.execute([e for e in block if e.key not in ('name','trigger','ai_chance')])
+        return True
 
     def next_event(self):
         self.day, _, name, self.saved = heapq.heappop(self.queue)

@@ -6,7 +6,7 @@ td.1 = {
     hidden = yes
     immediate = {
         if = {
-            limit = { td_feature_enabled_trigger = yes has_variable = td_bill scope:td_bill_run = var:td_bill_generation }
+            limit = { td_feature_enabled_trigger = yes has_variable = td_bill scope:td_bill_run = var:td_bill_generation scope:td_round_run = var:td_round_epoch NOT = { has_variable = td_waiting_round } }
             set_variable = { name = td_target value = var:td_bill_target }
             if = {
                 limit = { td_bill_target_valid_trigger = no td_can_legislate_trigger = yes }
@@ -20,17 +20,15 @@ td.1 = {
             }
             else = {
                 td_calculate_politics_effect = yes
-                random_list = {
-                    1 = { modifier = { multiply = var:td_chance } change_variable = { name = td_successes add = 1 } }
-                    1 = { modifier = { multiply = td_failure_weight } change_variable = { name = td_failures add = 1 } }
+                change_variable = { name = td_round_epoch add = 1 }
+                save_scope_value_as = { name = td_round_run value = var:td_round_epoch }
+                set_variable = td_waiting_round
+                if = { limit = { is_player = yes } td_open_negotiation_effect = yes }
+                else = {
+                    if = { limit = { td_can_pledge_navy_trigger = yes } td_sign_navy_pledge_effect = yes }
+                    if = { limit = { td_can_pledge_railway_trigger = yes } td_sign_railway_pledge_effect = yes }
+                    td_resolve_round_effect = yes
                 }
-                if = { limit = { var:td_successes >= td_bill_successes } td_pass_bill_effect = yes }
-                else_if = {
-                    limit = { var:td_failures >= td_bill_failures }
-                    td_cancel_bill_effect = yes
-                    trigger_event = td.13
-                }
-                else = { trigger_event = { id = td.1 days = td_bill_round_days } }
             }
         }
     }
@@ -95,7 +93,6 @@ td.20 = {
     }
     option = { name = td.reason.colonial_development trigger = { td_can_start_bill_trigger = yes td_colonial_reason_valid_trigger = yes } set_variable = { name = td_reason value = 6 } td_open_review_effect = yes }
     option = { name = td.reason.regional_interest trigger = { td_can_start_bill_trigger = yes td_regional_reason_valid_trigger = yes } set_variable = { name = td_reason value = 7 } td_open_review_effect = yes }
-    option = { name = td.designate_focus trigger = { td_can_designate_focus_trigger = yes } td_designate_focus_effect = yes td_open_target_menu_effect = yes ai_chance = { base = 0 } }
     option = { name = td.cancel_menu remove_variable = td_pending_bill ai_chance = { base = 0 } }
 }
 td.21 = {
@@ -171,8 +168,8 @@ td.28 = {
                     remove_modifier = td_annual_integration
                     remove_modifier = td_requires_admission
                     set_state_type = incorporated
+                    save_scope_as = td_notice_target
                 }
-                td_award_admission_success_effect = yes
                 td_end_project_effect = yes
                 trigger_event = td.15
             }
@@ -219,4 +216,27 @@ td.31 = {
     desc = td.31.d
     flavor = td.flavor
     option = { name = td.close remove_variable = td_pending_bill }
+}
+
+# Each dialog carries the bill generation inherited from its round event.
+td.32 = {
+    type = country_event
+    title = td.32.t
+    desc = td.32.d
+    flavor = td.flavor
+    immediate = { if = { limit = { td_active_negotiation_trigger = yes } td_calculate_politics_effect = yes } }
+    option = { name = td.negotiate.continue trigger = { td_active_negotiation_trigger = yes td_can_legislate_trigger = yes } td_resolve_round_effect = yes }
+    option = { name = td.negotiate.navy trigger = { td_active_negotiation_trigger = yes td_can_pledge_navy_trigger = yes } td_sign_navy_pledge_effect = yes trigger_event = td.32 }
+    option = { name = td.negotiate.railway trigger = { td_active_negotiation_trigger = yes td_can_pledge_railway_trigger = yes } td_sign_railway_pledge_effect = yes trigger_event = td.32 }
+    option = { name = td.negotiate.details trigger = { td_active_negotiation_trigger = yes } trigger_event = td.33 }
+    option = { name = td.negotiate.withdraw trigger = { td_active_negotiation_trigger = yes } td_cancel_bill_effect = yes trigger_event = td.14 ai_chance = { base = 0 } }
+    option = { name = td.close ai_chance = { base = 0 } }
+}
+td.33 = {
+    type = country_event
+    title = td.33.t
+    desc = td.33.d
+    flavor = td.flavor
+    option = { name = td.negotiate.return trigger = { td_active_negotiation_trigger = yes } trigger_event = td.32 }
+    option = { name = td.close ai_chance = { base = 0 } }
 }
