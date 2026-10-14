@@ -1,0 +1,2 @@
+﻿td_conscription_high_trust = { state_conscription_rate_mult = 0.1 }
+td_conscription_low_trust = { state_conscription_rate_mult = -0.1 }

@@ -40,6 +40,15 @@ class EventRunner:
         self.gold_reserves = 1000000
         self.total_population = 10000000
         self.legitimacy = 70
+        self.tax_level = "medium"
+        self.weekly_balance = 1000
+        self.weekly_expenses = 5000
+        self.bureaucracy_usage = 1000
+        self.institutions = {}
+        self.at_war = False
+        self.wars = {}
+        self.attacker_warleaders = {}
+        self.participants = {}
         self.auto_negotiate = True
         self.real_politics = False
         self.windows = []
@@ -128,10 +137,16 @@ class EventRunner:
         planning = sum(RULES['negotiation']['planning_bureaucracy'] for kind in ('navy','railway') if 'td_'+kind+'_planning' in self.modifiers)
         context.update({'is_player': True, 'bureaucracy': self.bureaucracy-planning, 'gold_reserves': self.gold_reserves, 'authority': 1000, 'root': self.country,
                         'is_subject':False,'is_revolutionary':False,'legitimacy':self.legitimacy,
-                        'is_at_war':False,'scaled_debt':0,'total_population':self.total_population,
+                        'is_at_war':self.at_war,'scaled_debt':0,'total_population':self.total_population,
                         'has_modifier:country_bankruptcy':False,
                         'has_interest_marker_in_region:var:td_target.region':True,
                         'prev': self.previous_scope})
+        tax_ranks = {name:rank for rank,name in enumerate(('very_low','low','medium','high','very_high'),1)}
+        context.update(tax_ranks)
+        context.update(tax_level=tax_ranks[self.tax_level], net_total_income=self.weekly_balance, total_expenses=self.weekly_expenses, bureaucracy_usage=self.bureaucracy_usage)
+        for institution in ('institution_schools','institution_health_system'):
+            context['has_institution:'+institution] = institution in self.institutions
+            context['institution_investment_level:'+institution] = self.institutions.get(institution,0)
         for name,key in self.variables.items():
             if isinstance(key,str) and key in self.states:
                 state = self.states[key]
@@ -162,6 +177,7 @@ class EventRunner:
             context.update({'var:' + k: v for k, v in self.storage().items()})
             context['owner'] = self.country
         elif self.scope:
+            context.update({'owner.var:' + k: v for k, v in self.variables.items()})
             context.update({'var:' + k: v for k, v in self.storage().items()})
             context.update(owner=self.states[self.scope]['owner'], root=self.country)
             context['is_treaty_port'] = self.states[self.scope]['treaty_port']
@@ -224,6 +240,21 @@ class EventRunner:
                     result = self.scope in self.groups and self.groups[self.scope]['leader_exists']
                 if result and e.value.startswith('var:') and e.value.endswith(('target','state')):
                     result = self.storage()[e.value.removeprefix('var:')] in self.states
+            elif e.key == 'any_scope_war':
+                previous, previous_prev = self.scope, self.previous_scope
+                result = False
+                for war in self.wars:
+                    if self.country not in self.participants.get(war,set()):
+                        continue
+                    self.scope, self.previous_scope = war, self.country
+                    if self.check(e.value):
+                        result = True
+                        break
+                self.scope, self.previous_scope = previous, previous_prev
+            elif e.key == 'attacker_warleader':
+                result = self.attacker_warleaders[self.scope] == self.resolve(e.value)
+            elif e.key == 'has_institution':
+                result = e.value in self.institutions
             elif e.key == 'has_claim':
                 region = self.resolve(e.value)
                 result = region in self.claims or any(
@@ -419,6 +450,8 @@ class EventRunner:
                 self.states[self.scope]['incorporated'] = e.value == 'incorporated'
             elif e.key == 'change_infamy':
                 self.variables['infamy'] = self.variables.get('infamy', 0) + self.resolve(e.value)
+            elif e.key == 'set_tax_level':
+                self.tax_level = e.value  # Actual vanilla revenue response is unmodeled.
             elif e.key == 'add_treasury':
                 self.gold_reserves += formula(e.value,self.context(),self.values)
             elif e.key in self.definitions:

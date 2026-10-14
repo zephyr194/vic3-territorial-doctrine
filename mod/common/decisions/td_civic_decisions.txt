@@ -1,0 +1,56 @@
+﻿td_enable_fiscal_accounting = {
+    is_shown = { is_player = yes td_feature_enabled_trigger = yes NOT = { has_global_variable = td_fiscal_enabled } }
+    possible = { td_feature_enabled_trigger = yes NOT = { has_global_variable = td_fiscal_enabled } }
+    when_taken = {
+        if = { limit = { td_feature_enabled_trigger = yes NOT = { has_global_variable = td_fiscal_enabled } }
+            set_global_variable = td_fiscal_enabled
+            every_country = { td_refresh_country_civic_effect = yes }
+        }
+    }
+    ai_chance = { value = 0 }
+}
+td_enable_recruitment_accounting = {
+    is_shown = { is_player = yes td_feature_enabled_trigger = yes NOT = { has_global_variable = td_recruitment_enabled } }
+    possible = { td_feature_enabled_trigger = yes NOT = { has_global_variable = td_recruitment_enabled } }
+    when_taken = {
+        if = { limit = { td_feature_enabled_trigger = yes NOT = { has_global_variable = td_recruitment_enabled } }
+            set_global_variable = td_recruitment_enabled
+            every_country = { td_refresh_country_civic_effect = yes }
+        }
+    }
+    ai_chance = { value = 0 }
+}
+td_enable_services_accounting = {
+    is_shown = { is_player = yes td_feature_enabled_trigger = yes NOT = { has_global_variable = td_services_enabled } }
+    possible = { td_feature_enabled_trigger = yes NOT = { has_global_variable = td_services_enabled } }
+    when_taken = {
+        if = { limit = { td_feature_enabled_trigger = yes NOT = { has_global_variable = td_services_enabled } }
+            set_global_variable = td_services_enabled
+            every_country = { td_refresh_country_civic_effect = yes }
+        }
+    }
+    ai_chance = { value = 0 }
+}
+td_civic_accounts = {
+    is_shown = { is_player = yes td_civic_any_enabled_trigger = yes }
+    when_taken = { td_refresh_country_civic_effect = yes trigger_event = td.40 }
+    ai_chance = { value = 0 }
+}
+td_raise_budget_tax = {
+    is_shown = { is_player = yes td_feature_enabled_trigger = yes has_global_variable = td_fiscal_enabled }
+    possible = { td_can_raise_budget_tax_trigger = yes }
+    when_taken = { td_raise_budget_tax_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_lower_budget_tax = {
+    is_shown = { is_player = yes td_feature_enabled_trigger = yes has_global_variable = td_fiscal_enabled }
+    possible = { td_can_lower_budget_tax_trigger = yes }
+    when_taken = { td_lower_budget_tax_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_return_peace_budget = {
+    is_shown = { is_player = yes td_civic_any_enabled_trigger = yes has_variable = td_expansion_program }
+    possible = { NOT = { AND = { has_variable = td_bill var:td_bill = 1 } } }
+    when_taken = { td_return_peace_budget_effect = yes }
+    ai_chance = { value = 0 }
+}

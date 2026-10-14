@@ -1,5 +1,6 @@
 # STATE scope. Ownership changes invalidate approval without changing homelands.
 td_update_state_owner_effect = {
+    td_maybe_clear_conscription_state_effect = yes
     if = {
         limit = { td_feature_enabled_trigger = yes }
         if = {

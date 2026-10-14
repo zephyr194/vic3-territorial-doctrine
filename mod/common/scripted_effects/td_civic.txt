@@ -1,0 +1,146 @@
+﻿td_snapshot_civic_bill_effect = {
+    set_variable = { name = td_bill_tax_baseline value = td_tax_rank }
+    set_variable = { name = td_bill_education_baseline value = td_education_level }
+    set_variable = { name = td_bill_health_baseline value = td_health_level }
+}
+td_refresh_civic_accounts_effect = {
+    if = { limit = { td_civic_any_enabled_trigger = yes }
+        if = { limit = { NOT = { has_variable = td_service_reference_education } }
+            set_variable = { name = td_service_reference_education value = td_education_level }
+            set_variable = { name = td_service_reference_health value = td_health_level }
+        }
+        set_variable = { name = td_civic_phase value = 0 }
+        if = { limit = { td_civic_expansion_phase_trigger = yes } set_variable = { name = td_civic_phase value = 1 } }
+        set_variable = { name = td_account_fiscal_enabled value = 0 }
+        set_variable = { name = td_account_recruitment_enabled value = 0 }
+        set_variable = { name = td_account_services_enabled value = 0 }
+        if = { limit = { has_global_variable = td_fiscal_enabled } set_variable = { name = td_account_fiscal_enabled value = 1 } }
+        if = { limit = { has_global_variable = td_recruitment_enabled } set_variable = { name = td_account_recruitment_enabled value = 1 } }
+        if = { limit = { has_global_variable = td_services_enabled } set_variable = { name = td_account_services_enabled value = 1 } }
+        set_variable = { name = td_weekly_balance value = net_total_income }
+        set_variable = { name = td_weekly_expenses value = total_expenses }
+        set_variable = { name = td_weekly_funding_gap value = { value = net_total_income multiply = -1 max = 0 } }
+        set_variable = { name = td_budget_tax_rank value = td_tax_rank }
+        set_variable = { name = td_budget_tax_law value = 0 }
+        if = { limit = { has_law = law_type:law_land_based_taxation } set_variable = { name = td_budget_tax_law value = 1 } }
+        if = { limit = { has_law = law_type:law_per_capita_based_taxation } set_variable = { name = td_budget_tax_law value = 2 } }
+        if = { limit = { has_law = law_type:law_consumption_based_taxation } set_variable = { name = td_budget_tax_law value = 3 } }
+        if = { limit = { has_law = law_type:law_proportional_taxation } set_variable = { name = td_budget_tax_law value = 4 } }
+        if = { limit = { has_law = law_type:law_graduated_taxation } set_variable = { name = td_budget_tax_law value = 5 } }
+        set_variable = { name = td_service_education value = td_education_level }
+        set_variable = { name = td_service_health value = td_health_level }
+        set_variable = { name = td_service_education_gap value = { value = var:td_service_reference_education subtract = td_education_level max = 0 } }
+        set_variable = { name = td_service_health_gap value = { value = var:td_service_reference_health subtract = td_health_level max = 0 } }
+        set_variable = { name = td_bureaucracy_balance value = bureaucracy }
+        set_variable = { name = td_bureaucracy_gap value = { value = bureaucracy multiply = -1 max = 0 } }
+        set_variable = { name = td_service_pressure_percent value = { value = var:td_bureaucracy_gap divide = { value = bureaucracy_usage max = 1 } multiply = 100 min = 100 } }
+        set_variable = { name = td_recruitment_active value = 0 }
+        set_variable = { name = td_recruitment_percent value = 0 }
+        if = { limit = { td_conscription_active_trigger = yes }
+            set_variable = { name = td_recruitment_active value = 1 }
+            set_variable = { name = td_recruitment_percent value = { value = td_mobilization_magnitude min = 1 max = -1 multiply = 10.0 } }
+        }
+    }
+}
+td_clear_conscription_state_effect = {
+    remove_modifier = td_conscription_high_trust
+    remove_modifier = td_conscription_low_trust
+}
+td_maybe_clear_conscription_state_effect = {
+    if = { limit = { OR = { NOT = { has_variable = td_recorded_owner } NOT = { var:td_recorded_owner = owner } } } td_clear_conscription_state_effect = yes }
+}
+td_refresh_country_civic_effect = {
+    every_scope_state = { td_clear_conscription_state_effect = yes }
+    if = { limit = { td_civic_any_enabled_trigger = yes }
+        td_refresh_civic_accounts_effect = yes
+        if = { limit = { td_conscription_active_trigger = yes }
+            if = { limit = { legitimacy > 50 }
+                set_variable = { name = td_mobilization_scale value = { value = td_mobilization_magnitude min = 1 max = 0 } }
+                every_scope_state = { if = { limit = { is_treaty_port = no } add_modifier = { name = td_conscription_high_trust multiplier = owner.var:td_mobilization_scale } } }
+            }
+            else_if = { limit = { legitimacy < 50 }
+                set_variable = { name = td_mobilization_scale value = { value = td_mobilization_magnitude multiply = -1 min = 1 max = 0 } }
+                every_scope_state = { if = { limit = { is_treaty_port = no } add_modifier = { name = td_conscription_low_trust multiplier = owner.var:td_mobilization_scale } } }
+            }
+        }
+    }
+}
+td_civic_bill_scores_effect = {
+    every_interest_group = {
+        set_variable = { name = td_component_fiscal value = 0 }
+        set_variable = { name = td_component_services value = 0 }
+    }
+    if = { limit = { td_civic_any_enabled_trigger = yes }
+        td_refresh_civic_accounts_effect = yes
+        if = { limit = { has_variable = td_bill_tax_baseline has_global_variable = td_fiscal_enabled }
+            set_variable = { name = td_bill_tax_pressure value = td_civic_tax_pressure }
+            if = { limit = { var:td_budget_tax_law = 1 }
+                ig:ig_landowners = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+                ig:ig_rural_folk = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+            }
+            if = { limit = { var:td_budget_tax_law = 2 }
+                ig:ig_trade_unions = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+                ig:ig_rural_folk = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+                ig:ig_petty_bourgeoisie = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+            }
+            if = { limit = { var:td_budget_tax_law = 3 }
+                ig:ig_trade_unions = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+                ig:ig_rural_folk = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+                ig:ig_petty_bourgeoisie = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+            }
+            if = { limit = { var:td_budget_tax_law = 4 }
+                ig:ig_landowners = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+                ig:ig_industrialists = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+                ig:ig_trade_unions = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+                ig:ig_petty_bourgeoisie = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+            }
+            if = { limit = { var:td_budget_tax_law = 5 }
+                ig:ig_landowners = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+                ig:ig_industrialists = { set_variable = { name = td_component_fiscal value = { value = owner.var:td_bill_tax_pressure multiply = -1 } } }
+            }
+        }
+        if = { limit = { has_variable = td_bill_education_baseline has_global_variable = td_services_enabled }
+            set_variable = { name = td_bill_education_cuts value = td_civic_education_cuts }
+            set_variable = { name = td_bill_health_cuts value = td_civic_health_cuts }
+            ig:ig_intelligentsia = { set_variable = { name = td_component_services value = { value = owner.var:td_bill_education_cuts multiply = td_civic_service_step_score multiply = -1 } } }
+            ig:ig_trade_unions = { set_variable = { name = td_component_services value = { value = owner.var:td_bill_health_cuts multiply = td_civic_service_step_score multiply = -1 } } }
+            if = { limit = { bureaucracy < 0 }
+                ig:ig_intelligentsia = { change_variable = { name = td_component_services subtract = td_civic_bureaucracy_pressure_score } }
+                ig:ig_trade_unions = { change_variable = { name = td_component_services subtract = td_civic_bureaucracy_pressure_score } }
+                ig:ig_petty_bourgeoisie = { change_variable = { name = td_component_services subtract = td_civic_bureaucracy_pressure_score } }
+            }
+        }
+    }
+    every_interest_group = {
+        set_variable = { name = td_component_services value = { value = var:td_component_services max = { value = td_civic_component_cap multiply = -1 } } }
+        change_variable = { name = td_score add = var:td_component_fiscal add = var:td_component_services }
+    }
+}
+td_raise_budget_tax_effect = {
+    if = { limit = { td_can_raise_budget_tax_trigger = yes }
+        if = { limit = { tax_level = very_low } set_tax_level = low }
+        else_if = { limit = { tax_level = low } set_tax_level = medium }
+        else_if = { limit = { tax_level = medium } set_tax_level = high }
+        else_if = { limit = { tax_level = high } set_tax_level = very_high }
+        set_variable = { name = td_tax_adjustment_wait days = 30 }
+        td_refresh_country_civic_effect = yes
+        if = { limit = { has_variable = td_bill exists = var:td_bill_target } td_calculate_politics_effect = yes }
+    }
+}
+td_lower_budget_tax_effect = {
+    if = { limit = { td_can_lower_budget_tax_trigger = yes }
+        if = { limit = { tax_level = very_high } set_tax_level = high }
+        else_if = { limit = { tax_level = high } set_tax_level = medium }
+        else_if = { limit = { tax_level = medium } set_tax_level = low }
+        else_if = { limit = { tax_level = low } set_tax_level = very_low }
+        set_variable = { name = td_tax_adjustment_wait days = 30 }
+        td_refresh_country_civic_effect = yes
+        if = { limit = { has_variable = td_bill exists = var:td_bill_target } td_calculate_politics_effect = yes }
+    }
+}
+td_return_peace_budget_effect = {
+    if = { limit = { td_civic_any_enabled_trigger = yes has_variable = td_expansion_program NOT = { AND = { has_variable = td_bill var:td_bill = 1 } } }
+        remove_variable = td_expansion_program
+        td_refresh_country_civic_effect = yes
+    }
+}

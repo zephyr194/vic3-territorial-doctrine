@@ -109,8 +109,11 @@ def roundtrip(runner, *, rolls=()):
     """Reload a fresh runner from only persisted test state, not Python objects."""
     fields = ('variables','states','policy','globals','saved','expirations',
               'modifiers','day','serial','bureaucracy','notifications','gold_reserves',
-              'auto_negotiate','real_politics','total_population','legitimacy','windows')
+              'auto_negotiate','real_politics','total_population','legitimacy','windows',
+              'tax_level','weekly_balance','weekly_expenses','bureaucracy_usage','institutions','at_war')
     payload = {name:getattr(runner,name) for name in fields}
+    payload.update(wars=runner.wars, attacker_warleaders=runner.attacker_warleaders,
+                   participants={k:sorted(v) for k,v in runner.participants.items()})
     payload.update(lists={k:sorted(v) for k,v in runner.lists.items()},
                    claims=sorted(runner.claims), queue=runner.queue,
                    modifier_expirations=[[scope,name,day] for (scope,name),day in runner.modifier_expirations.items()],
@@ -130,6 +133,9 @@ def roundtrip(runner, *, rolls=()):
     restored.rolls = iter(rolls)
     for name in fields:
         setattr(restored,name,saved[name])
+    restored.wars = saved['wars']
+    restored.attacker_warleaders = saved['attacker_warleaders']
+    restored.participants = {k:set(v) for k,v in saved['participants'].items()}
     restored.inputs = runner.inputs.copy()
     restored.claims = set(saved['claims'])
     restored.lists = {k:set(v) for k,v in saved['lists'].items()}

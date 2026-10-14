@@ -71,6 +71,8 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
                     errors.append(f'{path}:{number}: duplicate key {m[1]}')
                 else:
                     keys[m[1]] = path
+                    if not re.search(r':\d+\s+"VTD ', line):
+                        errors.append(f'{path}:{number}: missing VTD source prefix')
         localizations[lang] = keys
     for lang, keys in localizations.items():
         if keys.keys() != localizations['english'].keys():
@@ -131,6 +133,7 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
                                 'law_monarchy', 'law_autocracy', 'law_single_party_state', 'law_census_suffrage',
                                 'law_universal_suffrage', 'law_presidential_republic', 'law_parliamentary_republic',
                                 'building_naval_base', 'building_railway', 'railways',
+                                'institution_schools', 'institution_health_system',
                                 'law_multicultural', 'law_total_separation', 'ideology_jingoist', 'ideology_pacifist',
                                 'acceptance_status_5', 'law_no_colonial_affairs', 'law_colonial_resettlement',
                                 'law_colonial_exploitation', 'egalitarianism', 'human_rights',

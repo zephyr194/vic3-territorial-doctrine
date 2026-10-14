@@ -1,0 +1,25 @@
+﻿td_tax_rank = {
+    value = 0
+    if = { limit = { tax_level = very_low } value = 1 }
+    if = { limit = { tax_level = low } value = 2 }
+    if = { limit = { tax_level = medium } value = 3 }
+    if = { limit = { tax_level = high } value = 4 }
+    if = { limit = { tax_level = very_high } value = 5 }
+}
+td_education_level = {
+    value = 0
+    if = { limit = { has_institution = institution_schools } value = institution_investment_level:institution_schools }
+}
+td_health_level = {
+    value = 0
+    if = { limit = { has_institution = institution_health_system } value = institution_investment_level:institution_health_system }
+}
+td_civic_tax_step_score = { value = 5 }
+td_civic_service_step_score = { value = 5 }
+td_civic_bureaucracy_pressure_score = { value = 5 }
+td_civic_component_cap = { value = 10 }
+td_civic_tax_delta = { value = td_tax_rank subtract = var:td_bill_tax_baseline }
+td_civic_tax_pressure = { value = td_civic_tax_delta max = 0 multiply = td_civic_tax_step_score min = td_civic_component_cap }
+td_civic_education_cuts = { value = var:td_bill_education_baseline subtract = td_education_level max = 0 }
+td_civic_health_cuts = { value = var:td_bill_health_baseline subtract = td_health_level max = 0 }
+td_mobilization_magnitude = { value = legitimacy subtract = 50 divide = 50 }

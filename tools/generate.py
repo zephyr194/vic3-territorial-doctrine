@@ -2,6 +2,7 @@
 """Generate shared laws, IG opinions and balance values without dependencies."""
 import argparse
 import json
+import re
 from pathlib import Path
 import struct
 import sys
@@ -12,6 +13,7 @@ from tools.policy_assets import assets
 from tools.development_assets import assets as development_assets
 from tools.success_assets import assets as success_assets
 from tools.bargaining_assets import assets as bargaining_assets
+from tools.civic_assets import assets as civic_assets
 from tools.law_text import doctrine_description, group_description
 from territorial_doctrine.model import RULES, DOCTRINES  # noqa: E402
 
@@ -44,6 +46,8 @@ def outputs() -> dict[Path, bytes]:
     out: dict[Path, bytes] = {}
 
     def put(path: str, data: str | bytes):
+        if path.endswith('.yml') and isinstance(data, str):
+            data = re.sub(r'^(\s+[\w.]+:\d+\s+")(?!(?:VTD ))', r'\1VTD ', data, flags=re.M)
         encoding = 'utf-8' if path.endswith('.json') else 'utf-8-sig'
         out[ROOT / 'mod' / path] = data.encode(encoding) if isinstance(data, str) else data
 
@@ -194,7 +198,7 @@ td_requires_admission = {{ state_disallow_incorporation = yes }}
         'name': 'Territorial Doctrine',
         'id': 'territorial_doctrine', 'version': RULES['version'],
         'game_id': 'victoria3', 'supported_game_version': '1.13.*',
-        'short_description': 'Opt-in territorial legislation, colonial policy and war mandates',
+        'short_description': 'VTD: domestic territorial bargaining, budgets and accountable commitments',
         'tags': ['Gameplay', 'Politics'], 'relationships': [],
         'game_custom_data': {'multiplayer_synchronized': True}
     }
@@ -207,6 +211,13 @@ td_requires_admission = {{ state_disallow_incorporation = yes }}
         put(path, content)
     for path, content in bargaining_assets().items():
         put(path, content)
+    for path, content in civic_assets().items():
+        put(path, content)
+    # Prefix hand-maintained catalogs too, keeping regeneration idempotent.
+    for language in RULES['localization']['translated']:
+        for path in (ROOT / 'mod/localization' / language).glob('*.yml'):
+            if path not in out:
+                put(str(path.relative_to(ROOT / 'mod')), path.read_text(encoding='utf-8-sig'))
     # English is the source fallback; other game languages use identical keys/text
     # until a native translation is supplied. Never alter the game's language setting.
     english = {p.name: content.decode('utf-8-sig') for p, content in out.items()

@@ -1,1 +1,1 @@
-"""Offline reference model for Territorial Doctrine v0.7."""
+"""Offline reference model for Territorial Doctrine v0.8."""

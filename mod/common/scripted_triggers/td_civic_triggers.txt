@@ -1,0 +1,33 @@
+﻿td_civic_any_enabled_trigger = {
+    td_feature_enabled_trigger = yes
+    OR = { has_global_variable = td_fiscal_enabled has_global_variable = td_recruitment_enabled has_global_variable = td_services_enabled }
+}
+td_civic_expansion_phase_trigger = {
+    td_expansion_doctrine_trigger = yes
+    OR = { has_variable = td_expansion_program AND = { has_variable = td_bill var:td_bill = 1 } }
+}
+td_conscription_active_trigger = {
+    td_feature_enabled_trigger = yes
+    has_global_variable = td_recruitment_enabled
+    has_variable = td_expansion_program
+    td_expansion_doctrine_trigger = yes
+    is_at_war = yes
+    any_scope_war = { attacker_warleader = prev }
+}
+td_can_raise_budget_tax_trigger = {
+    td_feature_enabled_trigger = yes
+    has_global_variable = td_fiscal_enabled
+    NOT = { has_variable = td_tax_adjustment_wait }
+    NOT = { tax_level = very_high }
+    net_total_income < 0
+    NOT = { has_modifier = country_bankruptcy }
+}
+td_can_lower_budget_tax_trigger = {
+    td_feature_enabled_trigger = yes
+    has_global_variable = td_fiscal_enabled
+    NOT = { has_variable = td_tax_adjustment_wait }
+    NOT = { tax_level = very_low }
+    net_total_income > 0
+    gold_reserves > 0
+    NOT = { has_modifier = country_bankruptcy }
+}

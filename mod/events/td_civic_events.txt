@@ -1,0 +1,8 @@
+﻿td.40 = {
+    type = country_event
+    title = td.40.t
+    desc = td.40.d
+    flavor = td.flavor
+    immediate = { if = { limit = { td_civic_any_enabled_trigger = yes } td_refresh_civic_accounts_effect = yes } }
+    option = { name = td.close ai_chance = { base = 0 } }
+}

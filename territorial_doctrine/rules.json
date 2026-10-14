@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0-alpha.1",
+  "version": "0.8.0-alpha.1",
   "doctrines": {
     "status_quo": {
       "zh": "领土现状主义",
@@ -497,5 +497,14 @@
   },
   "legacy_scopes": [
     "td_mandate_war"
-  ]
+  ],
+  "civic_accounting": {
+    "expansion_program_years": 3,
+    "conscription_max_multiplier": 0.1,
+    "tax_step_score": 5,
+    "service_step_score": 5,
+    "bureaucracy_pressure_score": 5,
+    "component_cap": 10,
+    "tax_adjustment_days": 30
+  }
 }
