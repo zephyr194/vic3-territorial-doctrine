@@ -1,0 +1,427 @@
+﻿td_clear_religious_schools_allocation_effect = {
+    if = { limit = { has_variable = td_bill has_variable = td_bill_religious_schools var:td_religious_schools_bill_generation = var:td_bill_generation }
+        remove_variable = td_bill_religious_schools
+        change_variable = { name = td_bill_allocation_count subtract = 1 }
+    }
+    remove_modifier = td_religious_schools_planning
+    remove_variable = td_religious_schools_region
+    remove_variable = td_religious_schools_target
+    remove_variable = td_religious_schools_bill_generation
+    remove_variable = td_religious_schools_ratified
+    remove_variable = td_religious_schools_started
+    remove_variable = td_religious_schools_deadline
+    remove_variable = td_religious_schools_acquisition_deadline
+    remove_variable = td_religious_schools_survey_paid
+    remove_variable = td_religious_schools_baseline
+    remove_variable = td_religious_schools_faith
+    remove_variable = td_pending_religious_schools
+}
+td_sign_religious_schools_allocation_effect = {
+    if = { limit = { td_can_allocate_religious_schools_trigger = yes }
+        set_variable = { name = td_target value = var:td_bill_target }
+        if = { limit = { td_bill_target_valid_trigger = yes }
+            set_variable = { name = td_religious_schools_survey_paid value = td_pledge_survey_cost }
+            add_treasury = { value = var:td_religious_schools_survey_paid multiply = -1 }
+            add_modifier = td_religious_schools_planning
+            set_variable = td_pending_religious_schools
+            set_variable = td_bill_religious_schools
+            change_variable = { name = td_bill_allocation_count add = 1 }
+            set_variable = { name = td_religious_schools_bill_generation value = var:td_bill_generation }
+            set_variable = { name = td_religious_schools_region value = var:td_bill_target.state_region }
+            set_variable = { name = td_religious_schools_baseline value = institution_investment_level:institution_schools }
+            set_variable = { name = td_religious_schools_faith value = religion }
+            if = { limit = { var:td_bill_target = { owner = root } } set_variable = { name = td_religious_schools_target value = var:td_bill_target } }
+            td_calculate_politics_effect = yes
+        }
+    }
+}
+td_breach_religious_schools_allocation_effect = {
+    ig:ig_devout = { remove_modifier = td_pledge_broken add_modifier = { name = td_pledge_broken years = 5 } set_variable = { name = td_broken_pledge years = 5 } }
+    td_clear_religious_schools_allocation_effect = yes
+    trigger_event = td.18
+}
+td_clear_public_schools_allocation_effect = {
+    if = { limit = { has_variable = td_bill has_variable = td_bill_public_schools var:td_public_schools_bill_generation = var:td_bill_generation }
+        remove_variable = td_bill_public_schools
+        change_variable = { name = td_bill_allocation_count subtract = 1 }
+    }
+    remove_modifier = td_public_schools_planning
+    remove_variable = td_public_schools_region
+    remove_variable = td_public_schools_target
+    remove_variable = td_public_schools_bill_generation
+    remove_variable = td_public_schools_ratified
+    remove_variable = td_public_schools_started
+    remove_variable = td_public_schools_deadline
+    remove_variable = td_public_schools_acquisition_deadline
+    remove_variable = td_public_schools_survey_paid
+    remove_variable = td_public_schools_baseline
+    remove_variable = td_pending_public_schools
+}
+td_sign_public_schools_allocation_effect = {
+    if = { limit = { td_can_allocate_public_schools_trigger = yes }
+        set_variable = { name = td_target value = var:td_bill_target }
+        if = { limit = { td_bill_target_valid_trigger = yes }
+            set_variable = { name = td_public_schools_survey_paid value = td_pledge_survey_cost }
+            add_treasury = { value = var:td_public_schools_survey_paid multiply = -1 }
+            add_modifier = td_public_schools_planning
+            set_variable = td_pending_public_schools
+            set_variable = td_bill_public_schools
+            change_variable = { name = td_bill_allocation_count add = 1 }
+            set_variable = { name = td_public_schools_bill_generation value = var:td_bill_generation }
+            set_variable = { name = td_public_schools_region value = var:td_bill_target.state_region }
+            set_variable = { name = td_public_schools_baseline value = institution_investment_level:institution_schools }
+            if = { limit = { var:td_bill_target = { owner = root } } set_variable = { name = td_public_schools_target value = var:td_bill_target } }
+            td_calculate_politics_effect = yes
+        }
+    }
+}
+td_breach_public_schools_allocation_effect = {
+    ig:ig_intelligentsia = { remove_modifier = td_pledge_broken add_modifier = { name = td_pledge_broken years = 5 } set_variable = { name = td_broken_pledge years = 5 } }
+    td_clear_public_schools_allocation_effect = yes
+    trigger_event = td.18
+}
+td_clear_health_services_allocation_effect = {
+    if = { limit = { has_variable = td_bill has_variable = td_bill_health_services var:td_health_services_bill_generation = var:td_bill_generation }
+        remove_variable = td_bill_health_services
+        change_variable = { name = td_bill_allocation_count subtract = 1 }
+    }
+    remove_modifier = td_health_services_planning
+    remove_variable = td_health_services_region
+    remove_variable = td_health_services_target
+    remove_variable = td_health_services_bill_generation
+    remove_variable = td_health_services_ratified
+    remove_variable = td_health_services_started
+    remove_variable = td_health_services_deadline
+    remove_variable = td_health_services_acquisition_deadline
+    remove_variable = td_health_services_survey_paid
+    remove_variable = td_health_services_baseline
+    remove_variable = td_pending_health_services
+}
+td_sign_health_services_allocation_effect = {
+    if = { limit = { td_can_allocate_health_services_trigger = yes }
+        set_variable = { name = td_target value = var:td_bill_target }
+        if = { limit = { td_bill_target_valid_trigger = yes }
+            set_variable = { name = td_health_services_survey_paid value = td_pledge_survey_cost }
+            add_treasury = { value = var:td_health_services_survey_paid multiply = -1 }
+            add_modifier = td_health_services_planning
+            set_variable = td_pending_health_services
+            set_variable = td_bill_health_services
+            change_variable = { name = td_bill_allocation_count add = 1 }
+            set_variable = { name = td_health_services_bill_generation value = var:td_bill_generation }
+            set_variable = { name = td_health_services_region value = var:td_bill_target.state_region }
+            set_variable = { name = td_health_services_baseline value = institution_investment_level:institution_health_system }
+            if = { limit = { var:td_bill_target = { owner = root } } set_variable = { name = td_health_services_target value = var:td_bill_target } }
+            td_calculate_politics_effect = yes
+        }
+    }
+}
+td_breach_health_services_allocation_effect = {
+    ig:ig_trade_unions = { remove_modifier = td_pledge_broken add_modifier = { name = td_pledge_broken years = 5 } set_variable = { name = td_broken_pledge years = 5 } }
+    td_clear_health_services_allocation_effect = yes
+    trigger_event = td.18
+}
+td_clear_land_settlement_allocation_effect = {
+    if = { limit = { has_variable = td_bill has_variable = td_bill_land_settlement var:td_land_settlement_bill_generation = var:td_bill_generation }
+        remove_variable = td_bill_land_settlement
+        change_variable = { name = td_bill_allocation_count subtract = 1 }
+    }
+    remove_modifier = td_land_settlement_planning
+    remove_variable = td_land_settlement_region
+    remove_variable = td_land_settlement_target
+    remove_variable = td_land_settlement_bill_generation
+    remove_variable = td_land_settlement_ratified
+    remove_variable = td_land_settlement_started
+    remove_variable = td_land_settlement_deadline
+    remove_variable = td_land_settlement_acquisition_deadline
+    remove_variable = td_land_settlement_survey_paid
+    remove_variable = td_land_settlement_land_law
+    remove_variable = td_land_settlement_holding
+    remove_variable = td_pending_land_settlement
+}
+td_sign_land_settlement_allocation_effect = {
+    if = { limit = { td_can_allocate_land_settlement_trigger = yes }
+        set_variable = { name = td_target value = var:td_bill_target }
+        if = { limit = { td_bill_target_valid_trigger = yes }
+            set_variable = { name = td_land_settlement_survey_paid value = td_pledge_survey_cost }
+            add_treasury = { value = var:td_land_settlement_survey_paid multiply = -1 }
+            add_modifier = td_land_settlement_planning
+            set_variable = td_pending_land_settlement
+            set_variable = td_bill_land_settlement
+            change_variable = { name = td_bill_allocation_count add = 1 }
+            set_variable = { name = td_land_settlement_bill_generation value = var:td_bill_generation }
+            set_variable = { name = td_land_settlement_region value = var:td_bill_target.state_region }
+            
+            set_variable = { name = td_land_settlement_land_law value = 0 }
+            if = { limit = { has_law = law_type:law_serfdom } set_variable = { name = td_land_settlement_land_law value = 1 } }
+            if = { limit = { has_law = law_type:law_tenant_farmers } set_variable = { name = td_land_settlement_land_law value = 2 } }
+            if = { limit = { var:td_bill_target = { owner = root } } set_variable = { name = td_land_settlement_target value = var:td_bill_target } }
+            td_calculate_politics_effect = yes
+        }
+    }
+}
+td_breach_land_settlement_allocation_effect = {
+    ig:ig_landowners = { remove_modifier = td_pledge_broken add_modifier = { name = td_pledge_broken years = 5 } set_variable = { name = td_broken_pledge years = 5 } }
+    td_clear_land_settlement_allocation_effect = yes
+    trigger_event = td.18
+}
+td_clear_low_tax_allocation_effect = {
+    if = { limit = { has_variable = td_bill has_variable = td_bill_low_tax var:td_low_tax_bill_generation = var:td_bill_generation }
+        remove_variable = td_bill_low_tax
+        change_variable = { name = td_bill_allocation_count subtract = 1 }
+    }
+    remove_modifier = td_low_tax_planning
+    remove_variable = td_low_tax_region
+    remove_variable = td_low_tax_target
+    remove_variable = td_low_tax_bill_generation
+    remove_variable = td_low_tax_ratified
+    remove_variable = td_low_tax_started
+    remove_variable = td_low_tax_deadline
+    remove_variable = td_low_tax_acquisition_deadline
+    remove_variable = td_low_tax_survey_paid
+    remove_variable = td_low_tax_holding
+    remove_variable = td_pending_low_tax
+}
+td_sign_low_tax_allocation_effect = {
+    if = { limit = { td_can_allocate_low_tax_trigger = yes }
+        set_variable = { name = td_target value = var:td_bill_target }
+        if = { limit = { td_bill_target_valid_trigger = yes }
+            set_variable = { name = td_low_tax_survey_paid value = td_pledge_survey_cost }
+            add_treasury = { value = var:td_low_tax_survey_paid multiply = -1 }
+            add_modifier = td_low_tax_planning
+            set_variable = td_pending_low_tax
+            set_variable = td_bill_low_tax
+            change_variable = { name = td_bill_allocation_count add = 1 }
+            set_variable = { name = td_low_tax_bill_generation value = var:td_bill_generation }
+            set_variable = { name = td_low_tax_region value = var:td_bill_target.state_region }
+            
+            if = { limit = { var:td_bill_target = { owner = root } } set_variable = { name = td_low_tax_target value = var:td_bill_target } }
+            td_calculate_politics_effect = yes
+        }
+    }
+}
+td_breach_low_tax_allocation_effect = {
+    ig:ig_rural_folk = { remove_modifier = td_pledge_broken add_modifier = { name = td_pledge_broken years = 5 } set_variable = { name = td_broken_pledge years = 5 } }
+ig:ig_petty_bourgeoisie = { remove_modifier = td_pledge_broken add_modifier = { name = td_pledge_broken years = 5 } set_variable = { name = td_broken_pledge years = 5 } }
+    td_clear_low_tax_allocation_effect = yes
+    trigger_event = td.18
+}
+td_ratify_allocations_effect = {
+    if = { limit = { has_variable = td_bill_religious_schools has_variable = td_pending_religious_schools var:td_religious_schools_bill_generation = var:td_bill_generation }
+        set_variable = td_religious_schools_ratified
+        if = { limit = { exists = var:td_religious_schools_target } set_variable = td_religious_schools_started
+            set_variable = { name = td_religious_schools_deadline years = 3 } }
+        else = { set_variable = { name = td_religious_schools_acquisition_deadline years = 5 } }
+    }
+    if = { limit = { has_variable = td_bill_public_schools has_variable = td_pending_public_schools var:td_public_schools_bill_generation = var:td_bill_generation }
+        set_variable = td_public_schools_ratified
+        if = { limit = { exists = var:td_public_schools_target } set_variable = td_public_schools_started
+            set_variable = { name = td_public_schools_deadline years = 3 } }
+        else = { set_variable = { name = td_public_schools_acquisition_deadline years = 5 } }
+    }
+    if = { limit = { has_variable = td_bill_health_services has_variable = td_pending_health_services var:td_health_services_bill_generation = var:td_bill_generation }
+        set_variable = td_health_services_ratified
+        if = { limit = { exists = var:td_health_services_target } set_variable = td_health_services_started
+            set_variable = { name = td_health_services_deadline years = 3 } }
+        else = { set_variable = { name = td_health_services_acquisition_deadline years = 5 } }
+    }
+    if = { limit = { has_variable = td_bill_land_settlement has_variable = td_pending_land_settlement var:td_land_settlement_bill_generation = var:td_bill_generation }
+        set_variable = td_land_settlement_ratified
+        if = { limit = { exists = var:td_land_settlement_target } set_variable = td_land_settlement_started
+            set_variable = { name = td_land_settlement_deadline years = 2 }
+            set_variable = { name = td_land_settlement_holding years = 1 } }
+        else = { set_variable = { name = td_land_settlement_acquisition_deadline years = 5 } }
+    }
+    if = { limit = { has_variable = td_bill_low_tax has_variable = td_pending_low_tax var:td_low_tax_bill_generation = var:td_bill_generation }
+        set_variable = td_low_tax_ratified
+        if = { limit = { exists = var:td_low_tax_target } set_variable = td_low_tax_started
+            set_variable = { name = td_low_tax_deadline years = 2 }
+            set_variable = { name = td_low_tax_holding years = 1 } }
+        else = { set_variable = { name = td_low_tax_acquisition_deadline years = 5 } }
+    }
+}
+td_release_unratified_allocations_effect = {
+    if = { limit = { has_variable = td_pending_religious_schools NOT = { has_variable = td_religious_schools_ratified } } td_clear_religious_schools_allocation_effect = yes }
+    if = { limit = { has_variable = td_pending_public_schools NOT = { has_variable = td_public_schools_ratified } } td_clear_public_schools_allocation_effect = yes }
+    if = { limit = { has_variable = td_pending_health_services NOT = { has_variable = td_health_services_ratified } } td_clear_health_services_allocation_effect = yes }
+    if = { limit = { has_variable = td_pending_land_settlement NOT = { has_variable = td_land_settlement_ratified } } td_clear_land_settlement_allocation_effect = yes }
+    if = { limit = { has_variable = td_pending_low_tax NOT = { has_variable = td_low_tax_ratified } } td_clear_low_tax_allocation_effect = yes }
+}
+td_release_all_allocations_effect = {
+    td_clear_religious_schools_allocation_effect = yes
+    td_clear_public_schools_allocation_effect = yes
+    td_clear_health_services_allocation_effect = yes
+    td_clear_land_settlement_allocation_effect = yes
+    td_clear_low_tax_allocation_effect = yes
+}
+td_validate_unratified_allocations_effect = {
+    if = { limit = { has_variable = td_pending_religious_schools NOT = { has_variable = td_religious_schools_ratified } NOT = { td_religious_schools_conditions_trigger = yes } } td_clear_religious_schools_allocation_effect = yes }
+    if = { limit = { has_variable = td_pending_public_schools NOT = { has_variable = td_public_schools_ratified } NOT = { td_public_schools_conditions_trigger = yes } } td_clear_public_schools_allocation_effect = yes }
+    if = { limit = { has_variable = td_pending_health_services NOT = { has_variable = td_health_services_ratified } NOT = { td_health_services_conditions_trigger = yes } } td_clear_health_services_allocation_effect = yes }
+    if = { limit = { has_variable = td_pending_land_settlement NOT = { has_variable = td_land_settlement_ratified } NOT = { td_land_settlement_conditions_trigger = yes } } td_clear_land_settlement_allocation_effect = yes }
+    if = { limit = { has_variable = td_pending_low_tax NOT = { has_variable = td_low_tax_ratified } NOT = { td_low_tax_conditions_trigger = yes } } td_clear_low_tax_allocation_effect = yes }
+}
+td_allocations_monthly_effect = {
+    if = { limit = { td_feature_enabled_trigger = yes }
+        if = { limit = { has_variable = td_pending_religious_schools has_variable = td_religious_schools_ratified }
+            if = { limit = { NOT = { td_religious_schools_conditions_trigger = yes } } td_breach_religious_schools_allocation_effect = yes }
+            else = {
+                if = { limit = { NOT = { has_variable = td_religious_schools_started } }
+                    if = { limit = { NOT = { has_variable = td_religious_schools_acquisition_deadline } } td_clear_religious_schools_allocation_effect = yes }
+                    else = { ordered_scope_state = {
+                        limit = { state_region = root.var:td_religious_schools_region is_treaty_port = no }
+                        order_by = state_population
+                        max = 1
+                        root = {
+                            set_variable = { name = td_religious_schools_target value = prev }
+                            set_variable = td_religious_schools_started
+            set_variable = { name = td_religious_schools_deadline years = 3 }
+                            remove_variable = td_religious_schools_acquisition_deadline
+                        }
+                    } }
+                }
+                if = { limit = { has_variable = td_pending_religious_schools has_variable = td_religious_schools_started }
+                    if = { limit = { NOT = { has_variable = td_religious_schools_deadline } } td_breach_religious_schools_allocation_effect = yes }
+                    else_if = { limit = { exists = var:td_religious_schools_target var:td_religious_schools_target = { owner = root is_treaty_port = no is_incorporated = yes } institution_investment_level:institution_schools > var:td_religious_schools_baseline }
+                        ig:ig_devout = { remove_modifier = td_pledge_fulfilled add_modifier = { name = td_pledge_fulfilled years = 3 } }
+td_clear_religious_schools_allocation_effect = yes
+                        trigger_event = td.17
+                    }
+                }
+            }
+        }
+        if = { limit = { has_variable = td_pending_public_schools has_variable = td_public_schools_ratified }
+            if = { limit = { NOT = { td_public_schools_conditions_trigger = yes } } td_breach_public_schools_allocation_effect = yes }
+            else = {
+                if = { limit = { NOT = { has_variable = td_public_schools_started } }
+                    if = { limit = { NOT = { has_variable = td_public_schools_acquisition_deadline } } td_clear_public_schools_allocation_effect = yes }
+                    else = { ordered_scope_state = {
+                        limit = { state_region = root.var:td_public_schools_region is_treaty_port = no }
+                        order_by = state_population
+                        max = 1
+                        root = {
+                            set_variable = { name = td_public_schools_target value = prev }
+                            set_variable = td_public_schools_started
+            set_variable = { name = td_public_schools_deadline years = 3 }
+                            remove_variable = td_public_schools_acquisition_deadline
+                        }
+                    } }
+                }
+                if = { limit = { has_variable = td_pending_public_schools has_variable = td_public_schools_started }
+                    if = { limit = { NOT = { has_variable = td_public_schools_deadline } } td_breach_public_schools_allocation_effect = yes }
+                    else_if = { limit = { exists = var:td_public_schools_target var:td_public_schools_target = { owner = root is_treaty_port = no is_incorporated = yes } institution_investment_level:institution_schools > var:td_public_schools_baseline }
+                        ig:ig_intelligentsia = { remove_modifier = td_pledge_fulfilled add_modifier = { name = td_pledge_fulfilled years = 3 } }
+td_clear_public_schools_allocation_effect = yes
+                        trigger_event = td.17
+                    }
+                }
+            }
+        }
+        if = { limit = { has_variable = td_pending_health_services has_variable = td_health_services_ratified }
+            if = { limit = { NOT = { td_health_services_conditions_trigger = yes } } td_breach_health_services_allocation_effect = yes }
+            else = {
+                if = { limit = { NOT = { has_variable = td_health_services_started } }
+                    if = { limit = { NOT = { has_variable = td_health_services_acquisition_deadline } } td_clear_health_services_allocation_effect = yes }
+                    else = { ordered_scope_state = {
+                        limit = { state_region = root.var:td_health_services_region is_treaty_port = no }
+                        order_by = state_population
+                        max = 1
+                        root = {
+                            set_variable = { name = td_health_services_target value = prev }
+                            set_variable = td_health_services_started
+            set_variable = { name = td_health_services_deadline years = 3 }
+                            remove_variable = td_health_services_acquisition_deadline
+                        }
+                    } }
+                }
+                if = { limit = { has_variable = td_pending_health_services has_variable = td_health_services_started }
+                    if = { limit = { NOT = { has_variable = td_health_services_deadline } } td_breach_health_services_allocation_effect = yes }
+                    else_if = { limit = { exists = var:td_health_services_target var:td_health_services_target = { owner = root is_treaty_port = no is_incorporated = yes } institution_investment_level:institution_health_system > var:td_health_services_baseline }
+                        ig:ig_trade_unions = { remove_modifier = td_pledge_fulfilled add_modifier = { name = td_pledge_fulfilled years = 3 } }
+td_clear_health_services_allocation_effect = yes
+                        trigger_event = td.17
+                    }
+                }
+            }
+        }
+        if = { limit = { has_variable = td_pending_land_settlement has_variable = td_land_settlement_ratified }
+            if = { limit = { NOT = { td_land_settlement_conditions_trigger = yes } } td_breach_land_settlement_allocation_effect = yes }
+            else = {
+                if = { limit = { NOT = { has_variable = td_land_settlement_started } }
+                    if = { limit = { NOT = { has_variable = td_land_settlement_acquisition_deadline } } td_clear_land_settlement_allocation_effect = yes }
+                    else = { ordered_scope_state = {
+                        limit = { state_region = root.var:td_land_settlement_region is_treaty_port = no }
+                        order_by = state_population
+                        max = 1
+                        root = {
+                            set_variable = { name = td_land_settlement_target value = prev }
+                            set_variable = td_land_settlement_started
+            set_variable = { name = td_land_settlement_deadline years = 2 }
+            set_variable = { name = td_land_settlement_holding years = 1 }
+                            remove_variable = td_land_settlement_acquisition_deadline
+                        }
+                    } }
+                }
+                if = { limit = { has_variable = td_pending_land_settlement has_variable = td_land_settlement_started }
+                    if = { limit = { NOT = { has_variable = td_land_settlement_deadline } } td_breach_land_settlement_allocation_effect = yes }
+                    else_if = { limit = { exists = var:td_land_settlement_target var:td_land_settlement_target = { owner = root is_treaty_port = no } NOT = { has_variable = td_land_settlement_holding } }
+                        ig:ig_landowners = { remove_modifier = td_pledge_fulfilled add_modifier = { name = td_pledge_fulfilled years = 3 } }
+td_clear_land_settlement_allocation_effect = yes
+                        trigger_event = td.17
+                    }
+                }
+            }
+        }
+        if = { limit = { has_variable = td_pending_low_tax has_variable = td_low_tax_ratified }
+            if = { limit = { NOT = { td_low_tax_conditions_trigger = yes } } td_breach_low_tax_allocation_effect = yes }
+            else = {
+                if = { limit = { NOT = { has_variable = td_low_tax_started } }
+                    if = { limit = { NOT = { has_variable = td_low_tax_acquisition_deadline } } td_clear_low_tax_allocation_effect = yes }
+                    else = { ordered_scope_state = {
+                        limit = { state_region = root.var:td_low_tax_region is_treaty_port = no }
+                        order_by = state_population
+                        max = 1
+                        root = {
+                            set_variable = { name = td_low_tax_target value = prev }
+                            set_variable = td_low_tax_started
+            set_variable = { name = td_low_tax_deadline years = 2 }
+            set_variable = { name = td_low_tax_holding years = 1 }
+                            remove_variable = td_low_tax_acquisition_deadline
+                        }
+                    } }
+                }
+                if = { limit = { has_variable = td_pending_low_tax has_variable = td_low_tax_started }
+                    if = { limit = { NOT = { has_variable = td_low_tax_deadline } } td_breach_low_tax_allocation_effect = yes }
+                    else_if = { limit = { exists = var:td_low_tax_target var:td_low_tax_target = { owner = root is_treaty_port = no } NOT = { has_variable = td_low_tax_holding } }
+                        ig:ig_rural_folk = { remove_modifier = td_pledge_fulfilled add_modifier = { name = td_pledge_fulfilled years = 3 } }
+ig:ig_petty_bourgeoisie = { remove_modifier = td_pledge_fulfilled add_modifier = { name = td_pledge_fulfilled years = 3 } }
+td_clear_low_tax_allocation_effect = yes
+                        trigger_event = td.17
+                    }
+                }
+            }
+        }
+    }
+}
+td_allocation_scores_effect = {
+    every_interest_group = { set_variable = { name = td_component_allocation value = 0 } }
+    if = { limit = { has_variable = td_bill_religious_schools has_variable = td_pending_religious_schools var:td_religious_schools_bill_generation = var:td_bill_generation }
+        ig:ig_devout = { change_variable = { name = td_component_allocation add = 10 } }
+        ig:ig_intelligentsia = { change_variable = { name = td_component_allocation add = -5 } }
+    }
+    if = { limit = { has_variable = td_bill_public_schools has_variable = td_pending_public_schools var:td_public_schools_bill_generation = var:td_bill_generation }
+        ig:ig_intelligentsia = { change_variable = { name = td_component_allocation add = 10 } }
+        ig:ig_devout = { change_variable = { name = td_component_allocation add = -5 } }
+    }
+    if = { limit = { has_variable = td_bill_health_services has_variable = td_pending_health_services var:td_health_services_bill_generation = var:td_bill_generation }
+        ig:ig_trade_unions = { change_variable = { name = td_component_allocation add = 10 } }
+    }
+    if = { limit = { has_variable = td_bill_land_settlement has_variable = td_pending_land_settlement var:td_land_settlement_bill_generation = var:td_bill_generation }
+        ig:ig_landowners = { change_variable = { name = td_component_allocation add = 10 } }
+        ig:ig_rural_folk = { change_variable = { name = td_component_allocation add = -5 } }
+    }
+    if = { limit = { has_variable = td_bill_low_tax has_variable = td_pending_low_tax var:td_low_tax_bill_generation = var:td_bill_generation }
+        ig:ig_rural_folk = { change_variable = { name = td_component_allocation add = 10 } }
+        ig:ig_petty_bourgeoisie = { change_variable = { name = td_component_allocation add = 10 } }
+    }
+    every_interest_group = { change_variable = { name = td_score add = var:td_component_allocation } }
+}

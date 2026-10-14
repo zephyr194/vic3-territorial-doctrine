@@ -11,19 +11,19 @@ ideology_td_p0_h0_armed_forces = {
 ideology_td_p0_h1_armed_forces = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = neutral
+        law_td_status_quo = disapprove
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = neutral
+        law_td_strategic_frontiers = strongly_approve
+        law_td_imperial_expansion = approve
     }
 }
 ideology_td_p0_h2_armed_forces = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
+        law_td_status_quo = disapprove
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = disapprove
+        law_td_strategic_frontiers = strongly_approve
+        law_td_imperial_expansion = approve
     }
 }
 ideology_td_p1_h0_armed_forces = {
@@ -47,10 +47,10 @@ ideology_td_p1_h1_armed_forces = {
 ideology_td_p1_h2_armed_forces = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = neutral
+        law_td_status_quo = disapprove
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = neutral
+        law_td_strategic_frontiers = strongly_approve
+        law_td_imperial_expansion = approve
     }
 }
 ideology_td_p2_h0_armed_forces = {
@@ -65,19 +65,19 @@ ideology_td_p2_h0_armed_forces = {
 ideology_td_p2_h1_armed_forces = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = disapprove
+        law_td_status_quo = strongly_disapprove
         law_td_historical_rights = approve
         law_td_strategic_frontiers = strongly_approve
-        law_td_imperial_expansion = approve
+        law_td_imperial_expansion = strongly_approve
     }
 }
 ideology_td_p2_h2_armed_forces = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = disapprove
+        law_td_status_quo = strongly_disapprove
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = approve
+        law_td_strategic_frontiers = strongly_approve
+        law_td_imperial_expansion = strongly_approve
     }
 }
 ideology_td_p0_h0_landowners = {
@@ -92,25 +92,25 @@ ideology_td_p0_h0_landowners = {
 ideology_td_p0_h1_landowners = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
+        law_td_status_quo = neutral
         law_td_historical_rights = approve
         law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = neutral
+        law_td_imperial_expansion = approve
     }
 }
 ideology_td_p0_h2_landowners = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
+        law_td_status_quo = neutral
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = disapprove
-        law_td_imperial_expansion = disapprove
+        law_td_strategic_frontiers = neutral
+        law_td_imperial_expansion = approve
     }
 }
 ideology_td_p1_h0_landowners = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = disapprove
+        law_td_status_quo = neutral
         law_td_historical_rights = approve
         law_td_strategic_frontiers = neutral
         law_td_imperial_expansion = approve
@@ -128,10 +128,10 @@ ideology_td_p1_h1_landowners = {
 ideology_td_p1_h2_landowners = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
+        law_td_status_quo = neutral
         law_td_historical_rights = approve
         law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = neutral
+        law_td_imperial_expansion = approve
     }
 }
 ideology_td_p2_h0_landowners = {
@@ -139,14 +139,14 @@ ideology_td_p2_h0_landowners = {
     lawgroup_territorial_doctrine = {
         law_td_status_quo = disapprove
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = strongly_approve
+        law_td_strategic_frontiers = neutral
+        law_td_imperial_expansion = approve
     }
 }
 ideology_td_p2_h1_landowners = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = neutral
+        law_td_status_quo = disapprove
         law_td_historical_rights = approve
         law_td_strategic_frontiers = neutral
         law_td_imperial_expansion = approve
@@ -155,7 +155,7 @@ ideology_td_p2_h1_landowners = {
 ideology_td_p2_h2_landowners = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
+        law_td_status_quo = disapprove
         law_td_historical_rights = approve
         law_td_strategic_frontiers = neutral
         law_td_imperial_expansion = approve
@@ -173,19 +173,19 @@ ideology_td_p0_h0_industrialists = {
 ideology_td_p0_h1_industrialists = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
-        law_td_historical_rights = approve
-        law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = disapprove
+        law_td_status_quo = neutral
+        law_td_historical_rights = neutral
+        law_td_strategic_frontiers = approve
+        law_td_imperial_expansion = approve
     }
 }
 ideology_td_p0_h2_industrialists = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = strongly_approve
-        law_td_historical_rights = approve
-        law_td_strategic_frontiers = disapprove
-        law_td_imperial_expansion = strongly_disapprove
+        law_td_status_quo = approve
+        law_td_historical_rights = neutral
+        law_td_strategic_frontiers = approve
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p1_h0_industrialists = {
@@ -200,19 +200,19 @@ ideology_td_p1_h0_industrialists = {
 ideology_td_p1_h1_industrialists = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = neutral
-        law_td_historical_rights = neutral
+        law_td_status_quo = disapprove
+        law_td_historical_rights = disapprove
         law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = approve
+        law_td_imperial_expansion = strongly_approve
     }
 }
 ideology_td_p1_h2_industrialists = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
-        law_td_historical_rights = approve
-        law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = disapprove
+        law_td_status_quo = disapprove
+        law_td_historical_rights = neutral
+        law_td_strategic_frontiers = approve
+        law_td_imperial_expansion = approve
     }
 }
 ideology_td_p2_h0_industrialists = {
@@ -228,18 +228,18 @@ ideology_td_p2_h1_industrialists = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
         law_td_status_quo = disapprove
-        law_td_historical_rights = neutral
+        law_td_historical_rights = disapprove
         law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = approve
+        law_td_imperial_expansion = strongly_approve
     }
 }
 ideology_td_p2_h2_industrialists = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
-        law_td_historical_rights = approve
+        law_td_status_quo = disapprove
+        law_td_historical_rights = disapprove
         law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = neutral
+        law_td_imperial_expansion = strongly_approve
     }
 }
 ideology_td_p0_h0_petty_bourgeoisie = {
@@ -257,25 +257,25 @@ ideology_td_p0_h1_petty_bourgeoisie = {
         law_td_status_quo = approve
         law_td_historical_rights = strongly_approve
         law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = disapprove
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p0_h2_petty_bourgeoisie = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = strongly_approve
+        law_td_status_quo = approve
         law_td_historical_rights = strongly_approve
-        law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = disapprove
+        law_td_strategic_frontiers = approve
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p1_h0_petty_bourgeoisie = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = neutral
-        law_td_historical_rights = approve
+        law_td_status_quo = approve
+        law_td_historical_rights = strongly_approve
         law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = approve
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p1_h1_petty_bourgeoisie = {
@@ -293,23 +293,23 @@ ideology_td_p1_h2_petty_bourgeoisie = {
         law_td_status_quo = approve
         law_td_historical_rights = strongly_approve
         law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = disapprove
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p2_h0_petty_bourgeoisie = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = neutral
-        law_td_historical_rights = approve
+        law_td_status_quo = approve
+        law_td_historical_rights = strongly_approve
         law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = approve
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p2_h1_petty_bourgeoisie = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
         law_td_status_quo = approve
-        law_td_historical_rights = approve
+        law_td_historical_rights = strongly_approve
         law_td_strategic_frontiers = approve
         law_td_imperial_expansion = neutral
     }
@@ -320,7 +320,7 @@ ideology_td_p2_h2_petty_bourgeoisie = {
         law_td_status_quo = approve
         law_td_historical_rights = strongly_approve
         law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = disapprove
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p0_h0_intelligentsia = {
@@ -353,17 +353,17 @@ ideology_td_p0_h2_intelligentsia = {
 ideology_td_p1_h0_intelligentsia = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = disapprove
-        law_td_historical_rights = disapprove
-        law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = disapprove
+        law_td_status_quo = approve
+        law_td_historical_rights = neutral
+        law_td_strategic_frontiers = disapprove
+        law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p1_h1_intelligentsia = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
-        law_td_historical_rights = neutral
+        law_td_status_quo = strongly_approve
+        law_td_historical_rights = approve
         law_td_strategic_frontiers = disapprove
         law_td_imperial_expansion = strongly_disapprove
     }
@@ -373,26 +373,26 @@ ideology_td_p1_h2_intelligentsia = {
     lawgroup_territorial_doctrine = {
         law_td_status_quo = strongly_approve
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = disapprove
+        law_td_strategic_frontiers = strongly_disapprove
         law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p2_h0_intelligentsia = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = disapprove
-        law_td_historical_rights = disapprove
-        law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = neutral
+        law_td_status_quo = approve
+        law_td_historical_rights = neutral
+        law_td_strategic_frontiers = disapprove
+        law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p2_h1_intelligentsia = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
-        law_td_historical_rights = neutral
+        law_td_status_quo = strongly_approve
+        law_td_historical_rights = approve
         law_td_strategic_frontiers = disapprove
-        law_td_imperial_expansion = disapprove
+        law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p2_h2_intelligentsia = {
@@ -400,7 +400,7 @@ ideology_td_p2_h2_intelligentsia = {
     lawgroup_territorial_doctrine = {
         law_td_status_quo = strongly_approve
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = disapprove
+        law_td_strategic_frontiers = strongly_disapprove
         law_td_imperial_expansion = strongly_disapprove
     }
 }
@@ -416,8 +416,8 @@ ideology_td_p0_h0_trade_unions = {
 ideology_td_p0_h1_trade_unions = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = strongly_approve
-        law_td_historical_rights = approve
+        law_td_status_quo = approve
+        law_td_historical_rights = neutral
         law_td_strategic_frontiers = disapprove
         law_td_imperial_expansion = strongly_disapprove
     }
@@ -427,17 +427,17 @@ ideology_td_p0_h2_trade_unions = {
     lawgroup_territorial_doctrine = {
         law_td_status_quo = strongly_approve
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = strongly_disapprove
+        law_td_strategic_frontiers = disapprove
         law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p1_h0_trade_unions = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = disapprove
-        law_td_historical_rights = disapprove
-        law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = disapprove
+        law_td_status_quo = approve
+        law_td_historical_rights = neutral
+        law_td_strategic_frontiers = disapprove
+        law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p1_h1_trade_unions = {
@@ -461,10 +461,10 @@ ideology_td_p1_h2_trade_unions = {
 ideology_td_p2_h0_trade_unions = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = disapprove
-        law_td_historical_rights = disapprove
-        law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = neutral
+        law_td_status_quo = approve
+        law_td_historical_rights = neutral
+        law_td_strategic_frontiers = disapprove
+        law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p2_h1_trade_unions = {
@@ -473,7 +473,7 @@ ideology_td_p2_h1_trade_unions = {
         law_td_status_quo = approve
         law_td_historical_rights = neutral
         law_td_strategic_frontiers = disapprove
-        law_td_imperial_expansion = disapprove
+        law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p2_h2_trade_unions = {
@@ -506,19 +506,19 @@ ideology_td_p0_h1_rural_folk = {
 ideology_td_p0_h2_rural_folk = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = strongly_approve
-        law_td_historical_rights = approve
+        law_td_status_quo = approve
+        law_td_historical_rights = neutral
         law_td_strategic_frontiers = disapprove
-        law_td_imperial_expansion = strongly_disapprove
+        law_td_imperial_expansion = disapprove
     }
 }
 ideology_td_p1_h0_rural_folk = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = neutral
+        law_td_status_quo = approve
         law_td_historical_rights = neutral
         law_td_strategic_frontiers = disapprove
-        law_td_imperial_expansion = neutral
+        law_td_imperial_expansion = disapprove
     }
 }
 ideology_td_p1_h1_rural_folk = {
@@ -542,28 +542,28 @@ ideology_td_p1_h2_rural_folk = {
 ideology_td_p2_h0_rural_folk = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = neutral
-        law_td_historical_rights = disapprove
+        law_td_status_quo = strongly_approve
+        law_td_historical_rights = approve
         law_td_strategic_frontiers = disapprove
-        law_td_imperial_expansion = neutral
+        law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p2_h1_rural_folk = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
-        law_td_historical_rights = neutral
+        law_td_status_quo = strongly_approve
+        law_td_historical_rights = approve
         law_td_strategic_frontiers = disapprove
-        law_td_imperial_expansion = disapprove
+        law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p2_h2_rural_folk = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
-        law_td_historical_rights = neutral
+        law_td_status_quo = strongly_approve
+        law_td_historical_rights = approve
         law_td_strategic_frontiers = disapprove
-        law_td_imperial_expansion = disapprove
+        law_td_imperial_expansion = strongly_disapprove
     }
 }
 ideology_td_p0_h0_devout = {
@@ -578,28 +578,28 @@ ideology_td_p0_h0_devout = {
 ideology_td_p0_h1_devout = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
+        law_td_status_quo = neutral
         law_td_historical_rights = approve
         law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = disapprove
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p0_h2_devout = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
+        law_td_status_quo = neutral
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = disapprove
-        law_td_imperial_expansion = disapprove
+        law_td_strategic_frontiers = neutral
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p1_h0_devout = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = disapprove
+        law_td_status_quo = neutral
         law_td_historical_rights = approve
         law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = approve
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p1_h1_devout = {
@@ -614,19 +614,19 @@ ideology_td_p1_h1_devout = {
 ideology_td_p1_h2_devout = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
+        law_td_status_quo = neutral
         law_td_historical_rights = approve
         law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = disapprove
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p2_h0_devout = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = disapprove
+        law_td_status_quo = neutral
         law_td_historical_rights = approve
-        law_td_strategic_frontiers = approve
-        law_td_imperial_expansion = approve
+        law_td_strategic_frontiers = neutral
+        law_td_imperial_expansion = neutral
     }
 }
 ideology_td_p2_h1_devout = {
@@ -641,9 +641,9 @@ ideology_td_p2_h1_devout = {
 ideology_td_p2_h2_devout = {
     icon = "gfx/interface/icons/td/strategic_frontiers.dds"
     lawgroup_territorial_doctrine = {
-        law_td_status_quo = approve
+        law_td_status_quo = neutral
         law_td_historical_rights = approve
         law_td_strategic_frontiers = neutral
-        law_td_imperial_expansion = disapprove
+        law_td_imperial_expansion = neutral
     }
 }

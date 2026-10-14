@@ -1,4 +1,8 @@
 ﻿td_clear_navy_pledge_effect = {
+    if = { limit = { has_variable = td_bill has_variable = td_bill_pledge_navy var:td_navy_bill_generation = var:td_bill_generation }
+        remove_variable = td_bill_pledge_navy
+        change_variable = { name = td_bill_allocation_count subtract = 1 }
+    }
     remove_modifier = td_navy_planning
     remove_variable = td_navy_target
     remove_variable = td_navy_region
@@ -21,6 +25,7 @@ td_sign_navy_pledge_effect = {
             add_modifier = td_navy_planning
             set_variable = td_pending_navy
             set_variable = td_bill_pledge_navy
+            change_variable = { name = td_bill_allocation_count add = 1 }
             set_variable = { name = td_navy_bill_generation value = var:td_bill_generation }
             set_variable = { name = td_navy_region value = var:td_bill_target.state_region }
             if = { limit = { var:td_bill_target = { owner = root } }
@@ -33,6 +38,10 @@ td_sign_navy_pledge_effect = {
     }
 }
 td_clear_railway_pledge_effect = {
+    if = { limit = { has_variable = td_bill has_variable = td_bill_pledge_railway var:td_railway_bill_generation = var:td_bill_generation }
+        remove_variable = td_bill_pledge_railway
+        change_variable = { name = td_bill_allocation_count subtract = 1 }
+    }
     remove_modifier = td_railway_planning
     remove_variable = td_railway_target
     remove_variable = td_railway_region
@@ -55,6 +64,7 @@ td_sign_railway_pledge_effect = {
             add_modifier = td_railway_planning
             set_variable = td_pending_railway
             set_variable = td_bill_pledge_railway
+            change_variable = { name = td_bill_allocation_count add = 1 }
             set_variable = { name = td_railway_bill_generation value = var:td_bill_generation }
             set_variable = { name = td_railway_region value = var:td_bill_target.state_region }
             if = { limit = { var:td_bill_target = { owner = root } }

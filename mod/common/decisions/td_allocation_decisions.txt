@@ -1,0 +1,30 @@
+﻿td_allocate_religious_schools = {
+    is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill var:td_bill < 3 }
+    possible = { td_can_allocate_religious_schools_trigger = yes }
+    when_taken = { td_sign_religious_schools_allocation_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_allocate_public_schools = {
+    is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill var:td_bill < 3 }
+    possible = { td_can_allocate_public_schools_trigger = yes }
+    when_taken = { td_sign_public_schools_allocation_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_allocate_health_services = {
+    is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill var:td_bill < 3 }
+    possible = { td_can_allocate_health_services_trigger = yes }
+    when_taken = { td_sign_health_services_allocation_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_allocate_land_settlement = {
+    is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill var:td_bill < 3 }
+    possible = { td_can_allocate_land_settlement_trigger = yes }
+    when_taken = { td_sign_land_settlement_allocation_effect = yes }
+    ai_chance = { value = 0 }
+}
+td_allocate_low_tax = {
+    is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill var:td_bill < 3 }
+    possible = { td_can_allocate_low_tax_trigger = yes }
+    when_taken = { td_sign_low_tax_allocation_effect = yes }
+    ai_chance = { value = 0 }
+}

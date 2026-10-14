@@ -110,7 +110,7 @@ def roundtrip(runner, *, rolls=()):
     fields = ('variables','states','policy','globals','saved','expirations',
               'modifiers','day','serial','bureaucracy','notifications','gold_reserves',
               'auto_negotiate','real_politics','total_population','legitimacy','windows',
-              'tax_level','weekly_balance','weekly_expenses','bureaucracy_usage','institutions','at_war')
+              'market','religion','institution_max','tax_level','weekly_balance','weekly_expenses','bureaucracy_usage','institutions','at_war')
     payload = {name:getattr(runner,name) for name in fields}
     payload.update(wars=runner.wars, attacker_warleaders=runner.attacker_warleaders,
                    participants={k:sorted(v) for k,v in runner.participants.items()})

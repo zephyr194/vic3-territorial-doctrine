@@ -30,6 +30,118 @@ td_colonial_base_cost = {
     if = { limit = { td_colonial_category = 1 } value = 1 }
     if = { limit = { td_colonial_category = 2 } value = 1 }
 }
+td_colonial_expansion_armed_forces = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0.0 }
+    if = { limit = { td_colonial_category = 1 } value = 7.5 }
+    if = { limit = { td_colonial_category = 2 } value = 10.0 }
+    add = { value = td_humanitarian_stage multiply = 0 }
+}
+td_colonial_admission_armed_forces = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0 }
+    if = { limit = { td_colonial_category = 1 } value = 0 }
+    if = { limit = { td_colonial_category = 2 } value = 0 }
+    add = { value = td_humanitarian_stage multiply = 0 }
+}
+td_colonial_expansion_landowners = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0.0 }
+    if = { limit = { td_colonial_category = 1 } value = 3.75 }
+    if = { limit = { td_colonial_category = 2 } value = 5.0 }
+    add = { value = td_humanitarian_stage multiply = 0 }
+}
+td_colonial_admission_landowners = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0.0 }
+    if = { limit = { td_colonial_category = 1 } value = -2.5 }
+    if = { limit = { td_colonial_category = 2 } value = -5.0 }
+    add = { value = td_humanitarian_stage multiply = 0 }
+}
+td_colonial_expansion_industrialists = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0 }
+    if = { limit = { td_colonial_category = 1 } value = 15 }
+    if = { limit = { td_colonial_category = 2 } value = 20 }
+    add = { value = td_humanitarian_stage multiply = -3.75 }
+}
+td_colonial_admission_industrialists = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0.0 }
+    if = { limit = { td_colonial_category = 1 } value = -2.5 }
+    if = { limit = { td_colonial_category = 2 } value = -5.0 }
+    add = { value = td_humanitarian_stage multiply = 0 }
+}
+td_colonial_expansion_petty_bourgeoisie = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0 }
+    if = { limit = { td_colonial_category = 1 } value = 0 }
+    if = { limit = { td_colonial_category = 2 } value = 0 }
+    add = { value = td_humanitarian_stage multiply = 0 }
+}
+td_colonial_admission_petty_bourgeoisie = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0 }
+    if = { limit = { td_colonial_category = 1 } value = 0 }
+    if = { limit = { td_colonial_category = 2 } value = 0 }
+    add = { value = td_humanitarian_stage multiply = 3.75 }
+}
+td_colonial_expansion_intelligentsia = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0 }
+    if = { limit = { td_colonial_category = 1 } value = 0 }
+    if = { limit = { td_colonial_category = 2 } value = 0 }
+    add = { value = td_humanitarian_stage multiply = -15 }
+}
+td_colonial_admission_intelligentsia = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0.0 }
+    if = { limit = { td_colonial_category = 1 } value = -5.0 }
+    if = { limit = { td_colonial_category = 2 } value = -10.0 }
+    add = { value = td_humanitarian_stage multiply = 15 }
+}
+td_colonial_expansion_trade_unions = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0 }
+    if = { limit = { td_colonial_category = 1 } value = 0 }
+    if = { limit = { td_colonial_category = 2 } value = 0 }
+    add = { value = td_humanitarian_stage multiply = -7.5 }
+}
+td_colonial_admission_trade_unions = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0.0 }
+    if = { limit = { td_colonial_category = 1 } value = -5.0 }
+    if = { limit = { td_colonial_category = 2 } value = -10.0 }
+    add = { value = td_humanitarian_stage multiply = 15 }
+}
+td_colonial_expansion_rural_folk = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = -0.0 }
+    if = { limit = { td_colonial_category = 1 } value = -7.5 }
+    if = { limit = { td_colonial_category = 2 } value = -10.0 }
+    add = { value = td_humanitarian_stage multiply = 0 }
+}
+td_colonial_admission_rural_folk = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0 }
+    if = { limit = { td_colonial_category = 1 } value = 0 }
+    if = { limit = { td_colonial_category = 2 } value = 0 }
+    add = { value = td_humanitarian_stage multiply = 3.75 }
+}
+td_colonial_expansion_devout = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0 }
+    if = { limit = { td_colonial_category = 1 } value = 0 }
+    if = { limit = { td_colonial_category = 2 } value = 0 }
+    add = { value = td_humanitarian_stage multiply = 0 }
+}
+td_colonial_admission_devout = {
+    value = 0
+    if = { limit = { td_colonial_category = 0 } value = 0 }
+    if = { limit = { td_colonial_category = 1 } value = 0 }
+    if = { limit = { td_colonial_category = 2 } value = 0 }
+    add = { value = td_humanitarian_stage multiply = 0 }
+}
 td_colonial_admission_multiplier = {
     value = td_colonial_base_cost
     multiply = { value = td_humanitarian_stage multiply = 0 add = 1 }

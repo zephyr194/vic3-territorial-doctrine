@@ -25,6 +25,12 @@ def assets():
             op = 'subtract' if field == 'expansion' else 'add'
             values += f'    {op} = {{ value = td_humanitarian_stage multiply = {c["stage_shift"]} }}\n'
         values += '}\n'
+    for group, row in c['group_tendencies'].items():
+        for phase in ('expansion','admission'):
+            values += f'td_colonial_{phase}_{group} = {{\n    value = 0\n'
+            for policy in c['policies'].values():
+                values += f'    if = {{ limit = {{ td_colonial_category = {policy["id"]} }} value = {policy[phase]*row[phase]} }}\n'
+            values += f'    add = {{ value = td_humanitarian_stage multiply = {c["stage_shift"]*row["humanitarian_"+phase]} }}\n}}\n'
     values += f'''td_colonial_admission_multiplier = {{
     value = td_colonial_base_cost
     multiply = {{ value = td_humanitarian_stage multiply = {c['rights_cost_per_stage']} add = 1 }}
@@ -80,10 +86,10 @@ td_focus_limit = {{
     if = {
         limit = { exists = var:td_target var:td_target = { td_colonial_target_trigger = yes } OR = { var:td_bill = 1 var:td_bill = 2 } }
 '''
-    for group, weight in c['weights'].items():
+    for group in c['group_tendencies']:
         bill += f'''        ig:ig_{group} = {{
-            if = {{ limit = {{ owner = {{ var:td_bill = 1 }} }} change_variable = {{ name = td_score add = {{ value = owner.td_colonial_expansion_pull multiply = {weight} }} }} }}
-            else = {{ change_variable = {{ name = td_score add = {{ value = owner.td_colonial_admission_pull multiply = {weight} }} }} }}
+            if = {{ limit = {{ owner = {{ var:td_bill = 1 }} }} change_variable = {{ name = td_score add = {{ value = owner.td_colonial_expansion_{group} }} }} }}
+            else = {{ change_variable = {{ name = td_score add = {{ value = owner.td_colonial_admission_{group} }} }} }}
         }}
 '''
     bill += '    }\n}\n'

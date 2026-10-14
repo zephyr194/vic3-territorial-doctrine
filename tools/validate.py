@@ -144,7 +144,7 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
                 for entry in walk(tree):
                     for token in (entry.key, entry.value if isinstance(entry.value, str) else ''):
                         required_vanilla.update(
-                            ref for ref in re.findall(r'(?:law_type|ideology|bt):([A-Za-z_]\w*)', token)
+                            ref for ref in re.findall(r'(?:law_type|ideology|bt|institution):([A-Za-z_]\w*)', token)
                             if ref not in definitions)
             for doctrine in RULES['doctrines'].values():
                 for key in doctrine['industry_modifiers']:

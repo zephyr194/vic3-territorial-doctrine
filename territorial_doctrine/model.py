@@ -46,9 +46,9 @@ def group_scores(doctrine: str, *, admission: bool = False,
         raise ValueError("At most two pledges to distinct groups")
     scores = {g: row[index] * 10.0 for g, row in RULES["groups"].items()}
     if colonial_target and not renunciation:
-        expansion, acceptance = colonial_tendencies(colonial_policy, humanitarian_stage)
-        for group, weight in RULES['colonial']['weights'].items():
-            scores[group] += weight * (acceptance if admission else expansion)
+        for group in RULES['groups']:
+            expansion, acceptance = colonial_group_tendencies(group, colonial_policy, humanitarian_stage)
+            scores[group] += acceptance if admission else expansion
     for g in (*pledges, *broken_pledges, *(leader_adjustments or {})):
         if g not in scores:
             raise ValueError(f"Unknown interest group: {g}")
@@ -392,10 +392,9 @@ def colonial_admission_multiplier(policy: str, humanitarian_stage: int) -> float
 
 
 def doctrine_scores(doctrine: str, policy: str = 'none', humanitarian_stage: int = 0) -> dict[str, float]:
-    expansion, _ = colonial_tendencies(policy, humanitarian_stage)
     direction = RULES['colonial']['doctrine_directions'][doctrine]
     index = DOCTRINES.index(doctrine)
-    return {g: row[index] * 10 + expansion * direction * RULES['colonial']['weights'][g]
+    return {g: row[index] * 10 + colonial_group_tendencies(g, policy, humanitarian_stage)[0] * direction
             for g, row in RULES['groups'].items()}
 
 
@@ -429,3 +428,12 @@ class WarMandate:
         amount = min(RULES['war']['monthly_exhaustion'], RULES['war']['exhaustion_cap'] - self.cumulative_exhaustion)
         self.cumulative_exhaustion += amount
         return amount
+
+
+def colonial_group_tendencies(group: str, policy: str, stage: int = 0) -> tuple[float, float]:
+    """Distinct, tunable opportunities/burdens; never all-group moral shifts."""
+    colonial_tendencies(policy, stage)  # Validate policy/stage using the shared API.
+    row=RULES['colonial']['group_tendencies'][group]
+    base=RULES['colonial']['policies'][policy]
+    return tuple(base[phase]*row[phase] + stage*RULES['colonial']['stage_shift']*row['humanitarian_'+phase]
+                 for phase in ('expansion','admission'))

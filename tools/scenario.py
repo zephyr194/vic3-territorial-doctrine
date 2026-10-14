@@ -6,7 +6,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from territorial_doctrine.model import (Bill, Conditions, Integration, Target,
     final_probability, integration_cost, round_probability, colonial_tendencies,
-    WarGoal, WarMandate)  # noqa: E402
+    WarGoal, WarMandate, colonial_group_tendencies)  # noqa: E402
 
 
 def main():
@@ -34,7 +34,10 @@ def main():
           f'{project.months} legal months -> {project.status}, even with 0% cultural acceptance. Native completion uses one calendar year.')
     for stage in range(3):
         expansion, acceptance = colonial_tendencies('exploitation', stage)
-        print(f'Exploitation stage {stage}: expansion score {expansion:+}; admission score {acceptance:+}')
+        print(f'Legacy background reference, stage {stage}: acquisition {expansion:+}; admission {acceptance:+}')
+        for group in ('armed_forces','industrialists','rural_folk','devout'):
+            claim, admit = colonial_group_tendencies(group, 'exploitation', stage)
+            print(f'  {group}: acquisition {claim:+}; admission {admit:+}')
     mandate = WarMandate('imperial_expansion', (WarGoal('conquer_state', ('A','B')),), {'A'})
     total = sum(mandate.tick() for _ in range(12))
     assert total == 0

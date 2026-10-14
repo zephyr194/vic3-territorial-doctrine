@@ -71,6 +71,7 @@ td_country_monthly = {
                 td_select_admitted_effect = yes
                 if = { limit = { exists = var:td_target td_fast_ready_trigger = yes } td_start_fast_effect = yes }
             }
+            td_allocations_monthly_effect = yes
             td_pledges_monthly_effect = yes
             td_refresh_country_civic_effect = yes
             if = { limit = { OR = { has_variable = td_fast has_variable = td_regular } }

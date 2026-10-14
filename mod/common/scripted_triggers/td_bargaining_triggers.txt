@@ -8,6 +8,7 @@
 }
 td_can_pledge_navy_trigger = {
     td_can_legislate_trigger = yes
+    td_allocation_slot_trigger = yes
     has_variable = td_bill
     var:td_bill < 3
     exists = var:td_bill_target
@@ -23,6 +24,7 @@ td_can_pledge_navy_trigger = {
 }
 td_can_pledge_railway_trigger = {
     td_can_legislate_trigger = yes
+    td_allocation_slot_trigger = yes
     has_variable = td_bill
     var:td_bill < 3
     exists = var:td_bill_target

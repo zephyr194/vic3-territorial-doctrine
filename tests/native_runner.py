@@ -40,6 +40,9 @@ class EventRunner:
         self.gold_reserves = 1000000
         self.total_population = 10000000
         self.legitimacy = 70
+        self.market = "M_ACTOR"
+        self.religion = "FAITH_ACTOR"
+        self.institution_max = {"institution_schools":5,"institution_health_system":5}
         self.tax_level = "medium"
         self.weekly_balance = 1000
         self.weekly_expenses = 5000
@@ -76,6 +79,7 @@ class EventRunner:
         self.states = {key: {'owner': country, 'state_population': 1_000_000,
                             'turmoil': 0, 'devastation': 0, 'incorporated': False,
                             'homeland': False, 'treaty_port': False,
+                            'market':'M_ACTOR','market_access':1,'actor_religion_share':1,
                             'region': 'R1' if key == 'A' else 'R2',
                             'variables': {'td_source_administration': 1,
                                           'td_live_administration': 1, 'td_live_diplomatic': 1},
@@ -134,7 +138,7 @@ class EventRunner:
         context.update({'var:' + k: v for k, v in self.variables.items()})
         context.update({'root.var:' + k: v for k, v in self.variables.items()})
         context.update({'scope:' + k: v for k, v in self.saved.items()})
-        planning = sum(RULES['negotiation']['planning_bureaucracy'] for kind in ('navy','railway') if 'td_'+kind+'_planning' in self.modifiers)
+        planning = sum(RULES['negotiation']['planning_bureaucracy'] for name in self.modifiers if name.startswith('td_') and name.endswith('_planning'))
         context.update({'is_player': True, 'bureaucracy': self.bureaucracy-planning, 'gold_reserves': self.gold_reserves, 'authority': 1000, 'root': self.country,
                         'is_subject':False,'is_revolutionary':False,'legitimacy':self.legitimacy,
                         'is_at_war':self.at_war,'scaled_debt':0,'total_population':self.total_population,
@@ -143,14 +147,18 @@ class EventRunner:
                         'prev': self.previous_scope})
         tax_ranks = {name:rank for rank,name in enumerate(('very_low','low','medium','high','very_high'),1)}
         context.update(tax_ranks)
+        context.update(market=self.market,religion=self.religion)
+        context["root.market"]=self.market
+        context["root.religion"]=self.religion
         context.update(tax_level=tax_ranks[self.tax_level], net_total_income=self.weekly_balance, total_expenses=self.weekly_expenses, bureaucracy_usage=self.bureaucracy_usage)
         for institution in ('institution_schools','institution_health_system'):
             context['has_institution:'+institution] = institution in self.institutions
             context['institution_investment_level:'+institution] = self.institutions.get(institution,0)
+            context['institution:'+institution+'.investment_max'] = self.institution_max[institution]
         for name,key in self.variables.items():
             if isinstance(key,str) and key in self.states:
                 state = self.states[key]
-                for prop in ('state_population','turmoil','devastation','owner','region'):
+                for prop in ('state_population','turmoil','devastation','owner','region','market','market_access'):
                     context['var:'+name+'.'+prop] = state[prop]
                 for building in ('naval_base','railway'):
                     context['var:'+name+'.state_has_building_type_levels:bt:building_'+building] = state.get('buildings',{}).get(building,0)
@@ -172,7 +180,7 @@ class EventRunner:
                 RULES['negotiation']['broken_approval'] if name=='td_pledge_broken' else 0
                 for name in group['modifiers'])
             context.update({'owner.var:' + k: v for k, v in self.variables.items()})
-            for name in ('td_colonial_expansion_pull','td_colonial_admission_pull'):
+            for name in ('td_colonial_expansion_pull','td_colonial_admission_pull',*[f'td_colonial_{phase}_{self.scope.removeprefix("ig:ig_")}' for phase in ('expansion','admission')]):
                 context['owner.' + name] = formula(name, context, self.values)
             context.update({'var:' + k: v for k, v in self.storage().items()})
             context['owner'] = self.country
@@ -181,6 +189,7 @@ class EventRunner:
             context.update({'var:' + k: v for k, v in self.storage().items()})
             context.update(owner=self.states[self.scope]['owner'], root=self.country)
             context['is_treaty_port'] = self.states[self.scope]['treaty_port']
+            context['is_incorporated'] = self.states[self.scope]['incorporated']
             context['is_coastal'] = self.states[self.scope].get('coastal',True)
             for building in ('naval_base','railway'):
                 context['state_has_building_type_levels:bt:building_'+building] = self.states[self.scope].get('buildings',{}).get(building,0)
@@ -253,6 +262,11 @@ class EventRunner:
                 self.scope, self.previous_scope = previous, previous_prev
             elif e.key == 'attacker_warleader':
                 result = self.attacker_warleaders[self.scope] == self.resolve(e.value)
+            elif e.key == 'religion_percent_state':
+                settings={v.key:v for v in e.value}
+                assert self.resolve(settings['target'].value)==self.religion
+                share=self.states[self.scope]['actor_religion_share']
+                result=triggers([Entry('value',settings['value'].operator,settings['value'].value)], {**self.context(),'value':share},self.values)
             elif e.key == 'has_institution':
                 result = e.value in self.institutions
             elif e.key == 'has_claim':

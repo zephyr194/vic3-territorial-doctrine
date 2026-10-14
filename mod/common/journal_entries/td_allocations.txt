@@ -1,0 +1,90 @@
+﻿je_td_religious_schools_allocation = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_religious_schools has_variable = td_religious_schools_started exists = var:td_religious_schools_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_religious_schools has_variable = td_religious_schools_started exists = var:td_religious_schools_target }
+    can_deactivate = yes
+}
+je_td_religious_schools_allocation_waiting = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_religious_schools has_variable = td_religious_schools_ratified NOT = { has_variable = td_religious_schools_started } }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_religious_schools has_variable = td_religious_schools_ratified NOT = { has_variable = td_religious_schools_started } }
+    can_deactivate = yes
+}
+je_td_religious_schools_allocation_proposed = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_religious_schools NOT = { has_variable = td_religious_schools_ratified } has_variable = td_bill exists = var:td_bill_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_religious_schools NOT = { has_variable = td_religious_schools_ratified } has_variable = td_bill exists = var:td_bill_target }
+    can_deactivate = yes
+}
+je_td_public_schools_allocation = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_public_schools has_variable = td_public_schools_started exists = var:td_public_schools_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_public_schools has_variable = td_public_schools_started exists = var:td_public_schools_target }
+    can_deactivate = yes
+}
+je_td_public_schools_allocation_waiting = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_public_schools has_variable = td_public_schools_ratified NOT = { has_variable = td_public_schools_started } }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_public_schools has_variable = td_public_schools_ratified NOT = { has_variable = td_public_schools_started } }
+    can_deactivate = yes
+}
+je_td_public_schools_allocation_proposed = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_public_schools NOT = { has_variable = td_public_schools_ratified } has_variable = td_bill exists = var:td_bill_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_public_schools NOT = { has_variable = td_public_schools_ratified } has_variable = td_bill exists = var:td_bill_target }
+    can_deactivate = yes
+}
+je_td_health_services_allocation = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_health_services has_variable = td_health_services_started exists = var:td_health_services_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_health_services has_variable = td_health_services_started exists = var:td_health_services_target }
+    can_deactivate = yes
+}
+je_td_health_services_allocation_waiting = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_health_services has_variable = td_health_services_ratified NOT = { has_variable = td_health_services_started } }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_health_services has_variable = td_health_services_ratified NOT = { has_variable = td_health_services_started } }
+    can_deactivate = yes
+}
+je_td_health_services_allocation_proposed = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_health_services NOT = { has_variable = td_health_services_ratified } has_variable = td_bill exists = var:td_bill_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_health_services NOT = { has_variable = td_health_services_ratified } has_variable = td_bill exists = var:td_bill_target }
+    can_deactivate = yes
+}
+je_td_land_settlement_allocation = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_land_settlement has_variable = td_land_settlement_started exists = var:td_land_settlement_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_land_settlement has_variable = td_land_settlement_started exists = var:td_land_settlement_target }
+    can_deactivate = yes
+}
+je_td_land_settlement_allocation_waiting = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_land_settlement has_variable = td_land_settlement_ratified NOT = { has_variable = td_land_settlement_started } }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_land_settlement has_variable = td_land_settlement_ratified NOT = { has_variable = td_land_settlement_started } }
+    can_deactivate = yes
+}
+je_td_land_settlement_allocation_proposed = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_land_settlement NOT = { has_variable = td_land_settlement_ratified } has_variable = td_bill exists = var:td_bill_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_land_settlement NOT = { has_variable = td_land_settlement_ratified } has_variable = td_bill exists = var:td_bill_target }
+    can_deactivate = yes
+}
+je_td_low_tax_allocation = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_low_tax has_variable = td_low_tax_started exists = var:td_low_tax_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_low_tax has_variable = td_low_tax_started exists = var:td_low_tax_target }
+    can_deactivate = yes
+}
+je_td_low_tax_allocation_waiting = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_low_tax has_variable = td_low_tax_ratified NOT = { has_variable = td_low_tax_started } }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_low_tax has_variable = td_low_tax_ratified NOT = { has_variable = td_low_tax_started } }
+    can_deactivate = yes
+}
+je_td_low_tax_allocation_proposed = {
+    group = td_journal_group
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes has_variable = td_pending_low_tax NOT = { has_variable = td_low_tax_ratified } has_variable = td_bill exists = var:td_bill_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_pending_low_tax NOT = { has_variable = td_low_tax_ratified } has_variable = td_bill exists = var:td_bill_target }
+    can_deactivate = yes
+}

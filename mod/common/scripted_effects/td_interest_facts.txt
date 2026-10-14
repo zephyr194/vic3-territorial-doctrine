@@ -1,0 +1,16 @@
+td_interest_facts_effect = {
+    set_variable = { name = td_fact_new_market value = 0 }
+    set_variable = { name = td_fact_mission_space value = 0 }
+    every_interest_group = { set_variable = { name = td_component_opportunity value = 0 } }
+    if = { limit = { var:td_bill = 1 exists = var:td_bill_target }
+        if = { limit = { var:td_bill_target = { NOT = { owner = root } NOT = { market = root.market } market_access >= td_allocation_market_access_threshold } }
+            set_variable = { name = td_fact_new_market value = 1 }
+            ig:ig_industrialists = { change_variable = { name = td_component_opportunity add = td_allocation_opportunity_score } }
+        }
+        if = { limit = { has_law = law_type:law_religious_schools var:td_bill_target = { NOT = { owner = root } religion_percent_state = { target = root.religion value < td_allocation_religion_majority_threshold } } }
+            set_variable = { name = td_fact_mission_space value = 1 }
+            ig:ig_devout = { change_variable = { name = td_component_opportunity add = td_allocation_opportunity_score } }
+        }
+    }
+    every_interest_group = { change_variable = { name = td_score add = var:td_component_opportunity } }
+}

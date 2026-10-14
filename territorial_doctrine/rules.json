@@ -1,5 +1,5 @@
 {
-  "version": "0.8.0-alpha.1",
+  "version": "0.9.0-alpha.1",
   "doctrines": {
     "status_quo": {
       "zh": "领土现状主义",
@@ -376,6 +376,56 @@
       "historical_rights": -0.5,
       "strategic_frontiers": 0.5,
       "imperial_expansion": 1
+    },
+    "group_tendencies": {
+      "armed_forces": {
+        "expansion": 0.5,
+        "admission": 0,
+        "humanitarian_expansion": 0,
+        "humanitarian_admission": 0
+      },
+      "landowners": {
+        "expansion": 0.25,
+        "admission": 0.25,
+        "humanitarian_expansion": 0,
+        "humanitarian_admission": 0
+      },
+      "industrialists": {
+        "expansion": 1,
+        "admission": 0.25,
+        "humanitarian_expansion": -0.25,
+        "humanitarian_admission": 0
+      },
+      "petty_bourgeoisie": {
+        "expansion": 0,
+        "admission": 0,
+        "humanitarian_expansion": 0,
+        "humanitarian_admission": 0.25
+      },
+      "intelligentsia": {
+        "expansion": 0,
+        "admission": 0.5,
+        "humanitarian_expansion": -1,
+        "humanitarian_admission": 1
+      },
+      "trade_unions": {
+        "expansion": 0,
+        "admission": 0.5,
+        "humanitarian_expansion": -0.5,
+        "humanitarian_admission": 1
+      },
+      "rural_folk": {
+        "expansion": -0.5,
+        "admission": 0,
+        "humanitarian_expansion": 0,
+        "humanitarian_admission": 0.25
+      },
+      "devout": {
+        "expansion": 0,
+        "admission": 0,
+        "humanitarian_expansion": 0,
+        "humanitarian_admission": 0
+      }
     }
   },
   "war": {
@@ -408,64 +458,64 @@
       "zh": "武装力量",
       "en": "Armed Forces",
       "rationale": {
-        "zh": "重视国防部署与军方影响力，偏向战略边疆，反对削弱军事议程的守成政策。",
-        "en": "Prioritize defense deployments and military influence, favoring strategic frontiers over policies that restrain the military agenda."
+        "zh": "争取战略空间、基地与可负担的军事任务；扩张需求不等于所有远征都有实际收益。",
+        "en": "Seek strategic space, bases and affordable military missions; a desire to expand does not make every expedition beneficial."
       }
     },
     "landowners": {
       "zh": "地主",
       "en": "Landowners",
       "rationale": {
-        "zh": "维护土地、传统权利与精英地位，倾向历史权利和帝国扩张。",
-        "en": "Defend landed wealth, traditional rights and elite standing, favoring historical claims and imperial expansion."
+        "zh": "优先保护既有土地制度、收益与地位；制度保障须记录实际法律和期限，不能把扩张自动当作土地收益。",
+        "en": "Protect existing land institutions, returns and standing; a guarantee records the actual law and duration, not automatic gains from expansion."
       }
     },
     "industrialists": {
       "zh": "实业家",
       "en": "Industrialists",
       "rationale": {
-        "zh": "寻求对外市场与建设机会，偏向边疆和帝国扩张，重视殖民政策的商业取舍。",
-        "en": "Seek external markets and investment opportunities, favoring frontier and imperial expansion while weighing colonial commercial policy."
+        "zh": "争取市场准入、有效需求与实际投资；同一市场不算新增准入，铁路兑现不证明已经获得利润。",
+        "en": "Seek market access, demand and investment; an existing common market is not new access, and a delivered railway does not prove realized profit."
       }
     },
     "petty_bourgeoisie": {
       "zh": "小市民",
       "en": "Petty Bourgeoisie",
       "rationale": {
-        "zh": "强调国家认同与合法疆界，最重视历史权利，也支持有限边疆政策。",
-        "en": "Emphasize national identity and lawful borders, preferring historical rights while supporting limited frontier policies."
+        "zh": "争取低税、安全和本地经营/岗位；国家认同与税负诉求需要在同一方案中权衡。",
+        "en": "Seek low taxes, security and local opportunities; national identity and tax burdens must be weighed within the same proposal."
       }
     },
     "intelligentsia": {
       "zh": "知识分子",
       "en": "Intelligentsia",
       "rationale": {
-        "zh": "重视居民权利与国内改革，倾向现状主义，反对帝国扩张；人文科技提高接纳意愿。",
-        "en": "Prioritize residents’ rights and domestic reform, favoring the status quo over imperial expansion; humanitarian research encourages admission."
+        "zh": "争取教育、专业与制度议程；公共教育条款与国家宗教办学可能冲突，实际领袖可以改变扩张立场。",
+        "en": "Seek education, professional and institutional agendas; public and state religious schooling can conflict, while actual leaders can change expansion preferences."
       }
     },
     "trade_unions": {
       "zh": "工会",
       "en": "Trade Unions",
       "rationale": {
-        "zh": "重视劳工权利与公共服务，反对扩张挤占民生资源，支持给予新居民平等权利。",
-        "en": "Prioritize labor rights and public services, resisting expansion that diverts domestic resources and supporting equal rights for new residents."
+        "zh": "争取就业待遇、服务和劳动组织；医疗投入可以进入付费谈判，工资和新成员不得凭领土批准虚构。",
+        "en": "Seek employment conditions, services and labor organization; funded health commitments are negotiable, but passage does not fabricate wages or new members."
       }
     },
     "rural_folk": {
       "zh": "乡村民众",
       "en": "Rural Folk",
       "rationale": {
-        "zh": "重视土地生活与低征兵负担，倾向守成，警惕持续扩张带来的战争与财政压力。",
-        "en": "Prioritize rural livelihoods and limited conscription, favoring restraint over the war and fiscal burdens of sustained expansion."
+        "zh": "争取低税、土地生活与较少动员负担；可通过付费低税保障谈判，可能反对保留地主制度。",
+        "en": "Seek low taxes, rural livelihoods and limited mobilization; funded tax guarantees can win support while preserving a landlord regime can cause opposition."
       }
     },
     "devout": {
       "zh": "虔信者",
       "en": "Devout",
       "rationale": {
-        "zh": "重视传统共同体与历史合法性，偏向历史权利；殖民政策与人文发展会调整其立场。",
-        "en": "Value traditional communities and historical legitimacy, favoring historical rights while responding to colonial and humanitarian policy."
+        "zh": "争取传教、信徒保护与宗教组织空间；具体收益须符合宗教/教育制度和真实投入，不能凭殖民标签加分。",
+        "en": "Seek missionary opportunity, protection of believers and organizational space; religious and education laws and actual investment must support the proposal."
       }
     }
   },
@@ -506,5 +556,13 @@
     "bureaucracy_pressure_score": 5,
     "component_cap": 10,
     "tax_adjustment_days": 30
+  },
+  "allocation": {
+    "slots_per_bill": 2,
+    "maintenance_years": 1,
+    "maintenance_delivery_years": 2,
+    "opportunity_score": 5,
+    "religion_majority_threshold": 0.5,
+    "market_access_threshold": 0.5
   }
 }

@@ -25,6 +25,11 @@ td.1 = {
                 set_variable = td_waiting_round
                 if = { limit = { is_player = yes } td_open_negotiation_effect = yes }
                 else = {
+                    if = { limit = { td_can_allocate_low_tax_trigger = yes } td_sign_low_tax_allocation_effect = yes }
+                    else_if = { limit = { td_can_allocate_religious_schools_trigger = yes } td_sign_religious_schools_allocation_effect = yes }
+                    else_if = { limit = { td_can_allocate_public_schools_trigger = yes } td_sign_public_schools_allocation_effect = yes }
+                    else_if = { limit = { td_can_allocate_health_services_trigger = yes } td_sign_health_services_allocation_effect = yes }
+                    else_if = { limit = { td_can_allocate_land_settlement_trigger = yes } td_sign_land_settlement_allocation_effect = yes }
                     if = { limit = { td_can_pledge_navy_trigger = yes } td_sign_navy_pledge_effect = yes }
                     if = { limit = { td_can_pledge_railway_trigger = yes } td_sign_railway_pledge_effect = yes }
                     td_resolve_round_effect = yes
@@ -228,6 +233,11 @@ td.32 = {
     option = { name = td.negotiate.continue trigger = { td_active_negotiation_trigger = yes td_can_legislate_trigger = yes } td_resolve_round_effect = yes }
     option = { name = td.negotiate.navy trigger = { td_active_negotiation_trigger = yes td_can_pledge_navy_trigger = yes } td_sign_navy_pledge_effect = yes trigger_event = td.32 }
     option = { name = td.negotiate.railway trigger = { td_active_negotiation_trigger = yes td_can_pledge_railway_trigger = yes } td_sign_railway_pledge_effect = yes trigger_event = td.32 }
+    option = { name = td.allocate.religious_schools trigger = { td_active_negotiation_trigger = yes td_can_allocate_religious_schools_trigger = yes } td_sign_religious_schools_allocation_effect = yes trigger_event = td.32 }
+    option = { name = td.allocate.public_schools trigger = { td_active_negotiation_trigger = yes td_can_allocate_public_schools_trigger = yes } td_sign_public_schools_allocation_effect = yes trigger_event = td.32 }
+    option = { name = td.allocate.health_services trigger = { td_active_negotiation_trigger = yes td_can_allocate_health_services_trigger = yes } td_sign_health_services_allocation_effect = yes trigger_event = td.32 }
+    option = { name = td.allocate.land_settlement trigger = { td_active_negotiation_trigger = yes td_can_allocate_land_settlement_trigger = yes } td_sign_land_settlement_allocation_effect = yes trigger_event = td.32 }
+    option = { name = td.allocate.low_tax trigger = { td_active_negotiation_trigger = yes td_can_allocate_low_tax_trigger = yes } td_sign_low_tax_allocation_effect = yes trigger_event = td.32 }
     option = { name = td.negotiate.details trigger = { td_active_negotiation_trigger = yes } trigger_event = td.33 }
     option = { name = td.negotiate.withdraw trigger = { td_active_negotiation_trigger = yes } td_cancel_bill_effect = yes trigger_event = td.14 ai_chance = { base = 0 } }
     option = { name = td.close ai_chance = { base = 0 } }

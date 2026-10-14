@@ -1,0 +1,3 @@
+﻿td_allocation_opportunity_score = { value = 5 }
+td_allocation_religion_majority_threshold = { value = 0.5 }
+td_allocation_market_access_threshold = { value = 0.5 }

@@ -1,0 +1,91 @@
+﻿td_allocation_slot_trigger = {
+    has_variable = td_bill_allocation_count
+    var:td_bill_allocation_count < 2
+}
+td_religious_schools_conditions_trigger = {
+    has_law = law_type:law_religious_schools
+    religion = var:td_religious_schools_faith
+    has_institution = institution_schools
+}
+td_can_allocate_religious_schools_trigger = {
+    td_can_legislate_trigger = yes
+    td_allocation_slot_trigger = yes
+    has_variable = td_bill
+    var:td_bill < 3
+    exists = var:td_bill_target
+    NOT = { has_variable = td_pending_religious_schools }
+    gold_reserves >= td_pledge_survey_cost
+    bureaucracy >= 10
+    var:td_bill_target = { is_treaty_port = no OR = { owner = root NOT = { state_region = { any_scope_state = { owner = root } } } } }
+    has_institution = institution_schools
+    institution_investment_level:institution_schools < institution:institution_schools.investment_max
+    has_law = law_type:law_religious_schools
+    NOT = { has_variable = td_pending_public_schools }
+}
+td_public_schools_conditions_trigger = {
+    has_law = law_type:law_public_schools
+    has_institution = institution_schools
+}
+td_can_allocate_public_schools_trigger = {
+    td_can_legislate_trigger = yes
+    td_allocation_slot_trigger = yes
+    has_variable = td_bill
+    var:td_bill < 3
+    exists = var:td_bill_target
+    NOT = { has_variable = td_pending_public_schools }
+    gold_reserves >= td_pledge_survey_cost
+    bureaucracy >= 10
+    var:td_bill_target = { is_treaty_port = no OR = { owner = root NOT = { state_region = { any_scope_state = { owner = root } } } } }
+    has_institution = institution_schools
+    institution_investment_level:institution_schools < institution:institution_schools.investment_max
+    has_law = law_type:law_public_schools
+    NOT = { has_variable = td_pending_religious_schools }
+}
+td_health_services_conditions_trigger = {
+    has_institution = institution_health_system
+}
+td_can_allocate_health_services_trigger = {
+    td_can_legislate_trigger = yes
+    td_allocation_slot_trigger = yes
+    has_variable = td_bill
+    var:td_bill < 3
+    exists = var:td_bill_target
+    NOT = { has_variable = td_pending_health_services }
+    gold_reserves >= td_pledge_survey_cost
+    bureaucracy >= 10
+    var:td_bill_target = { is_treaty_port = no OR = { owner = root NOT = { state_region = { any_scope_state = { owner = root } } } } }
+    has_institution = institution_health_system
+    institution_investment_level:institution_health_system < institution:institution_health_system.investment_max
+}
+td_land_settlement_conditions_trigger = {
+    OR = { AND = { var:td_land_settlement_land_law = 1 has_law = law_type:law_serfdom } AND = { var:td_land_settlement_land_law = 2 has_law = law_type:law_tenant_farmers } }
+}
+td_can_allocate_land_settlement_trigger = {
+    td_can_legislate_trigger = yes
+    td_allocation_slot_trigger = yes
+    has_variable = td_bill
+    var:td_bill < 3
+    exists = var:td_bill_target
+    NOT = { has_variable = td_pending_land_settlement }
+    gold_reserves >= td_pledge_survey_cost
+    bureaucracy >= 10
+    var:td_bill_target = { is_treaty_port = no OR = { owner = root NOT = { state_region = { any_scope_state = { owner = root } } } } }
+    OR = { has_law = law_type:law_serfdom has_law = law_type:law_tenant_farmers }
+}
+td_low_tax_conditions_trigger = {
+    OR = { tax_level = very_low tax_level = low }
+}
+td_can_allocate_low_tax_trigger = {
+    td_can_legislate_trigger = yes
+    td_allocation_slot_trigger = yes
+    has_variable = td_bill
+    var:td_bill < 3
+    exists = var:td_bill_target
+    NOT = { has_variable = td_pending_low_tax }
+    gold_reserves >= td_pledge_survey_cost
+    bureaucracy >= 10
+    var:td_bill_target = { is_treaty_port = no OR = { owner = root NOT = { state_region = { any_scope_state = { owner = root } } } } }
+    has_global_variable = td_fiscal_enabled
+    OR = { tax_level = very_low tax_level = low }
+    net_total_income >= 0
+}

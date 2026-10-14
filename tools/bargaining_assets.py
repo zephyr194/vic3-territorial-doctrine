@@ -36,6 +36,7 @@ def assets():
         modifiers += f'td_{kind}_planning = {{ country_bureaucracy_add = -{n["planning_bureaucracy"]} }}\n'
         triggers += f'''td_can_pledge_{kind}_trigger = {{
     td_can_legislate_trigger = yes
+    td_allocation_slot_trigger = yes
     has_variable = td_bill
     var:td_bill < 3
     exists = var:td_bill_target
@@ -51,6 +52,10 @@ def assets():
 }}
 '''
         effects += f'''td_clear_{kind}_pledge_effect = {{
+    if = {{ limit = {{ has_variable = td_bill has_variable = td_bill_pledge_{kind} var:td_{kind}_bill_generation = var:td_bill_generation }}
+        remove_variable = td_bill_pledge_{kind}
+        change_variable = {{ name = td_bill_allocation_count subtract = 1 }}
+    }}
     remove_modifier = td_{kind}_planning
 '''
         for suffix in ('target','region','baseline','deadline','acquisition_deadline','started','ratified','owned_at_sign','bill_generation','survey_paid'):
@@ -65,6 +70,7 @@ def assets():
             add_modifier = td_{kind}_planning
             set_variable = td_pending_{kind}
             set_variable = td_bill_pledge_{kind}
+            change_variable = {{ name = td_bill_allocation_count add = 1 }}
             set_variable = {{ name = td_{kind}_bill_generation value = var:td_bill_generation }}
             set_variable = {{ name = td_{kind}_region value = var:td_bill_target.state_region }}
             if = {{ limit = {{ var:td_bill_target = {{ owner = root }} }}

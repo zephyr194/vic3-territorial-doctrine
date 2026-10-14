@@ -14,6 +14,7 @@ from tools.development_assets import assets as development_assets
 from tools.success_assets import assets as success_assets
 from tools.bargaining_assets import assets as bargaining_assets
 from tools.civic_assets import assets as civic_assets
+from tools.allocation_assets import assets as allocation_assets
 from tools.law_text import doctrine_description, group_description
 from territorial_doctrine.model import RULES, DOCTRINES  # noqa: E402
 
@@ -212,6 +213,9 @@ td_requires_admission = {{ state_disallow_incorporation = yes }}
     for path, content in bargaining_assets().items():
         put(path, content)
     for path, content in civic_assets().items():
+        put(path, content)
+    allocation_files, _ = allocation_assets()
+    for path, content in allocation_files.items():
         put(path, content)
     # Prefix hand-maintained catalogs too, keeping regeneration idempotent.
     for language in RULES['localization']['translated']:

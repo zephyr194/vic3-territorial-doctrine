@@ -7,7 +7,7 @@ import unittest
 
 from native_runner import EventRunner, WarRunner, policy_context
 from territorial_doctrine.model import (RULES, WarGoal, WarMandate, colonial_tendencies,
-    colonial_admission_multiplier, doctrine_scores, group_scores, integration_cost, political_weight)
+    colonial_admission_multiplier, colonial_group_tendencies, doctrine_scores, group_scores, integration_cost, political_weight)
 from territorial_doctrine.script import Entry, formula, load, walk
 from tools.generate import outputs
 from tools.validate import validate
@@ -28,9 +28,13 @@ class ColonialTests(unittest.TestCase):
         late_claim = group_scores('imperial_expansion', colonial_target=True, colonial_policy='exploitation', humanitarian_stage=2)
         early_admit = group_scores('imperial_expansion', admission=True, colonial_target=True, colonial_policy='exploitation')
         late_admit = group_scores('imperial_expansion', admission=True, colonial_target=True, colonial_policy='exploitation', humanitarian_stage=2)
-        for g in RULES['groups']:
+        for g in ('intelligentsia','trade_unions'):
             self.assertLess(late_claim[g], early_claim[g])
             self.assertGreater(late_admit[g], early_admit[g])
+        for g in ('armed_forces','devout'):
+            self.assertEqual(late_claim[g],early_claim[g])
+            self.assertEqual(late_admit[g],early_admit[g])
+        self.assertLess(early_claim['rural_folk'],group_scores('imperial_expansion')['rural_folk'])
 
     def test_humanitarian_rights_cost_more_despite_greater_support(self):
         early = integration_cost(1_000_000, 'strategic_frontiers', fast=False,
@@ -40,7 +44,7 @@ class ColonialTests(unittest.TestCase):
         self.assertEqual((early, late), (50, 50))
 
     def test_colonial_policy_shapes_national_doctrine_opinions(self):
-        for group in RULES['groups']:
+        for group in ('intelligentsia','trade_unions','industrialists'):
             self.assertLess(doctrine_scores('imperial_expansion', 'exploitation', 2)[group],
                             doctrine_scores('imperial_expansion', 'exploitation', 0)[group])
             self.assertGreater(doctrine_scores('status_quo', 'exploitation', 2)[group],
@@ -94,7 +98,7 @@ class ColonialTests(unittest.TestCase):
             r.execute(r.definitions['td_colonial_bill_scores_effect'])
             pull=colonial_tendencies(policy,stage)[kind-1]
             for group in RULES['groups']:
-                expected=RULES['groups'][group][3]*10+pull*RULES['colonial']['weights'][group]
+                expected=RULES['groups'][group][3]*10+colonial_group_tendencies(group,policy,stage)[kind-1]
                 self.assertEqual(r.groups['ig:ig_'+group]['variables']['td_score'],expected)
 
     def test_generated_profiles_match_model_and_preserve_vanilla_ideologies(self):

@@ -1,0 +1,5 @@
+﻿td_religious_schools_planning = { country_bureaucracy_add = -10 }
+td_public_schools_planning = { country_bureaucracy_add = -10 }
+td_health_services_planning = { country_bureaucracy_add = -10 }
+td_land_settlement_planning = { country_bureaucracy_add = -10 }
+td_low_tax_planning = { country_bureaucracy_add = -10 }
