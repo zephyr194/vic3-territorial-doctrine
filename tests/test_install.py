@@ -2,6 +2,7 @@
 from contextlib import redirect_stdout, redirect_stderr
 import io
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -222,8 +223,16 @@ class DiscoveryTests(unittest.TestCase):
             for action in ('install','status','update','remove','remove'):
                 command=[sys.executable,str(ROOT/'vtd.py'),action,'--mod-dir',str(destination)]
                 if action=='update':command.append('--generate')
-                result=subprocess.run(command,cwd=directory,capture_output=True,text=True)
+                log=directory/(action+'.log')
+                result=subprocess.run(command,cwd=directory,capture_output=True,text=True,
+                                      env={**os.environ,'VTD_LOG_FILE':str(log)})
                 self.assertEqual(result.returncode,0,result.stderr)
+                recorded=log.read_text(encoding='utf-8')
+                self.assertIn('VTD exit code: 0',recorded)
+                if action=='install':self.assertIn('Staging mod files',recorded)
+                if action=='update':
+                    self.assertIn('Regenerating source assets',recorded)
+                    self.assertIn('Backing up the previous installation',recorded)
             self.assertFalse((destination/installer.NAME).exists())
 
 

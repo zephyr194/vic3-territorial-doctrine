@@ -135,7 +135,12 @@ def validate_source(*, generate: bool = False) -> None:
     if (ROOT / 'mod').is_symlink() or (ROOT / 'LICENSE').is_symlink() or any(p.is_symlink() for p in (ROOT / 'mod').rglob('*')):
         raise ValueError('Source payload contains symbolic links; use regular files for installation.')
     if generate:
-        subprocess.run([sys.executable, str(ROOT / 'tools' / 'generate.py')], cwd=ROOT, check=True)
+        print('Regenerating source assets...', flush=True)
+        result = subprocess.run([sys.executable, str(ROOT / 'tools' / 'generate.py')], cwd=ROOT,
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                text=True, encoding='utf-8', errors='replace')
+        print(result.stdout, end='', flush=True)
+        result.check_returncode()
     from tools.package import check
     check()
 
@@ -229,6 +234,7 @@ def manage(action: str, destination: Path, *, dry_run: bool = False, generate: b
             print(f'Would back up the old payload and descriptor under {destination.parent / "vtd-backups"}.')
         return None
     if action != 'remove':
+        print('Validating source assets...', flush=True)
         validate_source(generate=generate)
     destination.mkdir(parents=True, exist_ok=True)
     with install_lock(destination):
@@ -241,8 +247,12 @@ def manage(action: str, destination: Path, *, dry_run: bool = False, generate: b
         with tempfile.TemporaryDirectory(prefix='.vtd-stage-', dir=destination) as tmp:
             staging = Path(tmp)
             if action != 'remove':
+                print('Staging mod files...', flush=True)
                 stage_payload(staging, destination)
+            if existing['present']:
+                print('Backing up the previous installation...', flush=True)
             backup = backup_installation(destination, action) if existing['present'] else None
+            print('Applying installation changes...', flush=True)
             swap_installation(destination, staging, remove=action == 'remove', backup=backup)
     print('Removed VTD.' if action == 'remove' else 'VTD ready. Restart the launcher and enable it in a playset.')
     if backup:
@@ -254,6 +264,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, epilog='update copies the current local checkout; run git pull --ff-only first for remote changes.')
     parser.add_argument('--mod-dir', type=Path, help='Victoria 3 user-data mod folder; also VTD_MOD_DIR')
     parser.add_argument('--dry-run', action='store_true', help='preview without changing files')
+    parser.add_argument('--menu', action='store_true', help='open the menu even when console input is redirected')
     subparsers = parser.add_subparsers(dest='action')
     for action in ('install', 'update', 'remove', 'status'):
         sub = subparsers.add_parser(action)
@@ -265,7 +276,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         destination = find_mod_dir(args.mod_dir)
         if args.action is None:
-            if not sys.stdin.isatty():
+            if not args.menu and not sys.stdin.isatty():
                 parser.print_help()
                 return 2
             print(f'VTD local test installer / 本地测试安装工具\nMod directory: {destination}')

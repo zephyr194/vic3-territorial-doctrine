@@ -2,20 +2,24 @@
 
 Version **0.9.0-alpha.1** adds paid distribution clauses for all eight interest groups and distinct colonial responses to domestic territorial bargaining. The system starts disabled: use **Enable National Territorial Doctrine** in decisions. English and Simplified Chinese are translated; nine other game-language catalogs contain complete English fallback text. Game settings select the language.
 
-Quick source installation, Python 3.10+ with no third-party dependencies:
+Quick source installation on Windows uses built-in Windows PowerShell 5.1; no Python or additional runtime installation is required:
 
-```bash
+```bat
 git clone https://github.com/zephyr194/vic3-territorial-doctrine.git
 cd vic3-territorial-doctrine
-python vtd.py install
-python vtd.py status
-python vtd.py update
-python vtd.py remove
+vtd.cmd install
+vtd.cmd status
+vtd.cmd update
+vtd.cmd remove
 ```
 
-On Windows, double-click `vtd.cmd` for the menu or pass the same commands. On Linux/macOS use `python3` or `./vtd.sh`. The tool discovers the **user-data mod directory**, including Windows Documents redirection, rather than modifying the Steam game files. Override it with `--mod-dir "/path/to/Victoria 3/mod"` or `VTD_MOD_DIR`; explicit arguments take precedence. Proton/custom profiles need the explicit path.
+Double-click `vtd.cmd` for the menu; type `exit` to close the retained console afterward. In a PowerShell terminal use `.\vtd.cmd`. Linux/macOS keep `python3 vtd.py` or `./vtd.sh` (Python 3.10+, no pip dependencies). The tool discovers the **user-data mod directory**, including Windows Documents redirection, rather than modifying the Steam game files. Override it with `--mod-dir "/path/to/Victoria 3/mod"` or `VTD_MOD_DIR`; explicit arguments take precedence. Proton/custom profiles need an explicit path.
 
-`update` copies your current checkout; run `git pull --ff-only` first to obtain remote changes. For edited shared rules/localization use `update --generate`. `--dry-run` previews paths without writing anything. Updates/removals back up the previous VTD folder and descriptor under the profile's `vtd-backups/` directory, preserving local edits there. Transactions roll back failed writes, reject unrelated files/symlinks and support legacy ZIP installations. Saves, other mods and playsets are preserved. Exit the game before changing files and restart the launcher afterward. Windows/macOS discovery is fixture-tested; the actual CLI filesystem lifecycle is tested on Linux. See [installation](INSTALL.md#源码安装工具).
+Both entry points print a persistent log path in the system temporary directory (`%TEMP%/vtd-installer-*.log` on Windows), recording progress and errors, including during dry runs. Set `VTD_LOG_FILE` to append to a file in an existing directory. The batch launcher uses a process-local execution policy for the repository script, without changing system policy. Managed device policies can still block scripts before they start. Run `vtd.cmd status` from an existing terminal to see startup errors.
+
+`update` copies the current checkout; run `git pull --ff-only` first for remote changes. Windows checks source identity, required files and links, then copies the checked-in payload without invoking Python. It does not perform the Python source-generation consistency or deep script checks. After editing generator inputs, regenerate in a Python development environment and commit the resulting assets. Python entry points retain full offline source validation and support `update --generate`; Windows rejects `--generate` explicitly. `--dry-run` changes no source or game files but still writes its diagnostic log.
+
+Updates/removals back up the old payload and descriptor under the profile's `vtd-backups/`, preserving local edits. Failed writes attempt rollback, unrelated files/descriptor paths are refused, and legacy ZIP installations are supported. Windows also refuses reparse points within source/backup payloads; use a full local copy if OneDrive placeholders are refused. Saves, other mods and playsets are preserved. Exit the game before changing files and restart the launcher afterward. PowerShell transactions are tested on Linux with optional `pwsh`; native Windows checks are included in CI. See [installation](INSTALL.md#源码安装工具).
 
 Select a claim, admission or lost-claim relinquishment target and an argument. Every 90 days the player negotiates a round: review group interests, fund a commitment, proceed or withdraw. Three successes pass; three failures reject. Closing a dialog does not immediately vote, and the negotiation decision reopens it. Engine timeout behavior remains to be tested.
 
@@ -31,7 +35,7 @@ All unconditional industrial, construction, migration, political-strength, legit
 
 Colonial policy still distinguishes acquiring land from admitting residents, and Egalitarianism/Human Rights supply humanitarian argument stages. These alter support estimates, not citizenship or residents’ actual acceptance. Medical/military technology does not increment humanitarian stages. Rights arguments receive extra support only with actual Multiculturalism and Total Separation laws. Population-specific taxes, automatic financing, actual property/profit/wage/member returns and complete ideology responses remain unimplemented.
 
-**227 offline tests pass, including 22 installer tests, 32 bargaining/contract, 22 accounting and 26 new allocation regressions. Victoria 3 1.13 engine behavior has not been tested.** Tests use explicit engine-data fixtures; JSON roundtrips validate persisted script state, not a real game save or PRNG. Test treasury scopes, UI, building counts, partial-state transfers and timing in a fresh 1.13 save. Old alpha saves are not supported migrations.
+**240 offline tests pass with optional PowerShell (2 native Windows batch tests are skipped on Linux), including 35 installer tests, 32 bargaining/contract, 22 accounting and 26 new allocation regressions. Victoria 3 1.13 engine behavior has not been tested.** Tests use explicit engine-data fixtures; JSON roundtrips validate persisted script state, not a real game save or PRNG. Test treasury scopes, UI, building counts, partial-state transfers and timing in a fresh 1.13 save. Old alpha saves are not supported migrations.
 
 Python 3.10+, no third-party dependencies:
 

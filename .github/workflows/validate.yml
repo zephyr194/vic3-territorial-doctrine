@@ -1,6 +1,21 @@
 name: Validate mod
 on: [push, pull_request]
 jobs:
+  windows-installer:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Windows launcher with no Python on PATH
+        shell: cmd
+        run: |
+          set "PATH=%SystemRoot%\System32;%SystemRoot%"
+          call vtd.cmd status --mod-dir "%RUNNER_TEMP%\VTD profile\mod"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -p test_launcher.py -v
+      - run: python -m unittest discover -s tests -p test_windows_install.py -v
+      - run: python -m unittest discover -s tests -p test_install.py -v
   offline:
     runs-on: ubuntu-latest
     steps:
