@@ -2,6 +2,21 @@
 
 Version **0.9.0-alpha.1** adds paid distribution clauses for all eight interest groups and distinct colonial responses to domestic territorial bargaining. The system starts disabled: use **Enable National Territorial Doctrine** in decisions. English and Simplified Chinese are translated; nine other game-language catalogs contain complete English fallback text. Game settings select the language.
 
+Quick source installation, Python 3.10+ with no third-party dependencies:
+
+```bash
+git clone https://github.com/zephyr194/vic3-territorial-doctrine.git
+cd vic3-territorial-doctrine
+python vtd.py install
+python vtd.py status
+python vtd.py update
+python vtd.py remove
+```
+
+On Windows, double-click `vtd.cmd` for the menu or pass the same commands. On Linux/macOS use `python3` or `./vtd.sh`. The tool discovers the **user-data mod directory**, including Windows Documents redirection, rather than modifying the Steam game files. Override it with `--mod-dir "/path/to/Victoria 3/mod"` or `VTD_MOD_DIR`; explicit arguments take precedence. Proton/custom profiles need the explicit path.
+
+`update` copies your current checkout; run `git pull --ff-only` first to obtain remote changes. For edited shared rules/localization use `update --generate`. `--dry-run` previews paths without writing anything. Updates/removals back up the previous VTD folder and descriptor under the profile's `vtd-backups/` directory, preserving local edits there. Transactions roll back failed writes, reject unrelated files/symlinks and support legacy ZIP installations. Saves, other mods and playsets are preserved. Exit the game before changing files and restart the launcher afterward. Windows/macOS discovery is fixture-tested; the actual CLI filesystem lifecycle is tested on Linux. See [installation](INSTALL.md#源码安装工具).
+
 Select a claim, admission or lost-claim relinquishment target and an argument. Every 90 days the player negotiates a round: review group interests, fund a commitment, proceed or withdraw. Three successes pass; three failures reject. Closing a dialog does not immediately vote, and the negotiation decision reopens it. Engine timeout behavior remains to be tested.
 
 Support reads vanilla clout, group approval and selected leader ideologies, plus explicit argument, colonial, commitment and breach components. The ledger separates these sources. Base affinities and score thresholds are adjustable gameplay parameters, not historical approval measurements.
@@ -16,7 +31,7 @@ All unconditional industrial, construction, migration, political-strength, legit
 
 Colonial policy still distinguishes acquiring land from admitting residents, and Egalitarianism/Human Rights supply humanitarian argument stages. These alter support estimates, not citizenship or residents’ actual acceptance. Medical/military technology does not increment humanitarian stages. Rights arguments receive extra support only with actual Multiculturalism and Total Separation laws. Population-specific taxes, automatic financing, actual property/profit/wage/member returns and complete ideology responses remain unimplemented.
 
-**205 offline tests pass, including 32 bargaining/contract, 22 accounting and 26 new allocation regressions. Victoria 3 1.13 engine behavior has not been tested.** Tests use explicit engine-data fixtures; JSON roundtrips validate persisted script state, not a real game save or PRNG. Test treasury scopes, UI, building counts, partial-state transfers and timing in a fresh 1.13 save. Old alpha saves are not supported migrations.
+**227 offline tests pass, including 22 installer tests, 32 bargaining/contract, 22 accounting and 26 new allocation regressions. Victoria 3 1.13 engine behavior has not been tested.** Tests use explicit engine-data fixtures; JSON roundtrips validate persisted script state, not a real game save or PRNG. Test treasury scopes, UI, building counts, partial-state transfers and timing in a fresh 1.13 save. Old alpha saves are not supported migrations.
 
 Python 3.10+, no third-party dependencies:
 

@@ -1,0 +1,2 @@
+vtd.cmd text eol=crlf
+vtd.sh text eol=lf

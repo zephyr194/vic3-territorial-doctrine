@@ -2,9 +2,7 @@
 """Validate and package the mod, or install into an explicitly chosen mod folder."""
 import argparse
 from pathlib import Path
-import shutil
 import sys
-import tempfile
 from zipfile import ZipFile, ZIP_DEFLATED
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,29 +49,10 @@ def package(output: Path) -> None:
 
 
 def install(destination: Path) -> None:
-    check()
-    destination = destination.expanduser().resolve()
-    checkout = ROOT.resolve()
-    if destination == checkout or checkout in destination.parents:
-        raise ValueError('Choose the game user-data mod directory outside the source checkout')
-    folder = destination / NAME
-    launcher = destination / f'{NAME}.mod'
-    if folder.exists() or launcher.exists():
-        raise ValueError('Installation already exists; move or remove it yourself before installing. No files overwritten.')
-    destination.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix='.td-install-', dir=destination) as tmp:
-        staging = Path(tmp) / NAME
-        shutil.copytree(ROOT / 'mod', staging)
-        shutil.copyfile(ROOT / 'LICENSE', staging / 'LICENSE')
-        # Exclusive creation protects a preexisting launcher file.
-        with launcher.open('x', encoding='utf-8') as file:
-            file.write(descriptor(folder.as_posix()))
-        try:
-            staging.rename(folder)
-        except BaseException:
-            launcher.unlink()
-            raise
-    print(f'Installed: {folder}; enable it in a launcher playset.')
+    # Keep the previous public entry point; use the same ownership checks and
+    # transaction code as the local test installer.
+    from tools.install import manage
+    manage('install', destination)
 
 
 def main() -> int:

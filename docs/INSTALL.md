@@ -10,9 +10,61 @@
 - Linux：~/.local/share/Paradox Interactive/Victoria 3/mod。
 - macOS：~/Documents/Paradox Interactive/Victoria 3/mod。
 
-源码安装：`python3 tools/package.py --install-dir "/你的用户数据路径/Victoria 3/mod"`。同名安装拒绝覆盖，请备份并移走旧版。不下载游戏或要求Steam凭据。
+源码推荐使用下方安装工具；旧命令`python3 tools/package.py --install-dir "/你的用户数据路径/Victoria 3/mod"`继续可用，调用同一套安装保护逻辑，同名安装需用`update`处理。
 
 ZIP附带所有Markdown规则与验收文档。可用`python3 tools/validate.py --game-dir "/你的Steam路径/Victoria 3/game"`核对实际数据库名称，不能替代引擎验收。
+
+## 源码安装工具
+
+安装工具随GitHub源码提供，ZIP安装包仍按前面的解压方式安装。需要Python 3.10+，无需pip依赖。操作前退出游戏，安装/更新后重新打开启动器，将Territorial Doctrine加入本地测试播放集。
+
+```bash
+git clone https://github.com/zephyr194/vic3-territorial-doctrine.git
+cd vic3-territorial-doctrine
+python vtd.py install
+python vtd.py status
+python vtd.py update
+python vtd.py remove
+```
+
+Windows推荐双击仓库根目录的`vtd.cmd`，选择安装、更新、移除或状态；命令行也支持`vtd.cmd install`等命令。Linux/macOS将`python`换成`python3`，或运行`./vtd.sh install`。入口使用脚本所在目录定位源码，可从其他工作目录调用。
+
+| 命令 | 行为 |
+|---|---|
+| `install` | 校验并复制当前源码，写入绝对路径的启动器描述；已有安装时提示使用update |
+| `update` | 校验并同步当前本地源码，清除旧版本残留文件；更新前完整备份旧安装与描述文件 |
+| `remove` | 备份后移除本模组目录及其描述文件；重复移除安全返回 |
+| `status` | 显示实际目标目录、安装状态和版本；缺失一部分时提示用update修复 |
+| `--dry-run` | 预览目标和备份位置，不改源码或游戏目录；不会验证尚未生成的未来载荷 |
+| `install/update --generate` | 先重新生成共享规则、图标和语言文件，再校验并安装，适合修改rules.json或本地化后的测试 |
+
+**update同步当前本地源码，不会自动拉取GitHub，也不会丢弃本地改动。** 获取远端最新版：
+
+```bash
+git pull --ff-only
+python vtd.py update
+```
+
+只测试本地代码改动时直接`python vtd.py update`；改了共享源数据则运行`python vtd.py update --generate`。生成会更新仓库内相应生成文件；不需要用管理员权限运行工具。
+
+默认安装到用户数据的`Victoria 3/mod`，不是Steam游戏本体的`game`目录：
+
+- Windows优先读取当前用户Documents的重定向位置，支持OneDrive；注册表不可用时尝试现有OneDrive/文档目录，有多个候选会提示手动指定。
+- Linux使用`$XDG_DATA_HOME/Paradox Interactive/Victoria 3/mod`，未设置则为`~/.local/share/Paradox Interactive/Victoria 3/mod`。
+- macOS使用`~/Documents/Paradox Interactive/Victoria 3/mod`。
+- Proton、自定义用户数据位置等情形请手动指定最终mod目录；也可设置环境变量`VTD_MOD_DIR`，显式`--mod-dir`优先。
+
+```bash
+python vtd.py install --mod-dir "D:/Paradox User Data/Victoria 3/mod"
+python vtd.py update --generate --mod-dir "D:/Paradox User Data/Victoria 3/mod"
+python vtd.py remove --dry-run --mod-dir "D:/Paradox User Data/Victoria 3/mod"
+```
+
+更新/移除的旧安装保存在所选mod目录的上一级`vtd-backups/时间-操作-标识/`，包含原模组、原描述文件和路径记录；安装目录内的手动改动也在此备份。成功更新后仅部署当前载荷，旧脚本不会残留生效。要恢复旧版，在退出游戏后将备份里的`territorial_doctrine/`与`territorial_doctrine.mod`放回原mod目录。备份确认不再需要后可手动清理。
+
+工具仅处理可识别为VTD的模组和描述文件，支持接管旧ZIP/旧安装命令的版本；同名其他文件、不同描述路径和顶层符号链接会拒绝修改。发生写入失败时尝试恢复原安装，完整备份始终可用于恢复。存档、其他模组和播放集保留，不会自动为测试改用新存档；游戏规则版本兼容性仍按本文的新测试档要求执行。
+
+如果出现`.vtd-install.lock`，先确认另一安装操作已经结束；进程异常终止留下的锁可手动删除后重试。安装源校验失败会给出原因；需要生成时使用`--generate`，结构/引用错误须先修复。移除和状态不依赖源载荷校验，便于本地源码尚未修好时管理已有安装。
 
 ## 启用与选择目标
 
@@ -40,7 +92,7 @@ ZIP附带所有Markdown规则与验收文档。可用`python3 tools/validate.py 
 
 法律接纳不直接消除歧视或改变文化、宗教、实际接受；“平等权利”理由的支持依赖现有公民权与宗教法律。永久财政、征募、服务模块见下文；长期服务保留合同仍是待接入设计。
 
-见 [DESIGN.md](DESIGN.md) 的当前0.8范围和参数解释，以及 [TESTING.md](TESTING.md) 的实机清单。旧版本历史记录以LEGACY文件名保存，不是当前规则。
+见 [DESIGN.md](DESIGN.md) 的当前0.9范围和参数解释，以及 [TESTING.md](TESTING.md) 的实机清单。旧版本历史记录以LEGACY文件名保存，不是当前规则。
 
 
 ## 永久计算模块与VTD提示
