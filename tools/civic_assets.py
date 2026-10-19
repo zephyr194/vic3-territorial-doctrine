@@ -228,6 +228,7 @@ td_civic_bill_scores_effect = {
 '''
     events = '''td.40 = {
     type = country_event
+    event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.40.t
     desc = td.40.d
     flavor = td.flavor

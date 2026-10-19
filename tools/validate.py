@@ -36,6 +36,13 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
     scopes = {e.value for tree in trees.values() for e in walk(tree) if e.key == 'save_scope_as'}
     scopes |= set(RULES.get('legacy_scopes', ()))
     for path, tree in trees.items():
+        if path.parent.name == 'events':
+            for event in tree:
+                if not isinstance(event.value, list):
+                    continue
+                fields = {e.key: e.value for e in event.value}
+                if fields.get('hidden') != 'yes' and 'type' in fields and 'event_image' not in fields:
+                    errors.append(f'{path}: visible event {event.key} has no event_image')
         for e in walk(tree):
             for token in (e.key, e.value if isinstance(e.value, str) else ''):
                 if token.startswith('"'):
@@ -91,10 +98,10 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
             if e.key in ('title', 'desc', 'flavor') or e.key == 'name' and isinstance(e.value, str) and e.value.startswith('td.'):
                 if isinstance(e.value, str) and e.value.startswith('td.'):
                     required.add(e.value)
-            if e.key == 'icon' and isinstance(e.value, str):
+            if e.key in ('icon', 'texture') and isinstance(e.value, str):
                 asset = e.value.strip('"')
                 if asset.startswith('gfx/') and not (mod / asset).is_file():
-                    errors.append(f'{path}: missing icon {asset}')
+                    errors.append(f'{path}: missing {e.key} {asset}')
     for lang, keys in localizations.items():
         for key in sorted(required - keys.keys()):
             errors.append(f'{lang}: missing localization {key}')

@@ -23,6 +23,7 @@ def policy_context(government='other', power='other', doctrine='strategic_fronti
     }.items()})
     context['var:td_reason'] = RULES['reasons'][reason]['id'] if reason else 0
     context.update({'var:td_bill': 0, 'var:td_pending_bill': 0,
+        'has_variable:td_bill': True, 'has_variable:td_pending_bill': True, 'has_variable:td_reason': True,
         'has_claim:var:td_target.state_region': False,
         'var:td_target.td_colonial_target_trigger': False})
     for p in RULES['colonial']['policies'].values():
@@ -134,7 +135,8 @@ class EventRunner:
         for key in [k for k, day in self.expirations.items() if day <= self.day]:
             self.variables.pop(key, None)
             del self.expirations[key]
-        context = self.policy.copy()
+        context = {key: value for key, value in self.policy.items()
+                   if not key.startswith('has_variable:')}
         context.update({'var:' + k: v for k, v in self.variables.items()})
         context.update({'root.var:' + k: v for k, v in self.variables.items()})
         context.update({'scope:' + k: v for k, v in self.saved.items()})
@@ -306,7 +308,9 @@ class EventRunner:
     def execute(self, entries):
         previous_if = False
         for e in entries:
-            if e.key in ('if', 'else_if', 'else'):
+            if e.key == 'hidden_effect':
+                self.execute(e.value)
+            elif e.key in ('if', 'else_if', 'else'):
                 limit = next((v.value for v in e.value if v.key == 'limit'), [])
                 enabled = (e.key == 'if' or not previous_if) and self.check(limit)
                 if e.key == 'if':

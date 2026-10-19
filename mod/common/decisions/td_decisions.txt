@@ -1,84 +1,77 @@
-# This decision remains visible while disabled and is the installation indicator.
-td_enable_doctrine = {
-    is_shown = { is_player = yes NOT = { td_feature_enabled_trigger = yes } }
-    possible = { NOT = { td_feature_enabled_trigger = yes } }
-    when_taken = { td_enable_system_effect = yes }
-    ai_chance = { value = 0 }
-}
+# One acknowledgement per country/save; there is no main-system toggle.
 td_mod_status = {
-    is_shown = { is_player = yes }
+    is_shown = { is_player = yes NOT = { has_variable = td_status_acknowledged } }
     when_taken = {
-        set_global_variable = td_mod_present
-        if = { limit = { td_feature_enabled_trigger = yes } td_refresh_colonial_profile_effect = yes trigger_event = td.23 }
-        else = { trigger_event = td.26 }
+        hidden_effect = { td_initialize_effect = yes }
+        trigger_event = td.23
     }
     ai_chance = { value = 0 }
 }
 td_select_claim = {
     is_shown = { td_feature_enabled_trigger = yes NOT = { has_law = law_type:law_td_status_quo } }
     possible = { td_can_start_bill_trigger = yes any_state = { td_claim_candidate_trigger = yes } }
-    when_taken = { clear_variable_list = td_seen_claim_regions td_select_claim_effect = yes td_open_target_menu_effect = yes }
+    when_taken = { hidden_effect = { clear_variable_list = td_seen_claim_regions td_select_claim_effect = yes td_open_target_menu_effect = yes } }
     ai_chance = { value = 0 }
 }
 td_claim_al_rif = {
     is_shown = { td_feature_enabled_trigger = yes this = c:SPA exists = s:STATE_AL_RIF.region_state:MOR NOT = { AND = { has_claim = s:STATE_AL_RIF is_target_in_variable_list = { name = td_approved_claim_regions target = s:STATE_AL_RIF } } } }
     possible = { td_can_start_bill_trigger = yes s:STATE_AL_RIF.region_state:MOR = { td_claim_candidate_trigger = yes } }
-    when_taken = {
+    when_taken = { hidden_effect = {
         set_variable = { name = td_target value = s:STATE_AL_RIF.region_state:MOR }
         set_variable = { name = td_pending_bill value = 1 }
         set_variable = { name = td_reason value = 0 }
         td_refresh_target_effect = yes
         td_open_target_menu_effect = yes
-    }
+    } }
     ai_chance = { value = 0 }
 }
 td_select_owned = {
     is_shown = { td_feature_enabled_trigger = yes any_scope_state = { td_needs_admission_trigger = yes } }
     possible = { td_can_start_bill_trigger = yes }
-    when_taken = { clear_variable_list = td_seen_owned_states td_select_owned_effect = yes td_open_target_menu_effect = yes }
+    when_taken = { hidden_effect = { clear_variable_list = td_seen_owned_states td_select_owned_effect = yes td_open_target_menu_effect = yes } }
     ai_chance = { value = 0 }
 }
 td_renounce_lost = {
     is_shown = { td_feature_enabled_trigger = yes any_state = { td_lost_state_trigger = yes } }
     possible = { td_can_start_bill_trigger = yes }
-    when_taken = { clear_variable_list = td_seen_lost_regions td_select_lost_effect = yes td_open_target_menu_effect = yes }
+    when_taken = { hidden_effect = { clear_variable_list = td_seen_lost_regions td_select_lost_effect = yes td_open_target_menu_effect = yes } }
     ai_chance = { value = 0 }
 }
 td_select_integration = {
-    is_shown = { td_feature_enabled_trigger = yes any_scope_state = { td_non_homeland_state_trigger = yes var:td_admitted_owner = owner } }
+    is_shown = { td_feature_enabled_trigger = yes any_scope_state = { td_non_homeland_state_trigger = yes has_variable = td_admitted_owner var:td_admitted_owner = owner } }
     possible = { NOT = { has_variable = td_bill } NOT = { has_variable = td_fast } NOT = { has_variable = td_regular } }
-    when_taken = { clear_variable_list = td_seen_admitted_states td_select_admitted_effect = yes td_open_integration_menu_effect = yes }
+    when_taken = { hidden_effect = { clear_variable_list = td_seen_admitted_states td_select_admitted_effect = yes td_open_integration_menu_effect = yes } }
     ai_chance = { value = 0 }
 }
 td_pledge_navy = {
     is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill var:td_bill < 3 }
     possible = { td_can_pledge_navy_trigger = yes }
-    when_taken = { td_sign_navy_pledge_effect = yes }
+    when_taken = { hidden_effect = { td_sign_navy_pledge_effect = yes } }
     ai_chance = { value = 0 }
 }
 td_pledge_railway = {
     is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill var:td_bill < 3 }
     possible = { td_can_pledge_railway_trigger = yes }
-    when_taken = { td_sign_railway_pledge_effect = yes }
+    when_taken = { hidden_effect = { td_sign_railway_pledge_effect = yes } }
     ai_chance = { value = 0 }
 }
 td_negotiate = {
     is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill has_variable = td_waiting_round }
-    when_taken = { td_open_negotiation_effect = yes }
+    when_taken = { hidden_effect = { td_open_negotiation_effect = yes } }
     ai_chance = { value = 0 }
 }
 td_bill_status = {
     is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill }
-    when_taken = { trigger_event = td.10 }
+    when_taken = { hidden_effect = { trigger_event = td.10  } }
     ai_chance = { value = 0 }
 }
 td_cancel_bill = {
     is_shown = { td_feature_enabled_trigger = yes has_variable = td_bill }
-    when_taken = { td_cancel_bill_effect = yes trigger_event = td.14 }
+    when_taken = { hidden_effect = { td_cancel_bill_effect = yes trigger_event = td.14  } }
     ai_chance = { value = 0 }
 }
 td_refresh_integration = {
-    is_shown = { td_feature_enabled_trigger = yes exists = var:td_target var:td_target = { owner = root var:td_admitted_owner = owner } }
-    when_taken = { td_refresh_target_effect = yes }
+    is_shown = { td_feature_enabled_trigger = yes exists = var:td_target var:td_target = { owner = root has_variable = td_admitted_owner var:td_admitted_owner = owner } }
+    when_taken = { hidden_effect = { td_refresh_acceptance_effect = yes } }
     ai_chance = { value = 0 }
 }

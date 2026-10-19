@@ -6,8 +6,8 @@ je_td_bill = {
 }
 je_td_admission_amendment = {
     group = td_journal_group
-    is_shown_when_inactive = { td_feature_enabled_trigger = yes is_player = yes var:td_bill = 2 exists = var:td_bill_target }
-    possible = { td_feature_enabled_trigger = yes var:td_bill = 2 exists = var:td_bill_target }
+    is_shown_when_inactive = { td_feature_enabled_trigger = yes is_player = yes has_variable = td_bill var:td_bill = 2 exists = var:td_bill_target }
+    possible = { td_feature_enabled_trigger = yes has_variable = td_bill var:td_bill = 2 exists = var:td_bill_target }
     can_deactivate = yes
 }
 je_td_integration = {

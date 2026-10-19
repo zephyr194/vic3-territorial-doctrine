@@ -96,7 +96,10 @@ td_select_admitted_effect = {
         if = { limit = { NOT = { has_variable = td_target } } clear_variable_list = td_seen_admitted_states td_pick_admitted_effect = yes }
         if = {
             limit = { exists = var:td_target }
-            set_variable = { name = td_reason value = var:td_target.var:td_admission_reason }
+            set_variable = { name = td_reason value = 4 }
+            if = { limit = { var:td_target = { has_variable = td_admission_reason } }
+                set_variable = { name = td_reason value = var:td_target.var:td_admission_reason }
+            }
         }
         td_refresh_target_effect = yes
     }
@@ -157,11 +160,17 @@ td_select_claim_effect = {
 # COUNTRY: a target may disappear while a browsing window is open. Never open
 # a dynamic state title or cost preview without an existing selected state.
 td_open_target_menu_effect = {
-    if = { limit = { exists = var:td_target } trigger_event = td.20 }
+    if = { limit = { exists = var:td_target has_variable = td_pending_bill }
+        var:td_target = { save_scope_as = td_menu_target }
+        trigger_event = td.20
+    }
     else = { trigger_event = td.31 }
 }
 td_open_integration_menu_effect = {
-    if = { limit = { exists = var:td_target } trigger_event = td.22 }
+    if = { limit = { exists = var:td_target }
+        var:td_target = { save_scope_as = td_menu_target }
+        trigger_event = td.22
+    }
     else = { trigger_event = td.31 }
 }
 td_designate_focus_effect = {

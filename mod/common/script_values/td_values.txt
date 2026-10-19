@@ -43,7 +43,7 @@ td_project_cost_before_rounding = {
 }
 td_inherited_cost_multiplier = {
     value = var:td_target.var:td_source_administration
-    if = { limit = { OR = { var:td_pending_bill = 1 var:td_bill = 1 } } value = var:td_target.var:td_live_administration }
+    if = { limit = { OR = { AND = { has_variable = td_pending_bill var:td_pending_bill = 1 } AND = { has_variable = td_bill var:td_bill = 1 } } } value = var:td_target.var:td_live_administration }
 }
 td_regular_project_cost = { value = td_project_cost_before_rounding multiply = td_cost_precision round = yes divide = td_cost_precision ceiling = yes }
 td_fast_project_cost = { value = td_project_cost_before_rounding multiply = td_annual_cost_multiplier multiply = td_cost_precision round = yes divide = td_cost_precision ceiling = yes }

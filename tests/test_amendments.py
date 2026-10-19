@@ -130,7 +130,7 @@ class AdmissionAmendmentTests(unittest.TestCase):
         for language in ('english','simp_chinese'):
             loc = localization(language,'td_gameplay')
             self.assertIn("Var('td_bill_target').GetState.GetName", loc['je_td_admission_amendment'])
-            self.assertIn("Var('td_target').GetState.GetName", loc['td.30.t'])
+            self.assertIn("SCOPE.sState('td_menu_target').GetName", loc['td.30.t'])
             self.assertIn("SCOPE.sState('td_notice_target')", loc['td.12.t'])
 
 

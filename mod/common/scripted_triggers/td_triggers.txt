@@ -38,6 +38,8 @@ td_admission_target_valid_trigger = {
     }
 }
 td_bill_target_valid_trigger = {
+    has_variable = td_bill
+    exists = var:td_target
     td_reason_valid_trigger = yes
     OR = {
         AND = { var:td_bill = 1 td_claim_target_valid_trigger = yes }
@@ -58,13 +60,29 @@ td_can_start_bill_trigger = {
     NOT = { has_variable = td_bill }
     NOT = { has_variable = td_bill_cooldown }
 }
+# Only the live menu's frozen state may be acted on by an old event window.
+td_current_target_menu_trigger = {
+    td_can_start_bill_trigger = yes
+    exists = scope:td_menu_target
+    exists = var:td_target
+    scope:td_menu_target = var:td_target
+    has_variable = td_pending_bill
+}
+td_current_integration_menu_trigger = {
+    td_can_select_target_trigger = yes
+    exists = scope:td_menu_target
+    exists = var:td_target
+    scope:td_menu_target = var:td_target
+}
 td_security_reason_valid_trigger = {
+    exists = var:td_target
     OR = {
         AND = { this = c:SPA var:td_target = { state_region = s:STATE_AL_RIF } }
         is_adjacent_to_state = var:td_target
     }
 }
 td_legal_reason_valid_trigger = {
+    exists = var:td_target
     NOT = { is_target_in_variable_list = { name = td_renounced_regions target = var:td_target.state_region } }
     OR = {
         has_claim = var:td_target.state_region
@@ -72,18 +90,21 @@ td_legal_reason_valid_trigger = {
     }
 }
 td_equality_reason_valid_trigger = {
+    exists = var:td_target
     OR = {
-        OR = { var:td_pending_bill = 2 var:td_bill = 2 }
-        var:td_target.var:td_live_power = 1
+        AND = { has_variable = td_pending_bill var:td_pending_bill = 2 }
+        AND = { has_variable = td_bill var:td_bill = 2 }
+        var:td_target = { has_variable = td_live_power var:td_live_power = 1 }
     }
 }
 td_reason_valid_trigger = {
+    has_variable = td_reason
     OR = {
         AND = { var:td_reason = 1 td_security_reason_valid_trigger = yes }
         AND = { var:td_reason = 2 td_legal_reason_valid_trigger = yes }
         AND = { var:td_reason = 3 td_equality_reason_valid_trigger = yes }
-        AND = { var:td_reason = 4 OR = { var:td_pending_bill = 2 var:td_bill = 2 } }
-        AND = { var:td_reason = 5 OR = { var:td_pending_bill = 3 var:td_bill = 3 } }
+        AND = { var:td_reason = 4 OR = { AND = { has_variable = td_pending_bill var:td_pending_bill = 2 } AND = { has_variable = td_bill var:td_bill = 2 } } }
+        AND = { var:td_reason = 5 OR = { AND = { has_variable = td_pending_bill var:td_pending_bill = 3 } AND = { has_variable = td_bill var:td_bill = 3 } } }
         AND = { var:td_reason = 6 td_colonial_reason_valid_trigger = yes }
         AND = { var:td_reason = 7 td_regional_reason_valid_trigger = yes }
     }
@@ -91,7 +112,7 @@ td_reason_valid_trigger = {
 td_fast_ready_trigger = {
     td_feature_enabled_trigger = yes
     td_admission_target_valid_trigger = yes
-    var:td_target = { var:td_admitted_owner = owner }
+    var:td_target = { has_variable = td_admitted_owner var:td_admitted_owner = owner }
     bureaucracy >= td_unpaid_project_cost
 }
 td_annual_project_valid_trigger = {
@@ -140,13 +161,13 @@ td_colonial_reason_valid_trigger = {
     td_colonial_law_active_trigger = yes
     exists = var:td_target
     var:td_target = { td_colonial_target_trigger = yes }
-    OR = { var:td_pending_bill = 1 var:td_bill = 1 }
+    OR = { AND = { has_variable = td_pending_bill var:td_pending_bill = 1 } AND = { has_variable = td_bill var:td_bill = 1 } }
 }
 td_regional_reason_valid_trigger = {
     has_law = law_type:law_td_imperial_expansion
     exists = var:td_target
     has_interest_marker_in_region = var:td_target.region
-    OR = { var:td_pending_bill = 1 var:td_bill = 1 }
+    OR = { AND = { has_variable = td_pending_bill var:td_pending_bill = 1 } AND = { has_variable = td_bill var:td_bill = 1 } }
 }
 # STATE scope, ROOT = proposing country. Existing claims can be legislated
 # without charging new-claim infamy; a vanilla claim alone is not a mandate.
@@ -176,6 +197,7 @@ td_claim_candidate_trigger = {
 td_can_designate_focus_trigger = {
     td_can_start_bill_trigger = yes
     exists = var:td_target
+    has_variable = td_pending_bill
     var:td_pending_bill = 1
     has_interest_marker_in_region = var:td_target.region
     NOT = { is_target_in_variable_list = { name = td_focus_regions target = var:td_target.region } }

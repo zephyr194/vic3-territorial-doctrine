@@ -2,6 +2,9 @@ on_game_started = { on_actions = { td_initialize_world } }
 td_initialize_world = {
     effect = {
         set_global_variable = td_mod_present
+        # Main doctrine is always active. Keep the legacy flag for saved scripts;
+        # law-group visibility must not depend on a runtime decision.
+        set_global_variable = td_system_enabled
         if = { limit = { td_feature_enabled_trigger = yes }
             if = { limit = { NOT = { has_global_variable = td_original_registry_ready } }
                 every_state = { td_register_original_territory_effect = yes }

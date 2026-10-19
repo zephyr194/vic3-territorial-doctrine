@@ -351,17 +351,10 @@ td_pass_bill_effect = {
 }
 
 td_enable_system_effect = {
-    if = {
-        limit = { NOT = { td_feature_enabled_trigger = yes } }
-        every_country = { td_disabled_cleanup_effect = yes }
-        set_global_variable = td_mod_present
-        set_global_variable = td_system_enabled
-        every_state = { td_register_original_territory_effect = yes }
-        set_global_variable = td_original_registry_ready
-        every_country = { td_initialize_effect = yes }
-        every_state = { td_update_state_owner_effect = yes }
-        trigger_event = td.24
-    }
+    # Compatibility entry point for older callers. World setup belongs to the
+    # startup on_action, never an interactive decision's tooltip evaluation.
+    hidden_effect = { td_initialize_effect = yes }
+    trigger_event = td.23
 }
 td_disabled_cleanup_effect = {
     if = {
@@ -394,7 +387,8 @@ td_disabled_cleanup_effect = {
 
 # COUNTRY: title the political review after the exact owned state.
 td_open_review_effect = {
-    if = { limit = { exists = var:td_target }
+    if = { limit = { exists = var:td_target has_variable = td_pending_bill }
+        var:td_target = { save_scope_as = td_menu_target }
         if = { limit = { var:td_pending_bill = 2 } trigger_event = td.30 }
         else = { trigger_event = td.21 }
     }

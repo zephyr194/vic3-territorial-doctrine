@@ -128,28 +128,29 @@ class ColonialTests(unittest.TestCase):
 
 
 class ActivationTests(unittest.TestCase):
-    def test_loaded_disabled_world_has_no_country_or_state_initialization(self):
+    def test_world_start_enables_main_system_without_a_decision(self):
         runner=EventRunner();runner.globals.clear()
         # A fresh disabled save has no enacted territorial doctrine to clean up.
         for doctrine in RULES['doctrines']:
             runner.policy['has_law:law_type:law_td_' + doctrine] = False
-        original=deepcopy(runner.variables)
         runner.execute(next(e.value for e in runner.definitions['td_initialize_world'] if e.key=='effect'))
-        self.assertEqual(runner.globals,{'td_mod_present':1})
-        self.assertEqual(runner.variables,original)
-        self.assertEqual(runner.owner_updates,0)
-        self.assertTrue(all(not g['ideologies'] for g in runner.groups.values()))
-
-    def test_enabled_decision_initializes_once_and_cannot_be_repeated(self):
-        runner=EventRunner();runner.globals.clear()
-        runner.execute(runner.definitions['td_enable_system_effect'])
         self.assertIn('td_system_enabled',runner.globals)
         self.assertIn('td_initialized_v4',runner.variables)
         self.assertEqual(runner.owner_updates,2)
-        state=deepcopy((runner.variables,runner.groups,runner.notifications))
+        self.assertTrue(all(g['ideologies'] for g in runner.groups.values()))
+        self.assertTrue(runner.policy['has_law:law_type:law_td_status_quo'])
+
+    def test_legacy_activation_only_opens_local_status(self):
+        runner=EventRunner()
         runner.execute(runner.definitions['td_enable_system_effect'])
-        self.assertEqual((runner.variables,runner.groups,runner.notifications),state)
-        self.assertEqual(runner.owner_updates,2)
+        self.assertIn('td_system_enabled',runner.globals)
+        self.assertIn('td_initialized_v4',runner.variables)
+        self.assertEqual(runner.owner_updates,0)
+        state=deepcopy((runner.variables,runner.groups))
+        runner.execute(runner.definitions['td_enable_system_effect'])
+        self.assertEqual((runner.variables,runner.groups),state)
+        self.assertEqual(runner.notifications,['td.23','td.23'])
+        self.assertEqual(runner.owner_updates,0)
 
     def test_disabled_late_bill_and_project_events_are_inert(self):
         runner=EventRunner();runner.globals.clear()

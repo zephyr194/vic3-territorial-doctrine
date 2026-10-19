@@ -1,10 +1,10 @@
 # 安装与操作（Vic3 1.13）
 
-版本`0.9.0-alpha.1`，尚未实机验收。使用新测试存档、仅本模组播放集；旧alpha不是受支持的迁移路径。
+版本`0.9.1-alpha.1`，尚未实机验收。使用新测试存档、仅本模组播放集；旧alpha不是受支持的迁移路径。
 
 ## 安装
 
-解压`territorial_doctrine-0.9.0-alpha.1.zip`，将`territorial_doctrine/`和`territorial_doctrine.mod`放入用户数据的`Victoria 3/mod/`目录，然后在启动器加入播放集：
+解压`territorial_doctrine-0.9.1-alpha.1.zip`，将`territorial_doctrine/`和`territorial_doctrine.mod`放入用户数据的`Victoria 3/mod/`目录，然后在启动器加入播放集：
 
 - Windows：文档/Paradox Interactive/Victoria 3/mod（文档可能由OneDrive重定向）。
 - Linux：~/.local/share/Paradox Interactive/Victoria 3/mod。
@@ -74,7 +74,7 @@ vtd.cmd remove --dry-run --mod-dir "D:/Paradox User Data/Victoria 3/mod"
 
 ## 启用与选择目标
 
-打开决议，确认“启用国家领土原则”和状态决议出现，再启用整个存档的规则。AI不能启用，无关闭入口。语言随游戏设置，中英译文、另9种语言英文回退。
+主系统随模组加载生效，法律组固定显示；在“法律 → 权力结构”查看“VTD 国家领土原则”。状态决议只展示当前国家，点击“知悉”后关闭并隐藏，不再提供主系统开关。语言随游戏设置，中英译文、另9种语言英文回退。
 
 选择原则，再用通用宣称、接纳或放弃失地入口选择合格目标与理由。远方主张仍需原版区域利益，不再额外等重点成熟。无合格目标或州消失时显示明确提示。批准宣称不会直接取得土地，后续外交沿用原版。
 

@@ -55,7 +55,6 @@ def outputs() -> dict[Path, bytes]:
     put('common/law_groups/td_law_group.txt', HEADER + '''lawgroup_territorial_doctrine = {
     law_group_category = power_structure
     base_enactment_days = 90
-    enable = { td_feature_enabled_trigger = yes }
     change_allowed_trigger = {
         td_can_legislate_trigger = yes
     }

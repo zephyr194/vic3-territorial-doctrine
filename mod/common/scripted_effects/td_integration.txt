@@ -1,5 +1,11 @@
-# COUNTRY scope. All population reads refer to the one selected state.
+# COUNTRY: browsing needs owner history, not an enumeration of every pop.
 td_refresh_target_effect = {
+    if = { limit = { exists = var:td_target }
+        var:td_target = { td_update_state_owner_effect = yes }
+    }
+}
+# Explicit diagnostic only. Acceptance is not an admission/cost prerequisite.
+td_refresh_acceptance_effect = {
     set_variable = { name = td_accepted_population value = 0 }
     set_variable = { name = td_accepted_share value = 0 }
     if = {

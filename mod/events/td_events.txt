@@ -61,47 +61,50 @@ td.2 = {
 
 td.10 = {
     type = country_event
+    event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.10.t
     desc = td.10.d
     flavor = td.flavor
     immediate = { td_calculate_politics_effect = yes }
     option = { name = td.close }
 }
-td.11 = { type = country_event title = td.11.t desc = td.11.d flavor = td.flavor option = { name = td.close } }
-td.12 = { type = country_event title = td.12.t desc = td.12.d flavor = td.flavor option = { name = td.close } }
-td.13 = { type = country_event title = td.13.t desc = td.13.d flavor = td.flavor option = { name = td.close } }
-td.14 = { type = country_event title = td.14.t desc = td.14.d flavor = td.flavor option = { name = td.close } }
-td.15 = { type = country_event title = td.15.t desc = td.15.d flavor = td.flavor option = { name = td.close } }
-td.17 = { type = country_event title = td.17.t desc = td.17.d flavor = td.flavor option = { name = td.close } }
-td.18 = { type = country_event title = td.18.t desc = td.18.d flavor = td.flavor option = { name = td.close } }
+td.11 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.11.t desc = td.11.d flavor = td.flavor option = { name = td.close } }
+td.12 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.12.t desc = td.12.d flavor = td.flavor option = { name = td.close } }
+td.13 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.13.t desc = td.13.d flavor = td.flavor option = { name = td.close } }
+td.14 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.14.t desc = td.14.d flavor = td.flavor option = { name = td.close } }
+td.15 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.15.t desc = td.15.d flavor = td.flavor option = { name = td.close } }
+td.17 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.17.t desc = td.17.d flavor = td.flavor option = { name = td.close } }
+td.18 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.18.t desc = td.18.d flavor = td.flavor option = { name = td.close } }
 
-td.19 = { type = country_event title = td.19.t desc = td.19.d flavor = td.flavor option = { name = td.close } }
+td.19 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.19.t desc = td.19.d flavor = td.flavor option = { name = td.close } }
 # Choosing a reason precedes the first timer and cannot pass a bill by itself.
 td.20 = {
     type = country_event
+    event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.20.t
     desc = td.20.d
     flavor = td.flavor
-    option = { name = td.reason.security trigger = { td_can_start_bill_trigger = yes exists = var:td_target td_security_reason_valid_trigger = yes NOT = { var:td_pending_bill = 3 } } set_variable = { name = td_reason value = 1 } td_open_review_effect = yes }
-    option = { name = td.reason.historical_right trigger = { td_can_start_bill_trigger = yes exists = var:td_target td_legal_reason_valid_trigger = yes NOT = { var:td_pending_bill = 3 } } set_variable = { name = td_reason value = 2 } td_open_review_effect = yes }
-    option = { name = td.reason.equal_rights trigger = { td_can_start_bill_trigger = yes exists = var:td_target td_equality_reason_valid_trigger = yes NOT = { var:td_pending_bill = 3 } } set_variable = { name = td_reason value = 3 } td_open_review_effect = yes }
-    option = { name = td.reason.civil_administration trigger = { td_can_start_bill_trigger = yes exists = var:td_target var:td_pending_bill = 2 } set_variable = { name = td_reason value = 4 } td_open_review_effect = yes }
-    option = { name = td.reason.peace_settlement trigger = { td_can_start_bill_trigger = yes exists = var:td_target var:td_pending_bill = 3 } set_variable = { name = td_reason value = 5 } td_open_review_effect = yes }
-    option = {
-        name = td.next_state
-        trigger = { td_can_start_bill_trigger = yes exists = var:td_target OR = { var:td_pending_bill = 1 var:td_pending_bill = 2 var:td_pending_bill = 3 } }
-        if = { limit = { var:td_pending_bill = 2 } td_select_owned_effect = yes }
-        else_if = { limit = { var:td_pending_bill = 3 } td_select_lost_effect = yes }
-        else = { td_select_claim_effect = yes }
-        td_open_target_menu_effect = yes
-        ai_chance = { base = 0 }
-    }
-    option = { name = td.reason.colonial_development trigger = { td_can_start_bill_trigger = yes td_colonial_reason_valid_trigger = yes } set_variable = { name = td_reason value = 6 } td_open_review_effect = yes }
-    option = { name = td.reason.regional_interest trigger = { td_can_start_bill_trigger = yes td_regional_reason_valid_trigger = yes } set_variable = { name = td_reason value = 7 } td_open_review_effect = yes }
-    option = { name = td.cancel_menu remove_variable = td_pending_bill ai_chance = { base = 0 } }
+    option = { name = td.reason.security trigger = { td_current_target_menu_trigger = yes exists = var:td_target td_security_reason_valid_trigger = yes NOT = { var:td_pending_bill = 3 } } hidden_effect = { set_variable = { name = td_reason value = 1 } td_open_review_effect = yes } }
+    option = { name = td.reason.historical_right trigger = { td_current_target_menu_trigger = yes exists = var:td_target td_legal_reason_valid_trigger = yes NOT = { var:td_pending_bill = 3 } } hidden_effect = { set_variable = { name = td_reason value = 2 } td_open_review_effect = yes } }
+    option = { name = td.reason.equal_rights trigger = { td_current_target_menu_trigger = yes exists = var:td_target td_equality_reason_valid_trigger = yes NOT = { var:td_pending_bill = 3 } } hidden_effect = { set_variable = { name = td_reason value = 3 } td_open_review_effect = yes } }
+    option = { name = td.reason.civil_administration trigger = { td_current_target_menu_trigger = yes exists = var:td_target var:td_pending_bill = 2 } hidden_effect = { set_variable = { name = td_reason value = 4 } td_open_review_effect = yes } }
+    option = { name = td.reason.peace_settlement trigger = { td_current_target_menu_trigger = yes exists = var:td_target var:td_pending_bill = 3 } hidden_effect = { set_variable = { name = td_reason value = 5 } td_open_review_effect = yes } }
+    option = { name = td.next_state trigger = { td_current_target_menu_trigger = yes exists = var:td_target OR = { var:td_pending_bill = 1 var:td_pending_bill = 2 var:td_pending_bill = 3 } } ai_chance = { base = 0 } hidden_effect = { if = { limit = { var:td_pending_bill = 2 } td_select_owned_effect = yes } else_if = { limit = { var:td_pending_bill = 3 } td_select_lost_effect = yes } else = { td_select_claim_effect = yes } td_open_target_menu_effect = yes } }
+    option = { name = td.reason.colonial_development trigger = { td_current_target_menu_trigger = yes td_colonial_reason_valid_trigger = yes } hidden_effect = { set_variable = { name = td_reason value = 6 } td_open_review_effect = yes } }
+    option = { name = td.reason.regional_interest trigger = { td_current_target_menu_trigger = yes td_regional_reason_valid_trigger = yes } hidden_effect = { set_variable = { name = td_reason value = 7 } td_open_review_effect = yes } }
+    option = { name = td.cancel_menu ai_chance = { base = 0 } hidden_effect = { if = { limit = { td_current_target_menu_trigger = yes } remove_variable = td_pending_bill } } }
 }
 td.21 = {
     type = country_event
+    event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.21.t
     desc = td.21.d
     flavor = td.flavor
@@ -113,38 +116,32 @@ td.21 = {
         set_variable = { name = td_preview_regular_cost value = td_regular_project_cost }
         set_variable = { name = td_preview_fast_cost value = td_fast_project_cost }
     }
-    option = {
-        name = td.submit_bill
-        trigger = {
-            td_can_start_bill_trigger = yes td_reason_valid_trigger = yes
-            OR = {
-                AND = { var:td_pending_bill = 1 td_claim_target_valid_trigger = yes }
-                AND = { var:td_pending_bill = 2 td_admission_target_valid_trigger = yes var:td_target = { td_needs_admission_trigger = yes } }
-                AND = { var:td_pending_bill = 3 exists = var:td_target var:td_target = { td_lost_state_trigger = yes } }
-            }
-        }
-        set_variable = { name = td_bill value = var:td_pending_bill }
-        td_start_bill_effect = yes
-    }
-    option = { name = td.change_reason trigger = { td_can_start_bill_trigger = yes } td_open_target_menu_effect = yes ai_chance = { base = 0 } }
-    option = { name = td.cancel_menu remove_variable = td_pending_bill ai_chance = { base = 0 } }
+    option = { name = td.submit_bill trigger = { td_current_target_menu_trigger = yes td_reason_valid_trigger = yes OR = { AND = { var:td_pending_bill = 1 td_claim_target_valid_trigger = yes } AND = { var:td_pending_bill = 2 td_admission_target_valid_trigger = yes var:td_target = { td_needs_admission_trigger = yes } } AND = { var:td_pending_bill = 3 exists = var:td_target var:td_target = { td_lost_state_trigger = yes } } } } hidden_effect = { set_variable = { name = td_bill value = var:td_pending_bill } td_start_bill_effect = yes } }
+    option = { name = td.change_reason trigger = { td_current_target_menu_trigger = yes } ai_chance = { base = 0 } hidden_effect = { td_open_target_menu_effect = yes } }
+    option = { name = td.cancel_menu ai_chance = { base = 0 } hidden_effect = { if = { limit = { td_current_target_menu_trigger = yes } remove_variable = td_pending_bill } } }
 }
 td.22 = {
     type = country_event
+    event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.22.t
     desc = td.22.d
     flavor = td.flavor
-    option = {
-        name = td.fast_track
-        trigger = { td_feature_enabled_trigger = yes NOT = { has_variable = td_bill } NOT = { has_variable = td_fast } NOT = { has_variable = td_regular } td_fast_ready_trigger = yes }
-        td_start_fast_effect = yes
-    }
-    option = { name = td.next_state trigger = { td_can_select_target_trigger = yes } td_select_admitted_effect = yes td_open_integration_menu_effect = yes ai_chance = { base = 0 } }
+    option = { name = td.fast_track trigger = { td_current_integration_menu_trigger = yes NOT = { has_variable = td_bill } NOT = { has_variable = td_fast } NOT = { has_variable = td_regular } td_fast_ready_trigger = yes } hidden_effect = { td_start_fast_effect = yes } }
+    option = { name = td.next_state trigger = { td_current_integration_menu_trigger = yes } ai_chance = { base = 0 } hidden_effect = { td_select_admitted_effect = yes td_open_integration_menu_effect = yes } }
     option = { name = td.cancel_menu ai_chance = { base = 0 } }
 }
 
-td.23 = { type = country_event title = td.23.t desc = td.23.d flavor = td.flavor option = { name = td.close } }
-td.24 = { type = country_event title = td.24.t desc = td.24.d flavor = td.flavor option = { name = td.close } }
+td.23 = {
+    type = country_event
+    event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.23.t
+    desc = td.23.d
+    flavor = td.flavor
+    immediate = { td_refresh_colonial_profile_effect = yes }
+    option = { name = td.close hidden_effect = { set_variable = td_status_acknowledged } }
+}
+td.24 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.24.t desc = td.24.d flavor = td.flavor option = { name = td.close } }
 td.25 = {
     type = country_event
     hidden = yes
@@ -154,7 +151,8 @@ td.25 = {
         }
     }
 }
-td.26 = { type = country_event title = td.26.t desc = td.26.d flavor = td.flavor option = { name = td.close } }
+td.26 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+    title = td.26.t desc = td.26.d flavor = td.flavor option = { name = td.close } }
 td.27 = {
     type = country_event
     hidden = yes
@@ -186,6 +184,7 @@ td.28 = {
 # A named individual amendment uses the same political review rules.
 td.30 = {
     type = country_event
+    event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.30.t
     desc = td.30.d
     flavor = td.flavor
@@ -197,35 +196,25 @@ td.30 = {
         set_variable = { name = td_preview_regular_cost value = td_regular_project_cost }
         set_variable = { name = td_preview_fast_cost value = td_fast_project_cost }
     }
-    option = {
-        name = td.submit_bill
-        trigger = {
-            td_can_start_bill_trigger = yes td_reason_valid_trigger = yes
-            OR = {
-                AND = { var:td_pending_bill = 1 td_claim_target_valid_trigger = yes }
-                AND = { var:td_pending_bill = 2 td_admission_target_valid_trigger = yes var:td_target = { td_needs_admission_trigger = yes } }
-                AND = { var:td_pending_bill = 3 exists = var:td_target var:td_target = { td_lost_state_trigger = yes } }
-            }
-        }
-        set_variable = { name = td_bill value = var:td_pending_bill }
-        td_start_bill_effect = yes
-    }
-    option = { name = td.change_reason trigger = { td_can_start_bill_trigger = yes } td_open_target_menu_effect = yes ai_chance = { base = 0 } }
-    option = { name = td.cancel_menu remove_variable = td_pending_bill ai_chance = { base = 0 } }
+    option = { name = td.submit_bill trigger = { td_current_target_menu_trigger = yes td_reason_valid_trigger = yes OR = { AND = { var:td_pending_bill = 1 td_claim_target_valid_trigger = yes } AND = { var:td_pending_bill = 2 td_admission_target_valid_trigger = yes var:td_target = { td_needs_admission_trigger = yes } } AND = { var:td_pending_bill = 3 exists = var:td_target var:td_target = { td_lost_state_trigger = yes } } } } hidden_effect = { set_variable = { name = td_bill value = var:td_pending_bill } td_start_bill_effect = yes } }
+    option = { name = td.change_reason trigger = { td_current_target_menu_trigger = yes } ai_chance = { base = 0 } hidden_effect = { td_open_target_menu_effect = yes } }
+    option = { name = td.cancel_menu ai_chance = { base = 0 } hidden_effect = { if = { limit = { td_current_target_menu_trigger = yes } remove_variable = td_pending_bill } } }
 }
 
 # No state interpolation: stale windows and exhausted candidate lists land here.
 td.31 = {
     type = country_event
+    event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.31.t
     desc = td.31.d
     flavor = td.flavor
-    option = { name = td.close remove_variable = td_pending_bill }
+    option = { name = td.close }
 }
 
 # Each dialog carries the bill generation inherited from its round event.
 td.32 = {
     type = country_event
+    event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.32.t
     desc = td.32.d
     flavor = td.flavor
@@ -244,6 +233,7 @@ td.32 = {
 }
 td.33 = {
     type = country_event
+    event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.33.t
     desc = td.33.d
     flavor = td.flavor

@@ -36,7 +36,7 @@ class GeographyRunner(EventRunner):
         # Formula evaluator requires an explicit engine result for scoped reads;
         # candidate/bill predicates still execute the actual trigger definition.
         target = self.variables.get('td_target')
-        if target:
+        if target in self.states:
             context['var:td_target.td_colonial_target_trigger'] = self.states[target].get('colonial_cost_fixture',False)
         if self.scope in self.states:
             context.update({k:v for k,v in self.states[self.scope].items()
