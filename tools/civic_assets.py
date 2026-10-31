@@ -59,7 +59,7 @@ td_can_raise_budget_tax_trigger = {
     NOT = { has_variable = td_tax_adjustment_wait }
     NOT = { tax_level = very_high }
     net_total_income < 0
-    NOT = { has_modifier = country_bankruptcy }
+    NOT = { has_modifier = declared_bankruptcy }
 }
 td_can_lower_budget_tax_trigger = {
     td_feature_enabled_trigger = yes
@@ -68,7 +68,7 @@ td_can_lower_budget_tax_trigger = {
     NOT = { tax_level = very_low }
     net_total_income > 0
     gold_reserves > 0
-    NOT = { has_modifier = country_bankruptcy }
+    NOT = { has_modifier = declared_bankruptcy }
 }
 '''
     # Tax levels are enumerated explicitly: no guessed integer setter/rank.
@@ -226,7 +226,9 @@ td_civic_bill_scores_effect = {
     ai_chance = { value = 0 }
 }
 '''
-    events = '''td.40 = {
+    events = '''namespace = td
+
+td.40 = {
     type = country_event
     event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.40.t

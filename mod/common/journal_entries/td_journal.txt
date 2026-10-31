@@ -1,4 +1,4 @@
-je_td_bill = {
+﻿je_td_bill = {
     group = td_journal_group
     is_shown_when_inactive = { td_feature_enabled_trigger = yes is_player = yes has_variable = td_bill NOT = { var:td_bill = 2 } }
     possible = { td_feature_enabled_trigger = yes has_variable = td_bill NOT = { var:td_bill = 2 } }

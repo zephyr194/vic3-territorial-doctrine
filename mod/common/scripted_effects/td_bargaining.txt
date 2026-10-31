@@ -1,4 +1,24 @@
-﻿td_clear_navy_pledge_effect = {
+﻿td_snapshot_navy_baseline_effect = {
+    if = { limit = { exists = var:td_navy_target }
+        set_variable = { name = td_navy_baseline value = 0 }
+        set_variable = { name = td_navy_probe value = 1 }
+        while = {
+            limit = { var:td_navy_target = { state_has_building_type_levels = { target = bt:building_naval_base value >= root.var:td_navy_probe } } }
+            change_variable = { name = td_navy_probe multiply = 2 }
+        }
+        while = {
+            limit = { var:td_navy_probe > 1 }
+            change_variable = { name = td_navy_probe divide = 2 }
+            set_variable = { name = td_navy_candidate value = { value = var:td_navy_baseline add = var:td_navy_probe } }
+            if = { limit = { var:td_navy_target = { state_has_building_type_levels = { target = bt:building_naval_base value >= root.var:td_navy_candidate } } }
+                set_variable = { name = td_navy_baseline value = var:td_navy_candidate }
+            }
+        }
+        remove_variable = td_navy_probe
+        remove_variable = td_navy_candidate
+    }
+}
+td_clear_navy_pledge_effect = {
     if = { limit = { has_variable = td_bill has_variable = td_bill_pledge_navy var:td_navy_bill_generation = var:td_bill_generation }
         remove_variable = td_bill_pledge_navy
         change_variable = { name = td_bill_allocation_count subtract = 1 }
@@ -31,10 +51,30 @@ td_sign_navy_pledge_effect = {
             if = { limit = { var:td_bill_target = { owner = root } }
                 set_variable = td_navy_owned_at_sign
                 set_variable = { name = td_navy_target value = var:td_bill_target }
-                set_variable = { name = td_navy_baseline value = var:td_bill_target.state_has_building_type_levels:bt:building_naval_base }
+                td_snapshot_navy_baseline_effect = yes
             }
             td_calculate_politics_effect = yes
         }
+    }
+}
+td_snapshot_railway_baseline_effect = {
+    if = { limit = { exists = var:td_railway_target }
+        set_variable = { name = td_railway_baseline value = 0 }
+        set_variable = { name = td_railway_probe value = 1 }
+        while = {
+            limit = { var:td_railway_target = { state_has_building_type_levels = { target = bt:building_railway value >= root.var:td_railway_probe } } }
+            change_variable = { name = td_railway_probe multiply = 2 }
+        }
+        while = {
+            limit = { var:td_railway_probe > 1 }
+            change_variable = { name = td_railway_probe divide = 2 }
+            set_variable = { name = td_railway_candidate value = { value = var:td_railway_baseline add = var:td_railway_probe } }
+            if = { limit = { var:td_railway_target = { state_has_building_type_levels = { target = bt:building_railway value >= root.var:td_railway_candidate } } }
+                set_variable = { name = td_railway_baseline value = var:td_railway_candidate }
+            }
+        }
+        remove_variable = td_railway_probe
+        remove_variable = td_railway_candidate
     }
 }
 td_clear_railway_pledge_effect = {
@@ -70,7 +110,7 @@ td_sign_railway_pledge_effect = {
             if = { limit = { var:td_bill_target = { owner = root } }
                 set_variable = td_railway_owned_at_sign
                 set_variable = { name = td_railway_target value = var:td_bill_target }
-                set_variable = { name = td_railway_baseline value = var:td_bill_target.state_has_building_type_levels:bt:building_railway }
+                td_snapshot_railway_baseline_effect = yes
             }
             td_calculate_politics_effect = yes
         }
@@ -116,7 +156,7 @@ td_pledges_monthly_effect = {
                         max = 1
                         root = {
                             set_variable = { name = td_navy_target value = prev }
-                            set_variable = { name = td_navy_baseline value = prev.state_has_building_type_levels:bt:building_naval_base }
+                            td_snapshot_navy_baseline_effect = yes
                             set_variable = td_navy_started
                             set_variable = { name = td_navy_deadline years = 3 }
                             remove_variable = td_navy_acquisition_deadline
@@ -137,7 +177,7 @@ td_pledges_monthly_effect = {
                 else_if = { limit = { exists = var:td_navy_target var:td_navy_target = {
                     owner = root
                     is_treaty_port = no
-                    state_has_building_type_levels:bt:building_naval_base > root.var:td_navy_baseline
+                    state_has_building_type_levels = { target = bt:building_naval_base value > root.var:td_navy_baseline }
                 } }
                     ig:ig_armed_forces = { remove_modifier = td_pledge_fulfilled add_modifier = { name = td_pledge_fulfilled years = 3 } }
                     td_clear_navy_pledge_effect = yes
@@ -157,7 +197,7 @@ td_pledges_monthly_effect = {
                         max = 1
                         root = {
                             set_variable = { name = td_railway_target value = prev }
-                            set_variable = { name = td_railway_baseline value = prev.state_has_building_type_levels:bt:building_railway }
+                            td_snapshot_railway_baseline_effect = yes
                             set_variable = td_railway_started
                             set_variable = { name = td_railway_deadline years = 3 }
                             remove_variable = td_railway_acquisition_deadline
@@ -178,7 +218,7 @@ td_pledges_monthly_effect = {
                 else_if = { limit = { exists = var:td_railway_target var:td_railway_target = {
                     owner = root
                     is_treaty_port = no
-                    state_has_building_type_levels:bt:building_railway > root.var:td_railway_baseline
+                    state_has_building_type_levels = { target = bt:building_railway value > root.var:td_railway_baseline }
                 } }
                     ig:ig_industrialists = { remove_modifier = td_pledge_fulfilled add_modifier = { name = td_pledge_fulfilled years = 3 } }
                     td_clear_railway_pledge_effect = yes

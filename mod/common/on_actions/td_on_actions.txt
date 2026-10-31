@@ -1,4 +1,4 @@
-on_game_started = { on_actions = { td_initialize_world } }
+﻿on_game_started = { on_actions = { td_initialize_world } }
 td_initialize_world = {
     effect = {
         set_global_variable = td_mod_present

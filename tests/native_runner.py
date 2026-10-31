@@ -18,7 +18,7 @@ def policy_context(government='other', power='other', doctrine='strategic_fronti
     context.update({f'has_law:law_type:law_{law}': enabled for law, enabled in {
         'monarchy': government == 'monarchy', 'presidential_republic': government == 'republic',
         'parliamentary_republic': False, 'autocracy': power == 'autocracy',
-        'single_party_state': False, 'census_suffrage': False,
+        'single_party_state': False, 'census_voting': False,
         'universal_suffrage': power == 'democracy',
     }.items()})
     context['var:td_reason'] = RULES['reasons'][reason]['id'] if reason else 0
@@ -62,7 +62,13 @@ class EventRunner:
         self.definitions = {}
         self.values = {}
         for path in (ROOT / 'mod').rglob('*.txt'):
+            namespaces = set()
             for e in load(path):
+                if e.key == 'namespace':
+                    namespaces.add(e.value)
+                    continue
+                if path.parent.name == 'events' and e.key.split('.', 1)[0] not in namespaces:
+                    raise AssertionError(f'{path}: missing file-local namespace for {e.key}')
                 self.definitions[e.key] = e.value
                 if path.parent.name == 'script_values':
                     self.values[e.key] = e.value
@@ -144,7 +150,7 @@ class EventRunner:
         context.update({'is_player': True, 'bureaucracy': self.bureaucracy-planning, 'gold_reserves': self.gold_reserves, 'authority': 1000, 'root': self.country,
                         'is_subject':False,'is_revolutionary':False,'legitimacy':self.legitimacy,
                         'is_at_war':self.at_war,'scaled_debt':0,'total_population':self.total_population,
-                        'has_modifier:country_bankruptcy':False,
+                        'has_modifier:declared_bankruptcy':False,
                         'has_interest_marker_in_region:var:td_target.region':True,
                         'prev': self.previous_scope})
         tax_ranks = {name:rank for rank,name in enumerate(('very_low','low','medium','high','very_high'),1)}
@@ -162,8 +168,6 @@ class EventRunner:
                 state = self.states[key]
                 for prop in ('state_population','turmoil','devastation','owner','region','market','market_access'):
                     context['var:'+name+'.'+prop] = state[prop]
-                for building in ('naval_base','railway'):
-                    context['var:'+name+'.state_has_building_type_levels:bt:building_'+building] = state.get('buildings',{}).get(building,0)
         if self.previous_scope in self.groups:
             context['prev.ig_clout'] = self.groups[self.previous_scope]['clout']
             context.update({'prev.var:'+k:v for k,v in self.groups[self.previous_scope]['variables'].items()})
@@ -193,8 +197,6 @@ class EventRunner:
             context['is_treaty_port'] = self.states[self.scope]['treaty_port']
             context['is_incorporated'] = self.states[self.scope]['incorporated']
             context['is_coastal'] = self.states[self.scope].get('coastal',True)
-            for building in ('naval_base','railway'):
-                context['state_has_building_type_levels:bt:building_'+building] = self.states[self.scope].get('buildings',{}).get(building,0)
         return context
 
     def resolve(self, value):
@@ -202,8 +204,6 @@ class EventRunner:
             return self.previous_scope
         if value == 'prev.state_region':
             return self.states[self.previous_scope].get('state_region', self.previous_scope)
-        if value.startswith('prev.state_has_building_type_levels:bt:building_'):
-            return self.states[self.previous_scope].get('buildings',{}).get(value.split('building_')[-1],0)
         if value.startswith('var:') and value.endswith('.state_region'):
             key = self.variables[value[4:].split('.')[0]]
             return self.states[key].get('state_region',key)
@@ -228,9 +228,18 @@ class EventRunner:
             if e.key in ('OR', 'AND', 'NOT'):
                 result = (any(self.check([v]) for v in e.value) if e.key == 'OR'
                           else not self.check(e.value) if e.key == 'NOT' else self.check(e.value))
-            elif e.key == 'if':
+            elif e.key == 'trigger_if':
                 limit=next((v.value for v in e.value if v.key=='limit'),[])
                 result=not self.check(limit) or self.check([v for v in e.value if v.key!='limit'])
+            elif e.key == 'if':
+                raise AssertionError('Effect-style if is not a valid trigger; use trigger_if')
+            elif e.key == 'state_has_building_type_levels':
+                settings = {v.key: v for v in e.value}
+                building = settings['target'].value.removeprefix('bt:building_')
+                levels = self.states[self.scope].get('buildings', {}).get(building, 0)
+                comparison = settings['value']
+                result = triggers([Entry('levels', comparison.operator, comparison.value)],
+                                  {**self.context(), 'levels': levels}, self.values)
             elif e.key == 'is_target_in_variable_list':
                 settings={v.key:v.value for v in e.value}
                 result=self.resolve(settings['target']) in self.lists.get(settings['name'],set())
@@ -310,6 +319,15 @@ class EventRunner:
         for e in entries:
             if e.key == 'hidden_effect':
                 self.execute(e.value)
+            elif e.key == 'while':
+                limit = next((v.value for v in e.value if v.key == 'limit'), [])
+                body = [v for v in e.value if v.key != 'limit']
+                iterations = 0
+                while self.check(limit):
+                    iterations += 1
+                    if iterations > 1000:
+                        raise AssertionError('Script loop exceeded the engine default of 1000')
+                    self.execute(body)
             elif e.key in ('if', 'else_if', 'else'):
                 limit = next((v.value for v in e.value if v.key == 'limit'), [])
                 enabled = (e.key == 'if' or not previous_if) and self.check(limit)

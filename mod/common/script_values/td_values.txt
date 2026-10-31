@@ -1,4 +1,4 @@
-td_legitimacy_bonus = { value = legitimacy subtract = 50 multiply = 0.2 }
+﻿td_legitimacy_bonus = { value = legitimacy subtract = 50 multiply = 0.2 }
 td_success_probability = {
     value = td_bill_base_probability
     add = { value = var:td_support multiply = 0.6 }

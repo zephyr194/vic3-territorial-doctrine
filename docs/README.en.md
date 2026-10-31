@@ -1,6 +1,6 @@
 # Territorial Doctrine — Victoria 3 1.13
 
-Version **0.9.1-alpha.1** adds paid distribution clauses for all eight interest groups and distinct colonial responses to domestic territorial bargaining. The main system runs with the mod. Its law group is always visible under Laws > Power Structure. The country status decision disappears after acknowledgement. Fiscal, recruitment and service accounting remain separate opt-in modules. English and Simplified Chinese are translated; nine other game-language catalogs contain complete English fallback text. Game settings select the language.
+Version **0.9.2-alpha.1** adds paid distribution clauses for all eight interest groups and distinct colonial responses to domestic territorial bargaining. The main system runs with the mod. Its law group is always visible under Laws > Power Structure. The country status decision disappears after acknowledgement. Fiscal, recruitment and service accounting remain separate opt-in modules. English and Simplified Chinese are translated; nine other game-language catalogs contain complete English fallback text. Game settings select the language.
 
 Quick source installation on Windows uses built-in Windows PowerShell 5.1; no Python or additional runtime installation is required:
 
@@ -47,7 +47,7 @@ python3 tools/scenario.py
 python3 tools/package.py
 ```
 
-Extract `territorial_doctrine-0.9.1-alpha.1.zip` into your user-data `Victoria 3/mod/` directory and enable it in a playset, the main system starts with the mod. All rule and acceptance documents are included. [Install](INSTALL.md), [Design and scope](DESIGN.md), [Testing](TESTING.md), [Colonial and war rules](COLONIAL_WAR_RULES.md).
+Extract `territorial_doctrine-0.9.2-alpha.1.zip` into your user-data `Victoria 3/mod/` directory and enable it in a playset, the main system starts with the mod. All rule and acceptance documents are included. [Install](INSTALL.md), [Design and scope](DESIGN.md), [Testing](TESTING.md), [Colonial and war rules](COLONIAL_WAR_RULES.md).
 
 
 After loading the mod, independently enable Fiscal Accounting, Political Recruitment Response and Public-Service Responsibility Accounting in decisions. Each flag is permanent for all countries in that save; peaceful budgeting never disables it. All mod-owned names and tooltips have one **VTD** prefix in all eleven catalogs. Vanilla localization keys are untouched.
@@ -68,3 +68,5 @@ Funded terms change the coalition and can create opponents: religious schooling 
 Observed foreign market difference plus current access >=50% supplies a commercial opportunity argument; actor-faith share below 50% under Religious Schools supplies a missionary/education argument. Both score +5 and denote opportunities, not realized profit or conversion. Colonial and humanitarian adjustments are group-specific: religious interests no longer receive blanket colonial scores. See DESIGN.md for the exact coefficient table and pending assessments. All 205 tests are offline fixtures; verify institutional caps, scoped faith/market comparisons and legal/state persistence in Victoria 3 1.13.
 
 The 0.9.1 hotfix guards missing variables, hides state-selection internals from tooltip previews, freezes menu targets and bundles replaceable event artwork. Offline checks cannot confirm that the reported 1.13.11 access violation is resolved. See [hotfix notes](HOTFIX_0_9_1.md).
+
+Version 0.9.2 fixes file-local event namespaces, trigger_if, block-form building predicates and cached building baselines, bankruptcy/incorporation/census identifiers, and script BOM preservation. See [0.9.2 hotfix notes](HOTFIX_0_9_2.md).

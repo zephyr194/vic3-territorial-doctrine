@@ -20,7 +20,7 @@ td_can_raise_budget_tax_trigger = {
     NOT = { has_variable = td_tax_adjustment_wait }
     NOT = { tax_level = very_high }
     net_total_income < 0
-    NOT = { has_modifier = country_bankruptcy }
+    NOT = { has_modifier = declared_bankruptcy }
 }
 td_can_lower_budget_tax_trigger = {
     td_feature_enabled_trigger = yes
@@ -29,5 +29,5 @@ td_can_lower_budget_tax_trigger = {
     NOT = { tax_level = very_low }
     net_total_income > 0
     gold_reserves > 0
-    NOT = { has_modifier = country_bankruptcy }
+    NOT = { has_modifier = declared_bankruptcy }
 }

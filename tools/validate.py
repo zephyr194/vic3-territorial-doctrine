@@ -18,6 +18,8 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
     definitions = {}
     for path in sorted(mod.rglob('*.txt')):
         try:
+            if not path.read_bytes().startswith(b'\xef\xbb\xbf'):
+                errors.append(f'{path}: script must have UTF-8 BOM')
             tree = load(path)
             trees[path] = tree
             for e in tree:
@@ -37,16 +39,46 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
     scopes |= set(RULES.get('legacy_scopes', ()))
     for path, tree in trees.items():
         if path.parent.name == 'events':
+            namespaces = set()
             for event in tree:
+                if event.key == 'namespace':
+                    namespaces.add(event.value)
+                    continue
                 if not isinstance(event.value, list):
                     continue
+                if event.key.split('.', 1)[0] not in namespaces:
+                    errors.append(f'{path}: event {event.key} needs namespace in this file before its definition')
                 fields = {e.key: e.value for e in event.value}
                 if fields.get('hidden') != 'yes' and 'type' in fields and 'event_image' not in fields:
                     errors.append(f'{path}: visible event {event.key} has no event_image')
         for e in walk(tree):
+            trigger_blocks = []
+            if path.parent.name == 'scripted_triggers' and e in tree:
+                trigger_blocks.append(e.value)
+            elif e.key in ('limit', 'trigger', 'is_shown', 'possible', 'is_shown_when_inactive',
+                           'can_enact', 'change_allowed_trigger', 'enable', 'trigger_if'):
+                trigger_blocks.append(e.value)
+            for block in trigger_blocks:
+                if isinstance(block, list) and any(t.key in ('if', 'else_if', 'else') for t in walk(block)):
+                    errors.append(f'{path}: effect-style if/else in trigger block; use trigger_if/trigger_else')
+            if e.key == 'state_has_building_type_levels':
+                fields = {v.key: v for v in e.value} if isinstance(e.value, list) else {}
+                target, value = fields.get('target'), fields.get('value')
+                if (set(fields) != {'target', 'value'} or target is None or
+                        not isinstance(target.value, str) or not target.value.startswith('bt:') or
+                        value is None or value.operator not in ('=', '>', '<', '>=', '<=')):
+                    errors.append(f'{path}: state_has_building_type_levels requires target/value block')
             for token in (e.key, e.value if isinstance(e.value, str) else ''):
                 if token.startswith('"'):
                     continue
+                if 'state_has_building_type_levels:' in token or token.endswith('.state_has_building_type_levels'):
+                    errors.append(f'{path}: building levels are a block trigger, not a numeric/event-target link')
+                replacements = {'country_bankruptcy': 'declared_bankruptcy',
+                                'law_census_suffrage': 'law_census_voting',
+                                'state_disallow_incorporation': 'state_disallow_incorporation_bool'}
+                for obsolete, replacement in replacements.items():
+                    if obsolete in re.split(r'[:.]', token):
+                        errors.append(f'{path}: obsolete engine identifier {obsolete}; use {replacement}')
                 if token.startswith(('td_', 'law_td_', 'lawgroup_territorial_', 'ideology_td_', 'je_td_', 'td.')):
                     loc_reference = e.key in ('title', 'desc', 'flavor') or e.key == 'name' and token.startswith('td.')
                     if token not in definitions and token not in variables | scopes and not loc_reference:
@@ -136,8 +168,8 @@ def validate(mod: Path, schema: Path | None = None, game: Path | None = None) ->
                 for path in (game / directory).rglob('*.txt'):
                     # Only identifiers; do not require parsing the whole base game.
                     vanilla.update(re.findall(r'^\s*([A-Za-z_]\w*)\s*=\s*\{', path.read_text(encoding='utf-8-sig', errors='replace'), re.M))
-            required_vanilla = {'SPA', 'MOR', 'STATE_AL_RIF', 'region_north_africa', 'country_bankruptcy',
-                                'law_monarchy', 'law_autocracy', 'law_single_party_state', 'law_census_suffrage',
+            required_vanilla = {'SPA', 'MOR', 'STATE_AL_RIF', 'region_north_africa', 'declared_bankruptcy',
+                                'law_monarchy', 'law_autocracy', 'law_single_party_state', 'law_census_voting',
                                 'law_universal_suffrage', 'law_presidential_republic', 'law_parliamentary_republic',
                                 'building_naval_base', 'building_railway', 'railways',
                                 'institution_schools', 'institution_health_system',

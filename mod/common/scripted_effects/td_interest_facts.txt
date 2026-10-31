@@ -1,4 +1,4 @@
-td_interest_facts_effect = {
+﻿td_interest_facts_effect = {
     set_variable = { name = td_fact_new_market value = 0 }
     set_variable = { name = td_fact_mission_space value = 0 }
     every_interest_group = { set_variable = { name = td_component_opportunity value = 0 } }

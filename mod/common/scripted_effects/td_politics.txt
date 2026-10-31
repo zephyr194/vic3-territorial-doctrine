@@ -1,4 +1,4 @@
-td_initialize_effect = {
+﻿td_initialize_effect = {
     if = { limit = { td_feature_enabled_trigger = yes }
         if = { limit = { NOT = { has_variable = td_generation } } set_variable = { name = td_generation value = 0 } }
         if = { limit = { NOT = { has_variable = td_bill_generation } } set_variable = { name = td_bill_generation value = 0 } }

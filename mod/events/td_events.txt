@@ -1,4 +1,4 @@
-namespace = td
+﻿namespace = td
 
 # Delayed country event. It never schedules another round after terminal cleanup.
 td.1 = {
@@ -140,7 +140,8 @@ td.23 = {
     immediate = { td_refresh_colonial_profile_effect = yes }
     option = { name = td.close hidden_effect = { set_variable = td_status_acknowledged } }
 }
-td.24 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+# Compatibility IDs kept for older callers; deliberately have no live hooks.
+td.24 = { type = country_event orphan = yes event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.24.t desc = td.24.d flavor = td.flavor option = { name = td.close } }
 td.25 = {
     type = country_event
@@ -151,10 +152,11 @@ td.25 = {
         }
     }
 }
-td.26 = { type = country_event event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
+td.26 = { type = country_event orphan = yes event_image = { texture = "gfx/event_pictures/td_territorial_deliberation.dds" }
     title = td.26.t desc = td.26.d flavor = td.flavor option = { name = td.close } }
 td.27 = {
     type = country_event
+    orphan = yes
     hidden = yes
     immediate = { td_snapshot_war_mandate_effect = yes }
 }

@@ -113,7 +113,7 @@ def outputs() -> dict[Path, bytes]:
     policy += '''td_power_category = {
     value = 0
     if = { limit = { OR = { has_law = law_type:law_autocracy has_law = law_type:law_single_party_state } } value = 1 }
-    else_if = { limit = { OR = { has_law = law_type:law_census_suffrage has_law = law_type:law_universal_suffrage } } value = 2 }
+    else_if = { limit = { OR = { has_law = law_type:law_census_voting has_law = law_type:law_universal_suffrage } } value = 2 }
 }
 td_government_category = {
     value = 0
@@ -170,10 +170,10 @@ td_store_power_on_prev_state_effect = {
     modifiers += f'''td_project_cost = {{ country_bureaucracy_add = -1 }}
 td_pledge_fulfilled = {{ interest_group_approval_add = {RULES['negotiation']['fulfilled_approval']} }}
 td_pledge_broken = {{ interest_group_approval_add = {RULES['negotiation']['broken_approval']} }}
-td_requires_admission = {{ state_disallow_incorporation = yes }}
+td_requires_admission = {{ state_disallow_incorporation_bool = yes }}
 '''
     modifiers += 'td_admission_ratified = {} # Legal record; all economic incentives belong to new territory.\n'
-    modifiers += 'td_annual_integration = { state_disallow_incorporation = yes }\n'
+    modifiers += 'td_annual_integration = { state_disallow_incorporation_bool = yes }\n'
     put('common/static_modifiers/td_modifiers.txt', modifiers)
     for language, label in [('english', 'en'), ('simp_chinese', 'zh')]:
         loc = f'l_{language}:\n'
@@ -216,6 +216,11 @@ td_requires_admission = {{ state_disallow_incorporation = yes }}
     allocation_files, _ = allocation_assets()
     for path, content in allocation_files.items():
         put(path, content)
+    # Native scripts are hand-maintained unless generated above, but encoding
+    # is uniform. --check catches an editor saving any script without its BOM.
+    for path in (ROOT / 'mod').rglob('*.txt'):
+        if path not in out:
+            put(str(path.relative_to(ROOT / 'mod')), path.read_text(encoding='utf-8-sig'))
     # Prefix hand-maintained catalogs too, keeping regeneration idempotent.
     for language in RULES['localization']['translated']:
         for path in (ROOT / 'mod/localization' / language).glob('*.yml'):

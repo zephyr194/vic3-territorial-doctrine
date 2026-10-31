@@ -51,7 +51,32 @@ def assets():
     }}
 }}
 '''
-        effects += f'''td_clear_{kind}_pledge_effect = {{
+        # Building levels are a block trigger, not a numeric value link.
+        # Bracket the count with powers of two, then cache it by binary search.
+        # Both loops take O(log levels), below the engine's 1000-loop ceiling
+        # even for a state with thousands of levels. The baseline is only taken
+        # at signing (owned) or first acquisition (foreign), never on refresh.
+        effects += f'''td_snapshot_{kind}_baseline_effect = {{
+    if = {{ limit = {{ exists = var:td_{kind}_target }}
+        set_variable = {{ name = td_{kind}_baseline value = 0 }}
+        set_variable = {{ name = td_{kind}_probe value = 1 }}
+        while = {{
+            limit = {{ var:td_{kind}_target = {{ state_has_building_type_levels = {{ target = bt:building_{building} value >= root.var:td_{kind}_probe }} }} }}
+            change_variable = {{ name = td_{kind}_probe multiply = 2 }}
+        }}
+        while = {{
+            limit = {{ var:td_{kind}_probe > 1 }}
+            change_variable = {{ name = td_{kind}_probe divide = 2 }}
+            set_variable = {{ name = td_{kind}_candidate value = {{ value = var:td_{kind}_baseline add = var:td_{kind}_probe }} }}
+            if = {{ limit = {{ var:td_{kind}_target = {{ state_has_building_type_levels = {{ target = bt:building_{building} value >= root.var:td_{kind}_candidate }} }} }}
+                set_variable = {{ name = td_{kind}_baseline value = var:td_{kind}_candidate }}
+            }}
+        }}
+        remove_variable = td_{kind}_probe
+        remove_variable = td_{kind}_candidate
+    }}
+}}
+td_clear_{kind}_pledge_effect = {{
     if = {{ limit = {{ has_variable = td_bill has_variable = td_bill_pledge_{kind} var:td_{kind}_bill_generation = var:td_bill_generation }}
         remove_variable = td_bill_pledge_{kind}
         change_variable = {{ name = td_bill_allocation_count subtract = 1 }}
@@ -76,7 +101,7 @@ def assets():
             if = {{ limit = {{ var:td_bill_target = {{ owner = root }} }}
                 set_variable = td_{kind}_owned_at_sign
                 set_variable = {{ name = td_{kind}_target value = var:td_bill_target }}
-                set_variable = {{ name = td_{kind}_baseline value = var:td_bill_target.state_has_building_type_levels:bt:building_{building} }}
+                td_snapshot_{kind}_baseline_effect = yes
             }}
             td_calculate_politics_effect = yes
         }}
@@ -106,7 +131,7 @@ def assets():
                         max = 1
                         root = {{
                             set_variable = {{ name = td_{kind}_target value = prev }}
-                            set_variable = {{ name = td_{kind}_baseline value = prev.state_has_building_type_levels:bt:building_{building} }}
+                            td_snapshot_{kind}_baseline_effect = yes
                             set_variable = td_{kind}_started
                             set_variable = {{ name = td_{kind}_deadline years = {n['delivery_years']} }}
                             remove_variable = td_{kind}_acquisition_deadline
@@ -127,7 +152,7 @@ def assets():
                 else_if = {{ limit = {{ exists = var:td_{kind}_target var:td_{kind}_target = {{
                     owner = root
                     is_treaty_port = no
-                    state_has_building_type_levels:bt:building_{building} > root.var:td_{kind}_baseline
+                    state_has_building_type_levels = {{ target = bt:building_{building} value > root.var:td_{kind}_baseline }}
                 }} }}
                     ig:ig_{group} = {{ remove_modifier = td_pledge_fulfilled add_modifier = {{ name = td_pledge_fulfilled years = {n['fulfilled_years']} }} }}
                     td_clear_{kind}_pledge_effect = yes

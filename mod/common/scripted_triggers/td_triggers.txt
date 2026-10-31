@@ -1,11 +1,11 @@
-td_feature_enabled_trigger = { has_global_variable = td_system_enabled }
+﻿td_feature_enabled_trigger = { has_global_variable = td_system_enabled }
 # Country scope unless explicitly labelled state scope.
 td_can_legislate_trigger = {
     td_feature_enabled_trigger = yes
     is_subject = no
     is_revolutionary = no
     NOT = { exists = civil_war }
-    NOT = { has_modifier = country_bankruptcy }
+    NOT = { has_modifier = declared_bankruptcy }
 }
 td_has_doctrine_trigger = {
     OR = {
@@ -202,9 +202,9 @@ td_can_designate_focus_trigger = {
     has_interest_marker_in_region = var:td_target.region
     NOT = { is_target_in_variable_list = { name = td_focus_regions target = var:td_target.region } }
     var:td_focus_count < td_focus_limit
-    if = { limit = { has_law = law_type:law_td_historical_rights } bureaucracy >= 25 }
-    if = { limit = { has_law = law_type:law_td_strategic_frontiers } bureaucracy >= 50 authority >= 25 }
-    if = { limit = { has_law = law_type:law_td_imperial_expansion } bureaucracy >= 75 authority >= 50 }
+    trigger_if = { limit = { has_law = law_type:law_td_historical_rights } bureaucracy >= 25 }
+    trigger_if = { limit = { has_law = law_type:law_td_strategic_frontiers } bureaucracy >= 50 authority >= 25 }
+    trigger_if = { limit = { has_law = law_type:law_td_imperial_expansion } bureaucracy >= 75 authority >= 50 }
 }
 # STATE, ROOT = attacking country, scoped war supplied by event td.27.
 td_war_expansion_target_trigger = {

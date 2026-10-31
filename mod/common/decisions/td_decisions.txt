@@ -1,4 +1,4 @@
-# One acknowledgement per country/save; there is no main-system toggle.
+﻿# One acknowledgement per country/save; there is no main-system toggle.
 td_mod_status = {
     is_shown = { is_player = yes NOT = { has_variable = td_status_acknowledged } }
     when_taken = {

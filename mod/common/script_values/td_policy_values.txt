@@ -2,7 +2,7 @@
 td_power_category = {
     value = 0
     if = { limit = { OR = { has_law = law_type:law_autocracy has_law = law_type:law_single_party_state } } value = 1 }
-    else_if = { limit = { OR = { has_law = law_type:law_census_suffrage has_law = law_type:law_universal_suffrage } } value = 2 }
+    else_if = { limit = { OR = { has_law = law_type:law_census_voting has_law = law_type:law_universal_suffrage } } value = 2 }
 }
 td_government_category = {
     value = 0
